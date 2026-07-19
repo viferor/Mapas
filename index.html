@@ -130,7 +130,6 @@
         }
 
         function setModo(nuevoModo) {
-            // Limpiar eventos previos antes de cambiar
             map.getContainer().removeEventListener('mousedown', iniciarTrazo);
             map.getContainer().removeEventListener('touchstart', iniciarTrazo);
             
@@ -156,7 +155,6 @@
         }
 
         function iniciarTrazo(e) {
-            // ANTI-SENSIBILIDAD: Si tocan más de 1 dedo, abortamos
             if (e.touches && e.touches.length > 1) { abortarTrazadoInmediato(); return; }
             
             if(e.cancelable) e.preventDefault();
@@ -269,10 +267,16 @@
             historialTrazos = []; capasGPX = []; papeleraTrazos = [];
         }
 
+        function extraerCoordenadasActuales() {
+            const datosMapa = historialTrazos.map(linea => linea.getLatLngs().map(ll => [parseFloat(ll.lat.toFixed(5)), parseFloat(ll.lng.toFixed(5))]));
+            capasGPX.forEach(gpx => { gpx.eachLayer(layer => { if (layer.getLatLngs) datosMapa.push(layer.getLatLngs().map(ll => [parseFloat(ll.lat.toFixed(5)), parseFloat(ll.lng.toFixed(5))])); }); });
+            return datosMapa;
+        }
+
         function guardarMapaActual() {
             if (historialTrazos.length === 0) return alert("Mapa vacío.");
             const nombre = prompt("Nombre del mapa:"); if (!nombre) return;
-            const datos = historialTrazos.map(l => l.getLatLngs());
+            const datos = extraerCoordenadasActuales();
             localStorage.setItem('mapa_' + nombre, JSON.stringify(datos));
             alert("Guardado!");
         }
@@ -295,13 +299,77 @@
         function cargarMapa(key) {
             borrarTodo();
             const coords = JSON.parse(localStorage.getItem(key));
-            coords.forEach(c => { const l = L.polyline(c, getEstilos()).addTo(map); vincularEventoGoma(l); historialTrazos.push(l); });
+            dibujarMatrizCoordenadas(coords);
             cerrarModal();
         }
 
+        function dibujarMatrizCoordenadas(matriz) {
+            matriz.forEach(coords => { const l = L.polyline(coords, getEstilos()).addTo(map); vincularEventoGoma(l); historialTrazos.push(l); });
+            if(historialTrazos.length > 0) map.fitBounds(new L.featureGroup(historialTrazos).getBounds());
+        }
+
         function borrarGuardado(key) { localStorage.removeItem(key); abrirModalCargar(); }
+
+        /* LÓGICA DE COMPRESIÓN PARA ENLACES COMPARTIDOS */
+        function comprimirDatos(texto) {
+            const dict = {}; const data = (texto + "").split(""); const out = [];
+            let currChar; let phrase = data[0]; let code = 256;
+            for (let i = 1; i < data.length; i++) {
+                currChar = data[i];
+                if (dict[phrase + currChar] != null) { phrase += currChar; } 
+                else { out.push(phrase.length > 1 ? dict[phrase] : phrase.charCodeAt(0)); dict[phrase + currChar] = code; code++; phrase = currChar; }
+            }
+            out.push(phrase.length > 1 ? dict[phrase] : phrase.charCodeAt(0));
+            for (let i = 0; i < out.length; i++) { out[i] = String.fromCharCode(out[i]); }
+            return btoa(unescape(encodeURIComponent(out.join("")))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+        }
+
+        function descomprimirDatos(base64Safe) {
+            let base64 = base64Safe.replace(/-/g, '+').replace(/_/g, '/'); while (base64.length % 4) base64 += '=';
+            const texto = decodeURIComponent(escape(atob(base64))); const dict = {}; const data = (texto + "").split("");
+            let currChar = data[0]; let oldPhrase = currChar; const out = [currChar]; let code = 256; let phrase;
+            for (let i = 1; i < data.length; i++) {
+                let currCode = data[i].charCodeAt(0);
+                if (currCode < 256) { phrase = data[i]; } else { phrase = dict[currCode] ? dict[currCode] : (oldPhrase + currChar); }
+                out.push(phrase); currChar = phrase.charAt(0); dict[code] = oldPhrase + currChar; code++; oldPhrase = phrase;
+            }
+            return out.join("");
+        }
         
-        function compartirMapa() { alert("Función de compartir lista para exportar JSON"); }
+        function compartirMapa() {
+            if (historialTrazos.length === 0 && capasGPX.length === 0) return alert("Dibuja algo primero antes de compartir.");
+            try {
+                const coordenadas = extraerCoordenadasActuales();
+                const textoCoordenadas = JSON.stringify(coordenadas);
+                const datosComprimidos = comprimirDatos(textoCoordenadas);
+                const urlBase = window.location.protocol + '//' + window.location.host + window.location.pathname;
+                const urlCompleta = urlBase + "?r=" + datosComprimidos;
+                
+                if (navigator.share) { 
+                    navigator.share({ title: 'Mi Ruta', url: urlCompleta }).catch(err => console.log(err)); 
+                } else { 
+                    navigator.clipboard.writeText(urlCompleta).then(() => alert("🔗 ¡Enlace de ruta copiado al portapapeles!")); 
+                }
+            } catch (e) { 
+                alert("Error al generar el enlace de la ruta."); 
+            }
+        }
+
+        function comprobarRutaCompartida() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const datosComprimidos = urlParams.get('r');
+            if (datosComprimidos) {
+                map.whenReady(() => {
+                    try {
+                        const jsonTexto = descomprimirDatos(datosComprimidos);
+                        const datosDecodificados = JSON.parse(jsonTexto);
+                        if (Array.isArray(datosDecodificados)) { setTimeout(() => dibujarMatrizCoordenadas(datosDecodificados), 300); }
+                    } catch (e) { console.error("Error al procesar el mapa compartido:", e); }
+                });
+            }
+        }
+
+        comprobarRutaCompartida();
     </script>
 </body>
 </html>
