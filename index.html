@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Visor de Rutas Pro</title>
+    <!-- Leaflet para el motor de mapas móvil -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Librería para importar archivos GPX -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/1.7.0/gpx.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        html, body, #map { height: 100%; width: 100vw; overflow: hidden; position: relative; }
+        
+        #controls {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            background: rgba(255, 255, 255, 0.98);
+            padding: 14px;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .row { display: flex; justify-content: space-between; align-items: center; gap: 6px; width: 100%; }
+        
+        .btn {
+            flex: 1;
+            padding: 12px 6px;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            white-space: nowrap;
+        }
+        .btn-primary { background: #007AFF; color: white; }
+        .btn-active-draw { background: #FF3B30; color: white; animation: pulse 1.5s infinite; }
+        .btn-active-erase { background: #FF9500; color: white; animation: pulse 1.5s infinite; }
+        .btn-secondary { background: #E5E5EA; color: #000; position: relative; }
+        .btn-success { background: #34C759; color: white; }
+        .btn-share { background: #5856D6; color: white; }
+        .btn-danger { background: #FF453A; color: white; }
+        
+        #file-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+        
+        .slider-container { display: flex; align-items: center; gap: 6px; flex: 1; }
+        .slider-container label { font-size: 11px; font-weight: 600; color: #48484A; min-width: 42px; }
+        .slider { flex: 1; height: 6px; border-radius: 3px; background: #D1D1D6; outline: none; -webkit-appearance: none; }
+        .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #007AFF; }
+        
+        .color-picker-wrapper { display: flex; align-items: center; gap: 4px; }
+        .color-picker-wrapper label { font-size: 11px; font-weight: 600; color: #48484A; }
+        .color-picker { -webkit-appearance: none; border: none; width: 28px; height: 28px; border-radius: 50%; background: none; }
+        .color-picker::-webkit-color-swatch-wrapper { padding: 0; }
+        .color-picker::-webkit-color-swatch { border: 2px solid #fff; box-shadow: 0 0 4px rgba(0,0,0,0.3); border-radius: 50%; }
+
+        #modal-load {
+            display: none;
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            width: 85%; max-width: 320px;
+            max-height: 60vh;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 25px rgba(0,0,0,0.3);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+        #modal-load h3 { margin-bottom: 12px; font-size: 16px; text-align: center; }
+        .map-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px; border-bottom: 1px solid #E5E5EA; font-size: 14px;
+        }
+        .map-item-name { flex: 1; cursor: pointer; font-weight: 500; color: #007AFF; }
+        .map-item-delete { color: #FF453A; font-weight: bold; cursor: pointer; padding-left: 10px; }
+        .close-modal {
+            display: block; width: 100%; text-align: center; margin-top: 15px;
+            color: #8E8E93; font-size: 13px; font-weight: bold; cursor: pointer;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.97); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="map"></div>
+
+    <div id="modal-load">
+        <h3>📂 Mis Mapas Guardados</h3>
+        <div id="lista-mapas"></div>
+        <span class="close-modal" onclick="cerrarModal()">Cerrar</span>
+    </div>
+
+    <div id="controls">
+        <div class="row">
+            <button id="btn-draw" class="btn btn-primary" onclick="setModo('dibujar')">📍 Dibujar</button>
+            <button id="btn-erase" class="btn btn-secondary" onclick="setModo('borrar')">🧽 Goma</button>
+            <button class="btn btn-secondary" onclick="deshacerUltimo()">↩️ Deshacer</button>
+            <button class="btn btn-danger" onclick="borrarTodo()">🗑️ Todo</button>
+        </div>
+
+        <div class="row">
+            <button class="btn btn-secondary">
+                📂 Importar GPX
+                <input type="file" id="file-input" accept=".gpx" onchange="importarGPX(event)">
+            </button>
+            <button class="btn btn-success" onclick="guardarMapaActual()">💾 Guardar</button>
+            <button class="btn btn-secondary" onclick="abrirModalCargar()">📂 Cargar</button>
+            <button class="btn btn-share" onclick="compartirMapa()">🔗 Compartir</button>
+        </div>
+        
+        <div class="row">
+            <div class="color-picker-wrapper">
+                <label>Color:</label>
+                <input type="color" id="color" class="color-picker" value="#FF3B30" oninput="actualizarEstiloRuta()">
+            </div>
+            <div class="slider-container">
+                <label>Grosor:</label>
+                <input type="range" id="grosor" class="slider" min="2" max="15" value="6" oninput="actualizarEstiloRuta()">
+            </div>
+            <div class="slider-container">
+                <label>Opacidad:</label>
+                <input type="range" id="opacidad" class="slider" min="10" max="100" value="85" oninput="actualizarEstiloRuta()">
+            </div>
+        </div>
+    </div>
+    <script>
+        const map = L.map('map', { zoomControl: false, tap: false }).setView([40.4167, -3.7037], 14);
+
+        const mapaCallejero = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            maxZoom: 20, attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        const mapaSateliteHibrido = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+            maxZoom: 20, attribution: '© Google Maps'
+        });
+
+        const mapasBase = { "🚶‍♂️ Callejero Andar": mapaCallejero, "🛰️ Satélite Híbrido": mapaSateliteHibrido };
+        L.control.layers(mapasBase, null, { position: 'topright' }).addTo(map);
+        L.control.zoom({ position: 'topleft' }).addTo(map);
+
+        let modoActual = 'navegar', puntosRutaActual = [], lineaActual = null, historialTrazos = [], capasGPX = [];
+
+        function getEstilos() {
+            return {
+                color: document.getElementById('color').value,
+                weight: parseInt(document.getElementById('grosor').value),
+                opacity: parseFloat(document.getElementById('opacidad').value) / 100,
+                lineJoin: 'round', lineCap: 'round'
+            };
+        }
+
+        function setModo(nuevoModo) {
+            const mapDiv = document.getElementById('map');
+            mapDiv.removeEventListener('mousedown', iniciarTrazo);
+            mapDiv.removeEventListener('touchstart', iniciarTrazo);
+            
+            modoActual = (modoActual === nuevoModo) ? 'navegar' : nuevoModo;
+
+            document.getElementById('btn-draw').className = "btn btn-primary";
+            document.getElementById('btn-draw').innerText = "📍 Dibujar";
+            document.getElementById('btn-erase').className = "btn btn-secondary";
+            document.getElementById('btn-erase').innerText = "🧽 Goma";
+
+            if (modoActual === 'navegar') {
+                map.dragging.enable(); map.touchZoom.enable(); map.doubleClickZoom.enable();
+            } else {
+                if (modoActual === 'dibujar') {
+                    document.getElementById('btn-draw').className = "btn btn-active-draw";
+                    document.getElementById('btn-draw').innerText = "🛑 Parar";
+                } else if (modoActual === 'borrar') {
+                    document.getElementById('btn-erase').className = "btn btn-active-erase";
+                    document.getElementById('btn-erase').innerText = "🛑 Parar";
+                }
+                map.dragging.disable(); map.touchZoom.disable(); map.doubleClickZoom.disable();
+                mapDiv.addEventListener('mousedown', iniciarTrazo, {passive: false});
+                mapDiv.addEventListener('touchstart', iniciarTrazo, {passive: false});
+            }
+        }
+
+        function iniciarTrazo(e) {
+            if(e.cancelable) e.preventDefault();
+            const eReal = e.touches ? e.touches[0] : e;
+            const latlng = map.mouseEventToLatLng(eReal);
+
+            if (modoActual === 'dibujar') {
+                puntosRutaActual = [latlng];
+                lineaActual = L.polyline(puntosRutaActual, getEstilos()).addTo(map);
+                vincularEventoGoma(lineaActual);
+                window.addEventListener('mousemove', dibujarTrazo, {passive: false});
+                window.addEventListener('touchmove', dibujarTrazo, {passive: false});
+                window.addEventListener('mouseup', terminarTrazo);
+                window.addEventListener('touchend', terminarTrazo);
+            } else if (modoActual === 'borrar') {
+                ejecutarBorradoInmediato(eReal);
+                window.addEventListener('mousemove', arrastrarBorrado, {passive: false});
+                window.addEventListener('touchmove', arrastrarBorrado, {passive: false});
+                window.addEventListener('mouseup', terminarBorrado);
+                window.addEventListener('touchend', terminarBorrado);
+            }
+        }
+
+        function dibujarTrazo(e) {
+            if(e.cancelable) e.preventDefault();
+            const eReal = e.touches ? e.touches[0] : e;
+            const latlng = map.mouseEventToLatLng(eReal);
+            if (latlng && lineaActual) { puntosRutaActual.push(latlng); lineaActual.setLatLngs(puntosRutaActual); }
+        }
+
+        function terminarTrazo() {
+            window.removeEventListener('mousemove', dibujarTrazo); window.removeEventListener('touchmove', dibujarTrazo);
+            window.removeEventListener('mouseup', terminarTrazo); window.removeEventListener('touchend', terminarTrazo);
+            if (lineaActual) { historialTrazos.push(lineaActual); lineaActual = null; puntosRutaActual = []; }
+        }
+
+        function vincularEventoGoma(linea) {
+            linea.on('click touchstart', function() {
+                if (modoActual === 'borrar') { map.removeLayer(linea); historialTrazos = historialTrazos.filter(h => h !== linea); }
+            });
+        }
+
+        function ejecutarBorradoInmediato(eReal) {
+            const el = document.elementFromPoint(eReal.clientX, eReal.clientY);
+            if(el && el.tagName === 'path') {
+                historialTrazos.forEach(linea => {
+                    if(linea._path === el) { map.removeLayer(linea); historialTrazos = historialTrazos.filter(h => h !== linea); }
+                });
+            }
+        }
+
+        function arrastrarBorrado(e) { if(e.cancelable) e.preventDefault(); ejecutarBorradoInmediato(e.touches ? e.touches[0] : e); }
+        function terminarBorrado() { window.removeEventListener('mousemove', arrastrarBorrado); window.removeEventListener('touchmove', arrastrarBorrado); }
+
+        function actualizarEstiloRuta() {
+            const estilos = getEstilos();
+            historialTrazos.forEach(linea => linea.setStyle(estilos));
+            capasGPX.forEach(gpx => gpx.setStyle(estilos));
+        }
+
+        function importarGPX(event) {
+            const file = event.target.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const nuevaCapaGPX = new L.GPX(e.target.result, { async: true, polyline_options: getEstilos() }).on('loaded', function(e) {
+                    map.fitBounds(e.target.getBounds());
+                    e.target.eachLayer(layer => { if(layer.setStyle) vincularEventoGoma(layer); });
+                }).addTo(map);
+                capasGPX.push(nuevaCapaGPX);
+            };
+            reader.readAsText(file);
+        }
+
+        function extraerCoordenadasActuales() {
+            const datosMapa = historialTrazos.map(linea => linea.getLatLngs().map(ll => [parseFloat(ll.lat.toFixed(5)), parseFloat(ll.lng.toFixed(5))]));
+            capasGPX.forEach(gpx => { gpx.eachLayer(layer => { if (layer.getLatLngs) datosMapa.push(layer.getLatLngs().map(ll => [parseFloat(ll.lat.toFixed(5)), parseFloat(ll.lng.toFixed(5))])); }); });
+            return datosMapa;
+        }
+
+        function guardarMapaActual() {
+            if (historialTrazos.length === 0 && capasGPX.length === 0) return alert("Mapa vacío.");
+            const nombre = prompt("Nombre del mapa:"); if (!nombre || !nombre.trim()) return;
+            let mapas = JSON.parse(localStorage.getItem('mis_mapas_rutas')) || {};
+            mapas[nombre] = extraerCoordenadasActuales();
+            localStorage.setItem('mis_mapas_rutas', JSON.stringify(mapas));
+            alert("¡Guardado!");
+        }
+
+        function abrirModalCargar() {
+            const mapas = JSON.parse(localStorage.getItem('mis_mapas_rutas')) || {};
+            const lista = document.getElementById('lista-mapas'); lista.innerHTML = "";
+            const nombres = Object.keys(mapas);
+            if (nombres.length === 0) lista.innerHTML = "<p style='font-size:13px;color:#8e8e93;text-align:center;'>Sin mapas.</p>";
+            else {
+                nombres.forEach(n => {
+                    const div = document.createElement('div'); div.className = 'map-item';
+                    div.innerHTML = `<span class="map-item-name" onclick="cargarMapaEspecifico('${n}')">${n}</span><span class="map-item-delete" onclick="eliminarMapaDeMemoria('${n}')">❌</span>`;
+                    lista.appendChild(div);
+                });
+            }
+            document.getElementById('modal-load').style.display = 'block';
+        }
+
+        function cargarMapaEspecifico(nombre) {
+            borrarTodo();
+            const mapas = JSON.parse(localStorage.getItem('mis_mapas_rutas')) || {};
+            if (mapas[nombre]) dibujarMatrizCoordenadas(mapas[nombre]);
+            cerrarModal();
+        }
+
+        function dibujarMatrizCoordenadas(matriz) {
+            matriz.forEach(coords => { const l = L.polyline(coords, getEstilos()).addTo(map); vincularEventoGoma(l); historialTrazos.push(l); });
+            if(historialTrazos.length > 0) map.fitBounds(new L.featureGroup(historialTrazos).getBounds());
+        }
+
+        function eliminarMapaDeMemoria(nombre) {
+            if (confirm("¿Borrar permanentemente?")) {
+                let mapas = JSON.parse(localStorage.getItem('mis_mapas_rutas')) || {}; delete mapas[nombre];
+                localStorage.setItem('mis_mapas_rutas', JSON.stringify(mapas)); abrirModalCargar();
+            }
+        }
+
+        function cerrarModal() { document.getElementById('modal-load').style.display = 'none'; }
+
+        // --- COMPRESIÓN COMPATIBLE CON NAVEGADORES INTERNOS DE ANDROID ---
+        function comprimirDatos(texto) {
+            const dict = {};
+            const data = (texto + "").split("");
+            const out = [];
+            let currChar;
+            let phrase = data[0];
+            let code = 256;
+            for (let i = 1; i < data.length; i++) {
+                currChar = data[i];
+                if (dict[phrase + currChar] != null) {
+                    phrase += currChar;
+                } else {
+                    out.push(phrase.length > 1 ? dict[phrase] : phrase.charCodeAt(0));
+                    dict[phrase + currChar] = code;
+                    code++;
+                    phrase = currChar;
+                }
+            }
+            out.push(phrase.length > 1 ? dict[phrase] : phrase.charCodeAt(0));
+            for (let i = 0; i < out.length; i++) {
+                out[i] = String.fromCharCode(out[i]);
+            }
+            return btoa(unescape(encodeURIComponent(out.join("")))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+        }
+
+        function descomprimirDatos(base64Safe) {
+            let base64 = base64Safe.replace(/-/g, '+').replace(/_/g, '/');
+            while (base64.length % 4) base64 += '=';
+            const texto = decodeURIComponent(escape(atob(base64)));
+            const dict = {};
+            const data = (texto + "").split("");
+            let currChar = data[0];
+            let oldPhrase = currChar;
+            const out = [currChar];
+            let code = 256;
+            let phrase;
+            for (let i = 1; i < data.length; i++) {
+                let currCode = data[i].charCodeAt(0);
+                if (currCode < 256) {
+                    phrase = data[i];
+                } else {
+                    phrase = dict[currCode] ? dict[currCode] : (oldPhrase + currChar);
+                }
+                out.push(phrase);
+                currChar = phrase.charAt(0);
+                dict[code] = oldPhrase + currChar;
+                code++;
+                oldPhrase = phrase;
+            }
+            return out.join("");
+        }
+
+        function compartirMapa() {
+            if (historialTrazos.length === 0 && capasGPX.length === 0) return alert("Dibuja algo primero.");
+            try {
+                const coordenadas = extraerCoordenadasActuales();
+                const textoCoordenadas = JSON.stringify(coordenadas);
+                const datosComprimidos = comprimirDatos(textoCoordenadas);
+                
+                const urlBase = window.location.protocol + '//' + window.location.host + window.location.pathname;
+                const urlCompleta = urlBase + "?r=" + datosComprimidos;
+
+                if (navigator.share) {
+                    navigator.share({ title: 'Mi Ruta', text: 'Te comparto esta ruta en el mapa:', url: urlCompleta })
+                             .catch(err => console.log(err));
+                } else {
+                    navigator.clipboard.writeText(urlCompleta).then(() => alert("🔗 ¡Enlace optimizado copiado! Listo para enviar."));
+                }
+            } catch (e) { alert("Error al generar el enlace."); }
+        }
+
+        // CONTROL DE CARGA FORZADO PARA ANDROID MOBILE
+        function comprobarRutaCompartida() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const datosComprimidos = urlParams.get('r');
+            
+            if (datosComprimidos) {
+                // Forzamos a que el motor espere a que Android inicialice por completo el mapa
+                map.whenReady(() => {
+                    try {
+                        const jsonTexto = descomprimirDatos(datosComprimidos);
+                        const datosDecodificados = JSON.parse(jsonTexto);
+                        if (Array.isArray(datosDecodificados)) {
+                            // Micro-delay de renderizado gráfico final
+                            setTimeout(() => dibujarMatrizCoordenadas(datosDecodificados), 300);
+                        }
+                    } catch (e) { console.error("Error al procesar el mapa compartido:", e); }
+                });
+            }
+        }
+
+        function deshacerUltimo() { if (historialTrazos.length > 0) map.removeLayer(historialTrazos.pop()); else if (capasGPX.length > 0) map.removeLayer(capasGPX.pop()); }
+        function borrarTodo() {
+            historialTrazos.forEach(l => map.removeLayer(l)); capasGPX.forEach(g => map.removeLayer(g));
+            historialTrazos = []; capasGPX = []; puntosRutaActual = []; if (lineaActual) { map.removeLayer(lineaActual); lineaActual = null; }
+            document.getElementById('file-input').value = "";
+        }
+
+        comprobarRutaCompartida();
+    </script>
+</body>
+</html>
