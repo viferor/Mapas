@@ -91,7 +91,7 @@ function obtenerEstilosActuales() {
     };
 }
 
-// --- GESTIÓN DE CLICS Y ENRUTAMIENTO PEATONAL SECUENCIAL (Del 1 al 2, del 2 al 3...) ---
+// --- GESTIÓN DE CLICS Y ENRUTAMIENTO SECUENCIAL LIBRE ---
 async function gestionarPulsacion(e) {
     if (modoActual !== 'numero') return;
 
@@ -136,10 +136,10 @@ async function gestionarPulsacion(e) {
 
     let lineaAsociada = null;
 
-    // 2. Si hay más de un punto, calculamos automáticamente la ruta peatonal desde el punto anterior hasta este actual
+    // 2. Si hay más de un punto, calculamos automáticamente la ruta libre desde el punto anterior hasta este actual
     if (puntosRuta.length > 1) {
         const puntoAnterior = puntosRuta[puntosRuta.length - 2];
-        const latlngsRuta = await obtenerRutaPeatonalOSRM(puntoAnterior, latlng);
+        const latlngsRuta = await obtenerRutaLibreOSRM(puntoAnterior, latlng);
 
         if (latlngsRuta && latlngsRuta.length > 0) {
             lineaAsociada = L.polyline(latlngsRuta, {
@@ -159,10 +159,10 @@ async function gestionarPulsacion(e) {
     contadorNumero++;
 }
 
-// --- PETICIÓN AL MOTOR OSRM EN MODO PEATONAL FLEXIBLE ---
-async function obtenerRutaPeatonalOSRM(origen, destino) {
-    // Parámetro 'foot' combinado con 'continue_straight=true' para mayor flexibilidad de trazado
-    const url = `https://router.project-osrm.org/route/v1/foot/${origen.lng},${origen.lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson&continue_straight=true`;
+// --- PETICIÓN AL MOTOR OSRM CON PERFIL LIBRE (BIKE / FLEXIBLE) ---
+async function obtenerRutaLibreOSRM(origen, destino) {
+    // Usamos el perfil 'bike' con restricciones mínimas para permitir doble sentido en prácticamente cualquier vía urbana
+    const url = `https://router.project-osrm.org/route/v1/bike/${origen.lng},${origen.lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson&continue_straight=true`;
 
     try {
         const response = await fetch(url);
@@ -174,10 +174,10 @@ async function obtenerRutaPeatonalOSRM(origen, destino) {
             return coordenadasGeoJSON.map(coord => [coord[1], coord[0]]);
         }
     } catch (e) {
-        console.error("Error al calcular la ruta peatonal:", e);
+        console.error("Error al calcular la ruta libre:", e);
     }
 
-    // Plan B de respaldo: Si el servidor falla o no hay conexión, une los puntos en línea recta directamente
+    // Plan B de respaldo absoluto: Si falla la red, une los puntos en línea recta directamente
     return [origen, destino];
 }
 
