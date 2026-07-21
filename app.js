@@ -13,10 +13,10 @@ let contadorNumero = 1;
 let historialAcciones = [];
 let historialRehacer = [];
 
-// Almacén de coordenadas de los puntos numerados para calcular las rutas encadenadas
+// Almacén de coordenadas de los puntos numerados
 let puntosRuta = []; 
 
-// Inicialización del mapa
+// Inicialización del mapa y eventos de la interfaz
 document.addEventListener("DOMContentLoaded", function () {
     map = L.map('map', {
         zoomControl: true,
@@ -55,6 +55,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // Evento de clic/toque en el mapa para colocar los números y enrutar
     map.on('click', gestionarPulsacion);
 
+    // Conectar eventos de los elementos de la interfaz (botones y selectores)
+    inicializarInterfaz();
+
     // Establecer modo por defecto al cargar visualmente
     setModo('numero');
 
@@ -65,6 +68,23 @@ document.addEventListener("DOMContentLoaded", function () {
         cargarMapaDesdeGithub(mapaCompartido);
     }
 });
+
+// Enlazar los botones y controles del HTML de forma segura
+function inicializarInterfaz() {
+    const btnNumber = document.getElementById('btn-number');
+    const btnErase = document.getElementById('btn-erase');
+    const colorPicker = document.getElementById('color');
+    const grosorInput = document.getElementById('grosor');
+    const opacidadInput = document.getElementById('opacidad');
+
+    if (btnNumber) btnNumber.addEventListener('click', () => setModo('numero'));
+    if (btnErase) btnErase.addEventListener('click', () => setModo('borrar'));
+
+    // Si cambian los estilos de línea/color en caliente, actualizamos la última línea activa
+    if (colorPicker) colorPicker.addEventListener('input', actualizarEstiloRuta);
+    if (grosorInput) grosorInput.addEventListener('input', actualizarEstiloRuta);
+    if (opacidadInput) opacidadInput.addEventListener('input', actualizarEstiloRuta);
+}
 
 // Selección de modo
 function setModo(modo) {
@@ -79,26 +99,32 @@ function setModo(modo) {
     const btnDraw = document.getElementById('btn-draw');
     if (btnDraw) btnDraw.className = 'btn btn-secondary';
     
-    document.getElementById('btn-number').className = modo === 'numero' ? 'btn btn-primary' : 'btn btn-secondary';
-    document.getElementById('btn-erase').className = modo === 'borrar' ? 'btn btn-danger' : 'btn btn-secondary';
+    const btnNumEl = document.getElementById('btn-number');
+    const btnErrEl = document.getElementById('btn-erase');
+    
+    if (btnNumEl) btnNumEl.className = modo === 'numero' ? 'btn btn-primary' : 'btn btn-secondary';
+    if (btnErrEl) btnErrEl.className = modo === 'borrar' ? 'btn btn-danger' : 'btn btn-secondary';
 }
 
 function obtenerEstilosActuales() {
+    const colorEl = document.getElementById('color');
+    const grosorEl = document.getElementById('grosor');
+    const opacidadEl = document.getElementById('opacidad');
+
     return {
-        color: document.getElementById('color').value,
-        weight: parseInt(document.getElementById('grosor').value),
-        opacity: parseFloat(document.getElementById('opacidad').value) / 100
+        color: colorEl ? colorEl.value : '#007bff',
+        weight: grosorEl ? parseInt(grosorEl.value) : 4,
+        opacity: opacidadEl ? parseFloat(opacidadEl.value) / 100 : 1.0
     };
 }
 
-// --- GESTIÓN DE CLICS Y ENRUTAMIENTO SECUENCIAL LIBRE ---
-async function gestionarPulsacion(e) {
+// --- GESTIÓN DE CLICS Y ENRUTAMIENTO PEATONAL LIBRE Y SECUENCIAL ---
+function gestionarPulsacion(e) {
     if (modoActual !== 'numero') return;
 
     const latlng = e.latlng;
     puntosRuta.push(latlng);
 
-    const color = document.getElementById('color').value;
     const estilos = obtenerEstilosActuales();
     const numeroActual = contadorNumero;
 
@@ -115,7 +141,7 @@ async function gestionarPulsacion(e) {
     setTimeout(() => {
         const el = marker.getElement();
         if (el) {
-            el.style.backgroundColor = color;
+            el.style.backgroundColor = estilos.color;
         }
     }, 10);
 
@@ -136,49 +162,25 @@ async function gestionarPulsacion(e) {
 
     let lineaAsociada = null;
 
-    // 2. Si hay más de un punto, calculamos automáticamente la ruta libre desde el punto anterior hasta este actual
+    // 2. Si hay más de un punto, unimos secuencialmente del punto anterior al actual con total libertad peatonal
     if (puntosRuta.length > 1) {
         const puntoAnterior = puntosRuta[puntosRuta.length - 2];
-        const latlngsRuta = await obtenerRutaLibreOSRM(puntoAnterior, latlng);
+        const coordenadasTramo = [puntoAnterior, latlng];
 
-        if (latlngsRuta && latlngsRuta.length > 0) {
-            lineaAsociada = L.polyline(latlngsRuta, {
-                color: estilos.color,
-                weight: estilos.weight,
-                opacity: estilos.opacity,
-                smoothFactor: 1
-            }).addTo(map);
+        lineaAsociada = L.polyline(coordenadasTramo, {
+            color: estilos.color,
+            weight: estilos.weight,
+            opacity: estilos.opacity,
+            smoothFactor: 1
+        }).addTo(map);
 
-            marker.lineaAsociada = lineaAsociada;
-            historialAcciones.push({ tipo: 'linea', elemento: lineaAsociada });
-        }
+        marker.lineaAsociada = lineaAsociada;
+        historialAcciones.push({ tipo: 'linea', elemento: lineaAsociada });
     }
 
-    historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: numeroActual, color: color });
+    historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: numeroActual, color: estilos.color });
     historialRehacer = [];
     contadorNumero++;
-}
-
-// --- PETICIÓN AL MOTOR OSRM CON PERFIL LIBRE (BIKE / FLEXIBLE) ---
-async function obtenerRutaLibreOSRM(origen, destino) {
-    // Usamos el perfil 'bike' con restricciones mínimas para permitir doble sentido en prácticamente cualquier vía urbana
-    const url = `https://router.project-osrm.org/route/v1/bike/${origen.lng},${origen.lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson&continue_straight=true`;
-
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-
-        if (data.code === 'Ok' && data.routes && data.routes.length > 0) {
-            const coordenadasGeoJSON = data.routes[0].geometry.coordinates;
-            // OSRM devuelve [lng, lat], Leaflet necesita [lat, lng]
-            return coordenadasGeoJSON.map(coord => [coord[1], coord[0]]);
-        }
-    } catch (e) {
-        console.error("Error al calcular la ruta libre:", e);
-    }
-
-    // Plan B de respaldo absoluto: Si falla la red, une los puntos en línea recta directamente
-    return [origen, destino];
 }
 
 // Deshacer y Rehacer
@@ -223,7 +225,20 @@ function borrarTodo() {
     contadorNumero = 1;
 }
 
-function actualizarEstiloRuta() {}
+// Actualizar estilo visual de la línea actual si se cambian los selectores
+function actualizarEstiloRuta() {
+    const estilos = obtenerEstilosActuales();
+    if (historialAcciones.length > 0) {
+        const ultimaLinea = historialAcciones.slice().reverse().find(item => item.tipo === 'linea');
+        if (ultimaLinea && ultimaLinea.elemento) {
+            ultimaLinea.elemento.setStyle({
+                color: estilos.color,
+                weight: estilos.weight,
+                opacity: estilos.opacity
+            });
+        }
+    }
+}
 
 // --- GESTIÓN CON GITHUB ---
 
@@ -351,6 +366,8 @@ async function guardarEnGithub() {
 async function abrirModalCargarGithub() {
     const modal = document.getElementById('modal-load');
     const listaContainer = document.getElementById('lista-mapas');
+    if (!modal) return;
+    
     modal.style.display = 'block';
     listaContainer.innerHTML = 'Cargando mapas...';
 
@@ -384,7 +401,8 @@ async function abrirModalCargarGithub() {
 }
 
 function cerrarModal() {
-    document.getElementById('modal-load').style.display = 'none';
+    const modal = document.getElementById('modal-load');
+    if (modal) modal.style.display = 'none';
 }
 
 async function cargarMapaDesdeGithub(nombreArchivo) {
@@ -487,7 +505,7 @@ async function compartirMapaGithub() {
         const shareUrl = `${baseUrl}?mapa=${fileName}`;
 
         navigator.clipboard.writeText(shareUrl).then(() => {
-            alert(`¡En enlace copiado al portapapeles!\n\n${shareUrl}`);
+            alert(`¡Enlace copiado al portapapeles!\n\n${shareUrl}`);
         }).catch(() => {
             prompt("Copia este enlace para compartir:", shareUrl);
         });
