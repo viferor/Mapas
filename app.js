@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
     map.on('mouseup touchend', finalizarTrazo);
     map.on('click', gestionarPulsacion);
 
-    // Establecer modo por defecto al cargar
+    // Establecer modo por defecto al cargar visualmente
     setModo('dibujar');
 
     // Cargar mapa desde URL si viene con parámetro ?mapa=nombre.json
@@ -63,11 +63,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-// Selección de modo (CORREGIDO: Desactiva arrastre también en modo 'numero')
+// Selección de modo
 function setModo(modo) {
     modoActual = modo;
     
-    if (modo === 'dibujar' || modo === 'numero') {
+    if (modo === 'dibujar') {
         map.dragging.disable();
     } else {
         map.dragging.enable();
@@ -89,6 +89,11 @@ function obtenerEstilosActuales() {
 // Dibujo a mano alzada
 function iniciarTrazo(e) {
     if (modoActual !== 'dibujar') return;
+    
+    if (e.originalEvent && typeof e.originalEvent.preventDefault === 'function') {
+        e.originalEvent.preventDefault();
+    }
+    
     dibujando = true;
 
     const latlng = e.latlng || map.mouseEventToLatLng(e.originalEvent.touches ? e.originalEvent.touches[0] : e.originalEvent);
@@ -104,6 +109,10 @@ function iniciarTrazo(e) {
 
 function moverTrazo(e) {
     if (!dibujando || modoActual !== 'dibujar') return;
+    
+    if (e.originalEvent && typeof e.originalEvent.preventDefault === 'function') {
+        e.originalEvent.preventDefault();
+    }
 
     const latlng = e.latlng || map.mouseEventToLatLng(e.originalEvent.touches ? e.originalEvent.touches[0] : e.originalEvent);
     if (latlng) {
@@ -122,7 +131,7 @@ function finalizarTrazo() {
     }
 }
 
-// Numeración paso a paso (CORREGIDO)
+// Numeración paso a paso
 function gestionarPulsacion(e) {
     if (modoActual === 'numero') {
         const color = document.getElementById('color').value;
@@ -143,7 +152,6 @@ function gestionarPulsacion(e) {
             }
         }, 10);
 
-        // Borrado directo si se pulsa sobre el número en modo borrar
         marker.on('click', function() {
             if (modoActual === 'borrar') {
                 map.removeLayer(marker);
@@ -249,20 +257,37 @@ function exportarDatosMapa() {
     };
 }
 
+// Guardar permitiendo elegir un mapa existente de la lista o crear uno nuevo
 async function guardarEnGithub() {
     const token = obtenerToken();
     if (!token) return alert("Se requiere un Token de GitHub para guardar.");
 
-    const nombreArchivo = prompt("Nombre para guardar el mapa (ej. ruta-sierra):");
-    if (!nombreArchivo) return;
-
-    const path = `${GITHUB_FOLDER}/${nombreArchivo.trim().toLowerCase().replace(/\s+/g, '-')}.json`;
-    const contenido = JSON.stringify(exportarDatosMapa(), null, 2);
-    const contenidoBase64 = btoa(unescape(encodeURIComponent(contenido)));
-
-    const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`;
-
+    const urlDir = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FOLDER}`;
+    
     try {
+        let archivosDisponibles = [];
+        const resList = await fetch(urlDir);
+        if (resList.ok) {
+            const dataFiles = await resList.json();
+            archivosDisponibles = dataFiles.filter(f => f.name.endsWith('.json')).map(f => f.name.replace('.json', ''));
+        }
+
+        let mensajePrompt = "Elige un nombre de mapa existente para sobrescribir o escribe uno nuevo:\n\n";
+        if (archivosDisponibles.length > 0) {
+            mensajePrompt += "Mapas guardados actualmente:\n- " + archivosDisponibles.join("\n- ") + "\n\n";
+        } else {
+            mensajePrompt += "(No hay mapas previos, introduce uno nuevo)\n\n";
+        }
+
+        const nombreArchivo = prompt(mensajePrompt);
+        if (!nombreArchivo) return;
+
+        const path = `${GITHUB_FOLDER}/${nombreArchivo.trim().toLowerCase().replace(/\s+/g, '-')}.json`;
+        const contenido = JSON.stringify(exportarDatosMapa(), null, 2);
+        const contenidoBase64 = btoa(unescape(encodeURIComponent(contenido)));
+
+        const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`;
+
         let sha = null;
         const resExist = await fetch(url, {
             headers: { 'Authorization': `token ${token}` }
@@ -408,19 +433,40 @@ async function cargarMapaDesdeGithub(nombreArchivo) {
     }
 }
 
-function compartirMapaGithub() {
-    const nombreMapa = prompt("Nombre del mapa guardado a compartir (ej. ruta-sierra):");
-    if (!nombreMapa) return;
+// Compartir mostrando listado previo de mapas existentes
+async function compartirMapaGithub() {
+    const urlDir = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FOLDER}`;
 
-    const fileName = nombreMapa.trim().toLowerCase().replace(/\s+/g, '-') + '.json';
-    const baseUrl = window.location.href.split('?')[0];
-    const shareUrl = `${baseUrl}?mapa=${fileName}`;
+    try {
+        let archivosDisponibles = [];
+        const resList = await fetch(urlDir);
+        if (resList.ok) {
+            const dataFiles = await resList.json();
+            archivosDisponibles = dataFiles.filter(f => f.name.endsWith('.json')).map(f => f.name.replace('.json', ''));
+        }
 
-    navigator.clipboard.writeText(shareUrl).then(() => {
-        alert(`¡Enlace copiado al portapapeles!\n\n${shareUrl}`);
-    }).catch(() => {
-        prompt("Copia este enlace para compartir:", shareUrl);
-    });
+        let mensajePrompt = "Introduce el nombre del mapa guardado que quieres compartir:\n\n";
+        if (archivosDisponibles.length > 0) {
+            mensajePrompt += "Mapas disponibles:\n- " + archivosDisponibles.join("\n- ") + "\n\n";
+        } else {
+            mensajePrompt += "(No hay mapas guardados todavía)\n\n";
+        }
+
+        const nombreMapa = prompt(mensajePrompt);
+        if (!nombreMapa) return;
+
+        const fileName = nombreMapa.trim().toLowerCase().replace(/\s+/g, '-') + '.json';
+        const baseUrl = window.location.href.split('?')[0];
+        const shareUrl = `${baseUrl}?mapa=${fileName}`;
+
+        navigator.clipboard.writeText(shareUrl).then(() => {
+            alert(`¡Enlace copiado al portapapeles!\n\n${shareUrl}`);
+        }).catch(() => {
+            prompt("Copia este enlace para compartir:", shareUrl);
+        });
+    } catch (e) {
+        alert(`Error al obtener los mapas: ${e.message}`);
+    }
 }
 
 function importarGPX(event) {
