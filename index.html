@@ -1,14 +1,3 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gestor de Mapas y Rutas</title>
-    
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
-    <!-- Estilos personalizados -->
     <style>
         body, html {
             margin: 0;
@@ -16,6 +5,9 @@
             height: 100%;
             width: 100%;
             font-family: Arial, sans-serif;
+            /* Inhabilita el "arrastrar para refrescar" en móviles */
+            overscroll-behavior: none;
+            touch-action: none;
         }
         #map {
             height: 100%;
@@ -23,6 +15,8 @@
             position: absolute;
             top: 0;
             bottom: 0;
+            /* Evita gestos nativos del navegador dentro del área del mapa */
+            touch-action: none;
         }
         /* Controles flotantes superiores */
         #controls {
@@ -38,6 +32,8 @@
             gap: 8px;
             flex-wrap: wrap;
             align-items: center;
+            /* Permite hacer scroll o tocar dentro del menú si es necesario */
+            touch-action: auto;
         }
         .btn {
             padding: 6px 12px;
@@ -54,7 +50,7 @@
         .btn-active-draw { background: #ffc107; color: black; }
         .btn-active-erase { background: #343a40; color: white; }
 
-        /* Estilos de la ventana modal para Cargar/Guardar/Compartir */
+        /* Estilos de la ventana modal */
         .modal {
             display: none;
             position: fixed;
@@ -64,6 +60,7 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0,0,0,0.5);
+            touch-action: auto;
         }
         .modal-content {
             background-color: #fefefe;
@@ -94,60 +91,3 @@
         }
         .map-item:hover { background: #e2e2e2; }
     </style>
-</head>
-<body>
-
-    <!-- Contenedor del Mapa -->
-    <div id="map"></div>
-
-    <!-- Barra de Controles y Herramientas -->
-    <div id="controls">
-        <button id="btn-draw" class="btn btn-primary" onclick="setModo('dibujar')">✏️ Dibujar</button>
-        <button id="btn-erase" class="btn btn-secondary" onclick="setModo('borrar')">🧹 Borrar</button>
-        <button class="btn btn-secondary" onclick="deshacerUltimo()">↩️ Deshacer</button>
-        <button class="btn btn-secondary" onclick="rehacerProximo()">↪️ Rehacer</button>
-        <button class="btn btn-danger" onclick="borrarTodo()">🗑️ Limpiar</button>
-
-        <!-- Selectores de Estilo de Línea -->
-        <input type="color" id="color" value="#ff0000" onchange="actualizarEstiloRuta()" title="Color de línea">
-        <select id="grosor" onchange="actualizarEstiloRuta()" title="Grosor de línea">
-            <option value="3">Fino</option>
-            <option value="5" selected>Medio</option>
-            <option value="8">Grueso</option>
-            *<option value="12">Muy Grueso</option>
-        </select>
-        <select id="opacidad" onchange="actualizarEstiloRuta()" title="Opacidad">
-            <option value="100">100%</option>
-            <option value="75" selected>75%</option>
-            <option value="50">50%</option>
-        </select>
-
-        <!-- Botones de GitHub y Archivos -->
-        <button class="btn btn-success" onclick="guardarEnGithub()">☁️ Guardar</button>
-        <button class="btn btn-primary" onclick="abrirModalCargarGithub()">📂 Cargar</button>
-        <button class="btn btn-primary" onclick="compartirMapaGithub()">🔗 Compartir</button>
-        <button class="btn btn-secondary" onclick="cambiarToken()">🔑 Token</button>
-
-        <!-- Importar GPX -->
-        <input type="file" id="gpx-file" accept=".gpx" style="display:none;" onchange="importarGPX(event)">
-        <button class="btn btn-secondary" onclick="document.getElementById('gpx-file').click()">📥 GPX</button>
-    </div>
-
-    <!-- Ventana Modal para la Lista de Mapas -->
-    <div id="modal-load" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="cerrarModal()">&times;</span>
-            <h3 style="margin-top: 0;">Gestión de Mapas</h3>
-            <div id="lista-mapas">Cargando...</div>
-        </div>
-    </div>
-
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Leaflet GPX plugin (por si lo usas para cargar ficheros GPX) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/1.7.0/gpx.min.js"></script>
-    
-    <!-- Tu Script principal de la aplicación -->
-    <script src="app.js"></script>
-</body>
-</html>
