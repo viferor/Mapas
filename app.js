@@ -159,10 +159,10 @@ async function gestionarPulsacion(e) {
     contadorNumero++;
 }
 
-// --- PETICIÓN AL MOTOR OSRM EN MODO PEATONAL ('foot') ---
+// --- PETICIÓN AL MOTOR OSRM EN MODO PEATONAL FLEXIBLE ---
 async function obtenerRutaPeatonalOSRM(origen, destino) {
-    // Parámetro 'foot' para asegurar trazado peatonal por aceras, paseos y zonas autorizadas
-    const url = `https://router.project-osrm.org/route/v1/foot/${origen.lng},${origen.lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson`;
+    // Parámetro 'foot' combinado con 'continue_straight=true' para mayor flexibilidad de trazado
+    const url = `https://router.project-osrm.org/route/v1/foot/${origen.lng},${origen.lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson&continue_straight=true`;
 
     try {
         const response = await fetch(url);
@@ -487,7 +487,7 @@ async function compartirMapaGithub() {
         const shareUrl = `${baseUrl}?mapa=${fileName}`;
 
         navigator.clipboard.writeText(shareUrl).then(() => {
-            alert(`¡Enlace copiado al portapapeles!\n\n${shareUrl}`);
+            alert(`¡En enlace copiado al portapapeles!\n\n${shareUrl}`);
         }).catch(() => {
             prompt("Copia este enlace para compartir:", shareUrl);
         });
