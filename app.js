@@ -46,25 +46,16 @@ document.addEventListener("DOMContentLoaded", function () {
     };
     L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
 
-    // Eventos de Leaflet nativos para el mapa que respetan el modo actual
-    map.on('mousedown touchstart', function(e) {
-        if (modoActual === 'dibujar') {
-            iniciarTrazoLeaflet(e);
-        }
-    });
+    // Configuración específica de eventos táctiles/pointer para tabletas
+    const mapContainer = map.getContainer();
+    mapContainer.style.touchAction = 'none'; // Evita gestos nativos de la tablet al dibujar
 
-    map.on('mousemove touchmove', function(e) {
-        if (modoActual === 'dibujar') {
-            moverTrazoLeaflet(e);
-        }
-    });
+    mapContainer.addEventListener('pointerdown', iniciarTrazoTablet);
+    mapContainer.addEventListener('pointermove', moverTrazoTablet);
+    window.addEventListener('pointerup', finalizarTrazoTablet);
+    window.addEventListener('pointercancel', finalizarTrazoTablet);
 
-    map.on('mouseup touchend', function(e) {
-        if (modoActual === 'dibujar') {
-            finalizarTrazoLeaflet(e);
-        }
-    });
-
+    // Evento de clic/toque clásico para los números
     map.on('click', gestionarPulsacion);
 
     // Establecer modo por defecto al cargar visualmente
@@ -82,10 +73,18 @@ document.addEventListener("DOMContentLoaded", function () {
 function setModo(modo) {
     modoActual = modo;
     
+    const mapContainer = map.getContainer();
+
     if (modo === 'dibujar') {
         map.dragging.disable();
+        map.touchZoom.disable();
+        map.doubleClickZoom.disable();
+        mapContainer.style.touchAction = 'none'; // Bloquea gestos de la tablet para priorizar el trazo
     } else {
         map.dragging.enable();
+        map.touchZoom.enable();
+        map.doubleClickZoom.enable();
+        mapContainer.style.touchAction = 'auto'; // Restaura la navegación normal por la tablet
     }
 
     document.getElementById('btn-draw').className = modo === 'dibujar' ? 'btn btn-primary' : 'btn btn-secondary';
@@ -101,28 +100,19 @@ function obtenerEstilosActuales() {
     };
 }
 
-// --- DIBUJO CON EVENTOS NATIVOS DE LEAFLET ---
-function iniciarTrazoLeaflet(e) {
+// --- DIBUJO TÁCTIL OPTIMIZADO PARA TABLET (POINTER EVENTS) ---
+function iniciarTrazoTablet(e) {
     if (modoActual !== 'dibujar') return;
     
-    if (e.originalEvent) {
-        if (typeof e.originalEvent.preventDefault === 'function') {
-            e.originalEvent.preventDefault();
-        }
-        if (e.originalEvent.stopPropagation) {
-            e.originalEvent.stopPropagation();
-        }
+    // Si se pulsa sobre la botonera o controles de Leaflet, no se dibuja
+    if (e.target.closest('.leaflet-control-container') || e.target.closest('button') || e.target.closest('input')) {
+        return;
     }
 
+    e.preventDefault();
     dibujando = true;
 
-    let latlng = e.latlng;
-    if (!latlng && e.originalEvent && e.originalEvent.touches && e.originalEvent.touches[0]) {
-        latlng = map.mouseEventToLatLng(e.originalEvent.touches[0]);
-    } else if (!latlng && e.originalEvent) {
-        latlng = map.mouseEventToLatLng(e.originalEvent);
-    }
-
+    const latlng = map.mouseEventToLatLng(e);
     if (!latlng) return;
 
     const estilos = obtenerEstilosActuales();
@@ -135,26 +125,18 @@ function iniciarTrazoLeaflet(e) {
     }).addTo(map);
 }
 
-function moverTrazoLeaflet(e) {
+function moverTrazoTablet(e) {
     if (!dibujando || modoActual !== 'dibujar' || !lineaActual) return;
 
-    if (e.originalEvent && typeof e.originalEvent.preventDefault === 'function') {
-        e.originalEvent.preventDefault();
-    }
+    e.preventDefault();
 
-    let latlng = e.latlng;
-    if (!latlng && e.originalEvent && e.originalEvent.touches && e.originalEvent.touches[0]) {
-        latlng = map.mouseEventToLatLng(e.originalEvent.touches[0]);
-    } else if (!latlng && e.originalEvent) {
-        latlng = map.mouseEventToLatLng(e.originalEvent);
-    }
-
+    const latlng = map.mouseEventToLatLng(e);
     if (latlng) {
         lineaActual.addLatLng(latlng);
     }
 }
 
-function finalizarTrazoLeaflet(e) {
+function finalizarTrazoTablet(e) {
     if (!dibujando || modoActual !== 'dibujar') return;
     dibujando = false;
 
