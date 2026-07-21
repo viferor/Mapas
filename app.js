@@ -1,7 +1,7 @@
 // ==================== CONFIGURACIÓN GITHUB ====================
 // RELLENA ESTOS 3 DATOS CON LOS TUYOS:
 const GITHUB_USER = "viferor";      
-const GITHUB_REPO = "viferor/Mapas";  
+const GITHUB_REPO = "Mapas";  
 const GITHUB_TOKEN = "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";   
 const CARPETA_MAPAS = "mapas";                 
 // ==============================================================
