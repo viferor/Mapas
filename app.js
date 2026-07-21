@@ -24,14 +24,14 @@ function cambiarToken() {
 // Mapa inicializado con zoom máximo en nivel 22
 const map = L.map('map', { zoomControl: false, tap: false, maxZoom: 22 }).setView([37.8882, -4.7794], 14);
 
-// CALLEJERO GOOGLE COMPLETO (Sustituido únicamente este layer por el más detallado)
+// CALLEJERO GOOGLE COMPLETO
 const mapaCallejero = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', { 
     attribution: '© Google Maps',
     maxZoom: 22,
     maxNativeZoom: 20
 }).addTo(map);
 
-// HÍBRIDO HD+ (Se mantiene exactamente igual que tenías)
+// HÍBRIDO HD+ (Google Satélite + Nombres)
 const mapaSatelite = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { 
     attribution: '© Google Maps',
     maxZoom: 22,
@@ -140,17 +140,71 @@ function borrarTodo() { historialTrazos.forEach(l => map.removeLayer(l)); capasG
 
 function extraerCoordenadasActuales() { return historialTrazos.map(linea => linea.getLatLngs().map(ll => [parseFloat(ll.lat.toFixed(5)), parseFloat(ll.lng.toFixed(5))])); }
 
-// API GITHUB
+// ==================== API GITHUB Y MODALES ====================
+
+// Ventana para GUARDAR (Seleccionar existente o crear nuevo)
 async function guardarEnGithub() {
     if (historialTrazos.length === 0) return alert("Dibuja una ruta antes de guardar.");
     
     const token = obtenerToken();
     if (!token) return alert("Necesitas introducir un Token para guardar.");
 
-    let nombre = prompt("Nombre del mapa para guardar en GitHub:");
+    const lista = document.getElementById('lista-mapas');
+    lista.innerHTML = "Cargando lista de mapas...";
+    document.getElementById('modal-load').style.display = 'block';
+
+    const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${CARPETA_MAPAS}`;
+    try {
+        const res = await fetch(url, { headers: { "Authorization": `token ${token}` } });
+        let files = [];
+        if (res.status === 200) {
+            files = await res.json();
+        }
+
+        lista.innerHTML = "";
+        
+        // Opción para crear uno nuevo
+        const divNuevo = document.createElement('div');
+        divNuevo.className = 'map-item';
+        divNuevo.style.background = '#e8f5e9';
+        divNuevo.style.fontWeight = 'bold';
+        divNuevo.innerHTML = `<span style="cursor:pointer; flex:1;" onclick="ejecutarGuardadoComoNuevo()">➕ Guardar como mapa nuevo...</span>`;
+        lista.appendChild(divNuevo);
+
+        const jsonFiles = files.filter(f => f.name.endsWith('.json'));
+        if (jsonFiles.length > 0) {
+            const hr = document.createElement('hr');
+            hr.style.margin = '8px 0';
+            lista.appendChild(hr);
+
+            jsonFiles.forEach(file => {
+                const div = document.createElement('div');
+                div.className = 'map-item';
+                const nombreLimpio = file.name.replace('.json', '');
+                
+                div.innerHTML = `
+                    <span style="cursor:pointer; flex:1;" onclick="ejecutarSobrescribirMapa('${nombreLimpio}')">💾 Sobrescribir '${nombreLimpio}'</span>
+                `;
+                lista.appendChild(div);
+            });
+        }
+    } catch (err) { lista.innerHTML = "Error al conectar con GitHub."; }
+}
+
+async function ejecutarGuardadoComoNuevo() {
+    let nombre = prompt("Escribe el nombre para el nuevo mapa:");
     if (!nombre) return;
-    
-    const nombreArchivo = nombre.toLowerCase().replace(/[^a-z0-9_-]/g, '_');
+    await procesarGuardado(nombre);
+}
+
+async function ejecutarSobrescribirMapa(nombre) {
+    if (!confirm(`¿Quieres sobrescribir el mapa '${nombre}' con los trazos actuales?`)) return;
+    await procesarGuardado(nombre);
+}
+
+async function procesarGuardado(nombreMapa) {
+    const token = obtenerToken();
+    const nombreArchivo = nombreMapa.toLowerCase().replace(/[^a-z0-9_-]/g, '_');
     const path = `${CARPETA_MAPAS}/${nombreArchivo}.json`;
     const content = btoa(JSON.stringify(extraerCoordenadasActuales(), null, 2));
     const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`;
@@ -175,6 +229,7 @@ async function guardarEnGithub() {
 
         if (res.ok) { 
             alert(`☁️ Mapa '${nombreArchivo}' guardado con éxito!`); 
+            cerrarModal();
         } else if (res.status === 401) {
             alert("Token incorrecto o caducado.");
             cambiarToken();
@@ -184,6 +239,7 @@ async function guardarEnGithub() {
     } catch (err) { alert("Error de conexión con GitHub."); }
 }
 
+// Ventana para CARGAR
 async function abrirModalCargarGithub() {
     const token = obtenerToken();
     if (!token) return alert("Necesitas introducir un Token para ver tus mapas.");
@@ -224,6 +280,59 @@ async function abrirModalCargarGithub() {
             lista.appendChild(div);
         });
     } catch (err) { lista.innerHTML = "Error al conectar con GitHub."; }
+}
+
+// Ventana para COMPARTIR
+async function compartirMapaGithub() {
+    const token = obtenerToken();
+    if (!token) return alert("Necesitas introducir un Token para compartir.");
+
+    const lista = document.getElementById('lista-mapas');
+    lista.innerHTML = "Cargando mapas para compartir...";
+    document.getElementById('modal-load').style.display = 'block';
+
+    const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${CARPETA_MAPAS}`;
+    try {
+        const res = await fetch(url, { headers: { "Authorization": `token ${token}` } });
+        if (res.status === 404 || res.status === 401) {
+            lista.innerHTML = "<p style='font-size:12px;'>No se encontraron mapas.</p>";
+            return;
+        }
+
+        const files = await res.json();
+        lista.innerHTML = "";
+        const jsonFiles = files.filter(f => f.name.endsWith('.json'));
+
+        if (jsonFiles.length === 0) {
+            lista.innerHTML = "<p style='font-size:12px;'>No hay mapas guardados para compartir.</p>";
+            return;
+        }
+
+        jsonFiles.forEach(file => {
+            const div = document.createElement('div');
+            div.className = 'map-item';
+            const nombreLimpio = file.name.replace('.json', '');
+
+            div.innerHTML = `
+                <span style="cursor:pointer; flex:1;" onclick="ejecutarAccionCompartir('${nombreLimpio}')">🔗 Compartir '${nombreLimpio}'</span>
+            `;
+            lista.appendChild(div);
+        });
+    } catch (err) { lista.innerHTML = "Error al conectar con GitHub."; }
+}
+
+function ejecutarAccionCompartir(nombreMapa) {
+    const nombreArchivo = nombreMapa.toLowerCase().replace(/[^a-z0-9_-]/g, '_');
+    const urlRawGithub = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${CARPETA_MAPAS}/${nombreArchivo}.json`;
+    const urlAppCompartir = `${window.location.origin}${window.location.pathname}?g=${encodeURIComponent(urlRawGithub)}`;
+
+    cerrarModal();
+
+    if (navigator.share) {
+        navigator.share({ title: `Mi recorrido: ${nombreArchivo}`, url: urlAppCompartir });
+    } else {
+        navigator.clipboard.writeText(urlAppCompartir).then(() => alert("🔗 Link copiado al portapapeles"));
+    }
 }
 
 async function eliminarMapaGithub(nombreArchivo, sha) {
@@ -271,21 +380,6 @@ async function cargarMapaDesdeGithub(downloadUrl) {
 }
 
 function cerrarModal() { document.getElementById('modal-load').style.display = 'none'; }
-
-function compartirMapaGithub() {
-    const nombreMapa = prompt("Escribe el nombre del mapa guardado que quieres compartir:");
-    if (!nombreMapa) return;
-
-    const nombreArchivo = nombreMapa.toLowerCase().replace(/[^a-z0-9_-]/g, '_');
-    const urlRawGithub = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${CARPETA_MAPAS}/${nombreArchivo}.json`;
-    const urlAppCompartir = `${window.location.origin}${window.location.pathname}?g=${encodeURIComponent(urlRawGithub)}`;
-
-    if (navigator.share) {
-        navigator.share({ title: `Mi recorrido: ${nombreArchivo}`, url: urlAppCompartir });
-    } else {
-        navigator.clipboard.writeText(urlAppCompartir).then(() => alert("🔗 Link copiado al portapapeles"));
-    }
-}
 
 function importarGPX(event) {
     const file = event.target.files[0];
