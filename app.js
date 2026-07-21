@@ -14,7 +14,7 @@ let historialRehacer = [];
 
 // Control de tramos independientes
 let ultimoPuntoTramo = null; 
-let nuevoTrazoLibre = true; // Control específico para romper la línea en modo libre
+let trazoLibreActivo = false; // Control robusto de trazo libre compatible con Brave y Chrome
 
 // Inicialización del mapa y eventos de la interfaz
 document.addEventListener("DOMContentLoaded", function () {
@@ -125,11 +125,11 @@ function obtenerEstilosActuales() {
     };
 }
 
-// --- FUNCIÓN PARA CORTAR TRAMO ACTUAL (Sirve para Números y Dibujo Libre) ---
+// --- FUNCIÓN PARA CORTAR TRAMO ACTUAL ---
 function cortarTramoActual() {
     ultimoPuntoTramo = null;
     window.puntosDibujoLibre = [];
-    nuevoTrazoLibre = true; // Fuerza a que el próximo punto libre empiece sin conectar
+    trazoLibreActivo = false; // Fuerza el corte limpio e independiente en modo libre
     alert("Próximo punto iniciado como un trazado nuevo independiente.");
 }
 
@@ -154,12 +154,9 @@ async function gestionarPulsacion(e) {
 
     // MODO DIBUJO LIBRE (Línea recta directa sin numeración)
     if (modoActual === 'dibujar') {
-        if (!window.puntosDibujoLibre) window.puntosDibujoLibre = [];
-
-        // Si se acaba de pulsar el botón de cortar o se inicia de cero, reseteamos el array de puntos del trazo anterior
-        if (nuevoTrazoLibre) {
+        if (!window.puntosDibujoLibre || !trazoLibreActivo) {
             window.puntosDibujoLibre = [];
-            nuevoTrazoLibre = false;
+            trazoLibreActivo = true;
         }
 
         window.puntosDibujoLibre.push(latlng);
@@ -317,7 +314,7 @@ function borrarTodo() {
     ultimoPuntoTramo = null;
     contadorNumero = 1;
     window.puntosDibujoLibre = [];
-    nuevoTrazoLibre = true;
+    trazoLibreActivo = false;
 }
 
 // Actualiza de forma GLOBAL el grosor, color y opacidad de TODAS las líneas del mapa
@@ -348,8 +345,9 @@ function obtenerToken() {
 }
 
 function cambiarToken() {
-    const nuevoToken = prompt("Introduce tu nuevo Personal Access Token de GitHub:");
-    if (nuevoToken) {
+    const tokenActual = localStorage.getItem('github_token') || "";
+    const nuevoToken = prompt("Introduce tu Personal Access Token de GitHub:", tokenActual);
+    if (nuevoToken !== null) {
         localStorage.setItem('github_token', nuevoToken.trim());
         alert("Token actualizado correctamente.");
     }
