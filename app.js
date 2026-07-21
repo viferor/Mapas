@@ -21,24 +21,24 @@ function cambiarToken() {
 }
 // ==============================================================
 
-// Mapa inicializado con maxZoom en 20
-const map = L.map('map', { zoomControl: false, tap: false, maxZoom: 20 }).setView([37.8882, -4.7794], 14);
+// Mapa inicializado permitiendo zoom máximo hasta nivel 22
+const map = L.map('map', { zoomControl: false, tap: false, maxZoom: 22 }).setView([37.8882, -4.7794], 14);
 
-// Callejero CartoDB Positron (Alta precisión, zoom nivel 20)
-const mapaCallejero = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { 
-    attribution: '© OpenStreetMap, © CARTO',
-    maxZoom: 20,
+// CALLEJERO HD+ (Esri World Street Map - Zoom hasta 21)
+const mapaCallejero = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { 
+    attribution: '© Esri, HERE, Garmin, USGS, OpenStreetMap',
+    maxZoom: 22,
     maxNativeZoom: 19
 }).addTo(map);
 
-// NUEVO: Satélite Híbrido Actualizado (Fotografía aérea + Nombres de calles)
+// HÍBRIDO HD+ (Google Satélite + Nombres de Calles - Zoom hasta 22)
 const mapaSatelite = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { 
     attribution: '© Google Maps',
-    maxZoom: 20,
+    maxZoom: 22,
     maxNativeZoom: 20
 });
 
-L.control.layers({ "🚶‍♂️ Callejero HD": mapaCallejero, "🛰️ Híbrido HD": mapaSatelite }, null, { position: 'topright' }).addTo(map);
+L.control.layers({ "🚶‍♂️ Callejero HD+": mapaCallejero, "🛰️ Híbrido HD+": mapaSatelite }, null, { position: 'topright' }).addTo(map);
 L.control.zoom({ position: 'topleft' }).addTo(map);
 
 const contenedorControles = document.getElementById('controls');
