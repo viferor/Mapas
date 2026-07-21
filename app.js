@@ -1,9 +1,26 @@
 // ==================== CONFIGURACIÓN GITHUB ====================
-// RELLENA ESTOS 3 DATOS CON LOS TUYOS:
 const GITHUB_USER = "viferor";      
 const GITHUB_REPO = "Mapas";  
-const GITHUB_TOKEN = "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";   
 const CARPETA_MAPAS = "mapas";                 
+
+// Obtiene el token guardado en el móvil o lo pide si es la primera vez
+function obtenerToken() {
+    let token = localStorage.getItem("github_token_mapas");
+    if (!token) {
+        token = prompt("Introduce tu Token de GitHub (solo se pedirá una vez):");
+        if (token) {
+            token = token.trim();
+            localStorage.setItem("github_token_mapas", token);
+        }
+    }
+    return token;
+}
+
+// Opción por si algún día necesitas cambiar de token
+function cambiarToken() {
+    localStorage.removeItem("github_token_mapas");
+    obtenerToken();
+}
 // ==============================================================
 
 const map = L.map('map', { zoomControl: false, tap: false }).setView([37.8882, -4.7794], 14);
@@ -115,6 +132,10 @@ function extraerCoordenadasActuales() { return historialTrazos.map(linea => line
 // API GITHUB
 async function guardarEnGithub() {
     if (historialTrazos.length === 0) return alert("Dibuja una ruta antes de guardar.");
+    
+    const token = obtenerToken();
+    if (!token) return alert("Necesitas introducir un Token para guardar.");
+
     let nombre = prompt("Nombre del mapa para guardar en GitHub:");
     if (!nombre) return;
     
@@ -125,7 +146,7 @@ async function guardarEnGithub() {
 
     try {
         let sha = "";
-        const checkRes = await fetch(url, { headers: { "Authorization": `token ${GITHUB_TOKEN}` } });
+        const checkRes = await fetch(url, { headers: { "Authorization": `token ${token}` } });
         if (checkRes.status === 200) {
             const data = await checkRes.json();
             sha = data.sha;
@@ -133,7 +154,7 @@ async function guardarEnGithub() {
 
         const res = await fetch(url, {
             method: "PUT",
-            headers: { "Authorization": `token ${GITHUB_TOKEN}`, "Content-Type": "application/json" },
+            headers: { "Authorization": `token ${token}`, "Content-Type": "application/json" },
             body: JSON.stringify({
                 message: `Guardado: ${nombreArchivo}`,
                 content: content,
@@ -141,24 +162,45 @@ async function guardarEnGithub() {
             })
         });
 
-        if (res.ok) { alert(`☁️ Mapa '${nombreArchivo}' guardado! Ya puedes compartirlo.`); } 
-        else { alert("Error al guardar en GitHub."); }
+        if (res.ok) { 
+            alert(`☁️ Mapa '${nombreArchivo}' guardado con éxito!`); 
+        } else if (res.status === 401) {
+            alert("Token incorrecto o caducado. Vuelve a introducirlo.");
+            cambiarToken();
+        } else { 
+            alert("Error al guardar en GitHub. Comprueba el nombre del mapa."); 
+        }
     } catch (err) { alert("Error de conexión con GitHub."); }
 }
 
 async function abrirModalCargarGithub() {
+    const token = obtenerToken();
+    if (!token) return alert("Necesitas introducir un Token para ver tus mapas.");
+
     const lista = document.getElementById('lista-mapas');
     lista.innerHTML = "Cargando...";
     document.getElementById('modal-load').style.display = 'block';
 
     const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${CARPETA_MAPAS}`;
     try {
-        const res = await fetch(url, { headers: { "Authorization": `token ${GITHUB_TOKEN}` } });
+        const res = await fetch(url, { headers: { "Authorization": `token ${token}` } });
         if (res.status === 404) { lista.innerHTML = "<p style='font-size:12px;'>No hay carpeta 'mapas'.</p>"; return; }
+        if (res.status === 401) {
+            alert("Token inválido.");
+            cambiarToken();
+            cerrarModal();
+            return;
+        }
+        
         const files = await res.json();
         lista.innerHTML = "";
         const jsonFiles = files.filter(f => f.name.endsWith('.json'));
         
+        if (jsonFiles.length === 0) {
+            lista.innerHTML = "<p style='font-size:12px;'>No hay mapas guardados aún.</p>";
+            return;
+        }
+
         jsonFiles.forEach(file => {
             const div = document.createElement('div');
             div.className = 'map-item';
@@ -220,3 +262,4 @@ map.whenReady(() => {
         cargarMapaDesdeGithub(decodeURIComponent(urlParams.get('g')));
     }
 });
+
