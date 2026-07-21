@@ -6,20 +6,21 @@ const GITHUB_FOLDER = "mapas";
 
 // Variables globales
 let map;
-let modoActual = 'dibujar'; // 'dibujar', 'numero', 'borrar'
-let dibujando = false;
-let lineaActual = null;
+let modoActual = 'numero'; // 'numero' o 'borrar' por defecto
 let contadorNumero = 1;
 
 // Historial para deshacer / rehacer
 let historialAcciones = [];
 let historialRehacer = [];
 
+// Almacén de coordenadas de los puntos numerados para calcular las rutas encadenadas
+let puntosRuta = []; 
+
 // Inicialización del mapa
 document.addEventListener("DOMContentLoaded", function () {
     map = L.map('map', {
         zoomControl: true,
-        touchZoom: false // Lo gestionamos de forma limpia según el modo
+        touchZoom: true
     }).setView([37.8882, -4.7794], 13); // Centrado en Córdoba
 
     // Capas base de mapas
@@ -47,20 +48,15 @@ document.addEventListener("DOMContentLoaded", function () {
     };
     L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
 
-    // Configuración de eventos táctiles puros para un dibujo continuo perfecto
+    // Permitir navegación libre y fluida en todo momento con los dedos
     const mapContainer = map.getContainer();
-    mapContainer.style.touchAction = 'none';
+    mapContainer.style.touchAction = 'auto';
 
-    mapContainer.addEventListener('touchstart', iniciarTrazoTacto, { passive: false });
-    mapContainer.addEventListener('touchmove', moverTrazoTacto, { passive: false });
-    window.addEventListener('touchend', finalizarTrazoTacto);
-    window.addEventListener('touchcancel', finalizarTrazoTacto);
-
-    // Evento de clic/toque clásico para los números
+    // Evento de clic/toque en el mapa para colocar los números y enrutar
     map.on('click', gestionarPulsacion);
 
     // Establecer modo por defecto al cargar visualmente
-    setModo('dibujar');
+    setModo('numero');
 
     // Cargar mapa desde URL si viene con parámetro ?mapa=nombre.json
     const urlParams = new URLSearchParams(window.location.search);
@@ -73,23 +69,16 @@ document.addEventListener("DOMContentLoaded", function () {
 // Selección de modo
 function setModo(modo) {
     modoActual = modo;
-    const mapContainer = map.getContainer();
+    
+    // Habilitar siempre la navegación libre del mapa (zoom y desplazamiento perfectos)
+    map.dragging.enable();
+    map.touchZoom.enable();
+    map.doubleClickZoom.enable();
 
-    if (modo === 'dibujar') {
-        // En modo dibujo, bloqueamos el mapa para garantizar trazo libre y fluido sin cortes
-        map.dragging.disable();
-        map.touchZoom.disable();
-        map.doubleClickZoom.disable();
-        mapContainer.style.touchAction = 'none';
-    } else {
-        // En otros modos, permitimos mover y hacer zoom libremente con los dedos
-        map.dragging.enable();
-        map.touchZoom.enable();
-        map.doubleClickZoom.enable();
-        mapContainer.style.touchAction = 'auto';
-    }
-
-    document.getElementById('btn-draw').className = modo === 'dibujar' ? 'btn btn-primary' : 'btn btn-secondary';
+    // Actualizar clases de botones de la interfaz
+    const btnDraw = document.getElementById('btn-draw');
+    if (btnDraw) btnDraw.className = 'btn btn-secondary'; // El dibujo a mano alzada ya no es necesario
+    
     document.getElementById('btn-number').className = modo === 'numero' ? 'btn btn-primary' : 'btn btn-secondary';
     document.getElementById('btn-erase').className = modo === 'borrar' ? 'btn btn-danger' : 'btn btn-secondary';
 }
@@ -102,98 +91,94 @@ function obtenerEstilosActuales() {
     };
 }
 
-// --- CONVERSIÓN DE TACTO A LAT/LNG ---
-function obtenerLatLngDesdeTacto(touch) {
-    const mapContainer = map.getContainer();
-    const rect = mapContainer.getBoundingClientRect();
-    
-    const x = touch.clientX - rect.left;
-    const y = touch.clientY - rect.top;
+// --- GESTIÓN DE CLICS Y ENRUTAMIENTO AUTOMÁTICO POR CALLES ---
+async function gestionarPulsacion(e) {
+    if (modoActual !== 'numero') return;
 
-    return map.containerPointToLatLng([x, y]);
-}
+    const latlng = e.latlng;
+    puntosRuta.push(latlng);
 
-// --- DIBUJO TÁCTIL FLUIDO Y CONTINUO ---
-function iniciarTrazoTacto(e) {
-    if (modoActual !== 'dibujar') return;
-    
-    // Si se pulsa sobre la botonera o controles, no se dibuja
-    if (e.target.closest('.leaflet-control-container') || e.target.closest('button') || e.target.closest('input')) {
-        return;
-    }
-
-    e.preventDefault();
-    dibujando = true;
-
-    const touch = e.touches[0];
-    const latlng = obtenerLatLngDesdeTacto(touch);
-    if (!latlng) return;
-
+    const color = document.getElementById('color').value;
     const estilos = obtenerEstilosActuales();
+    const numeroActual = contadorNumero;
 
-    lineaActual = L.polyline([latlng], {
-        color: estilos.color,
-        weight: estilos.weight,
-        opacity: estilos.opacity,
-        smoothFactor: 1
-    }).addTo(map);
-}
+    // 1. Crear el marcador numerado en el punto pulsado
+    const numberIcon = L.divIcon({
+        className: 'number-icon',
+        html: `<span>${numeroActual}</span>`,
+        iconSize: [28, 28],
+        iconAnchor: [14, 14]
+    });
 
-function moverTrazoTacto(e) {
-    if (modoActual !== 'dibujar' || !dibujando || !lineaActual) return;
+    const marker = L.marker(latlng, { icon: numberIcon }).addTo(map);
+    
+    setTimeout(() => {
+        const el = marker.getElement();
+        if (el) {
+            el.style.backgroundColor = color;
+        }
+    }, 10);
 
-    e.preventDefault();
-
-    const touch = e.touches[0];
-    const latlng = obtenerLatLngDesdeTacto(touch);
-    if (latlng) {
-        lineaActual.addLatLng(latlng);
-    }
-}
-
-function finalizarTrazoTacto() {
-    if (!dibujando || modoActual !== 'dibujar') return;
-    dibujando = false;
-
-    if (lineaActual) {
-        historialAcciones.push({ tipo: 'linea', elemento: lineaActual });
-        historialRehacer = [];
-        lineaActual = null;
-    }
-}
-
-// Numeración paso a paso
-function gestionarPulsacion(e) {
-    if (modoActual === 'numero') {
-        const color = document.getElementById('color').value;
-
-        const numberIcon = L.divIcon({
-            className: 'number-icon',
-            html: `<span>${contadorNumero}</span>`,
-            iconSize: [28, 28],
-            iconAnchor: [14, 14]
-        });
-
-        const marker = L.marker(e.latlng, { icon: numberIcon }).addTo(map);
-        
-        setTimeout(() => {
-            const el = marker.getElement();
-            if (el) {
-                el.style.backgroundColor = color;
+    // Permitir borrar el marcador individualmente en modo borrar
+    marker.on('click', function(ev) {
+        if (modoActual === 'borrar') {
+            L.DomEvent.stopPropagation(ev); // Evitar que el mapa interprete el clic
+            map.removeLayer(marker);
+            historialAcciones = historialAcciones.filter(item => item.elemento !== marker);
+            
+            // Si el marcador borrado tenía una línea asociada, la eliminamos también de la vista
+            if (marker.lineaAsociada) {
+                map.removeLayer(marker.lineaAsociada);
+                historialAcciones = historialAcciones.filter(item => item.elemento !== marker.lineaAsociada);
             }
-        }, 10);
+        }
+    });
 
-        marker.on('click', function() {
-            if (modoActual === 'borrar') {
-                map.removeLayer(marker);
-                historialAcciones = historialAcciones.filter(item => item.elemento !== marker);
-            }
-        });
+    let lineaAsociada = null;
 
-        historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: contadorNumero, color: color });
-        historialRehacer = [];
-        contadorNumero++;
+    // 2. Si hay más de un punto, calculamos la ruta por calles desde el punto anterior hasta este
+    if (puntosRuta.length > 1) {
+        const puntoAnterior = puntosRuta[puntosRuta.length - 2];
+        const latlngsRuta = await obtenerRutaCallejeroOSRM(puntoAnterior, latlng);
+
+        if (latlngsRuta && latlngsRuta.length > 0) {
+            lineaAsociada = L.polyline(latlngsRuta, {
+                color: estilos.color,
+                weight: estilos.weight,
+                opacity: estilos.opacity,
+                smoothFactor: 1
+            }).addTo(map);
+
+            marker.lineaAsociada = lineaAsociada;
+            historialAcciones.push({ tipo: 'linea', elemento: lineaAsociada });
+        }
     }
+
+    historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: numeroActual, color: color });
+    historialRehacer = [];
+    contadorNumero++;
+}
+
+// --- PETICIÓN AL MOTOR DE RUTAS OSRM (OpenStreetMap Routing) ---
+async function obtenerRutaCallejeroOSRM(origen, destino) {
+    // OSRM usa formato coordenadas: [longitud, latitud]
+    const url = `https://router.project-osrm.org/route/v1/driving/${origen.lng},${origen.lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson`;
+
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.code === 'Ok' && data.routes && data.routes.length > 0) {
+            const coordenadasGeoJSON = data.routes[0].geometry.coordinates;
+            // Convertimos de [lng, lat] de OSRM a [lat, lng] que utiliza Leaflet
+            return coordenadasGeoJSON.map(coord => [coord[1], coord[0]]);
+        }
+    } catch (e) {
+        console.error("Error al calcular la ruta ruteable:", e);
+    }
+
+    // Plan B de respaldo: Si falla internet o el servidor OSRM, une los puntos en línea recta directamente
+    return [origen, destino];
 }
 
 // Deshacer y Rehacer
@@ -206,6 +191,14 @@ function deshacerUltimo() {
 
     if (ultimaAccion.tipo === 'marcador') {
         contadorNumero = Math.max(1, contadorNumero - 1);
+        puntosRuta.pop(); // Quitamos también la coordenada del array de ruta
+        
+        // Si el marcador tenía una línea asociada en el historial, la quitamos también visualmente
+        if (ultimaAccion.elemento.lineaAsociada) {
+            map.removeLayer(ultimaAccion.elemento.lineaAsociada);
+            historialAcciones = historialAcciones.filter(item => item.elemento !== ultimaAccion.elemento.lineaAsociada);
+            historialRehacer.push({ tipo: 'linea', elemento: ultimaAccion.elemento.lineaAsociada });
+        }
     }
 }
 
@@ -218,6 +211,7 @@ function rehacerProximo() {
 
     if (accionRehacer.tipo === 'marcador') {
         contadorNumero++;
+        puntosRuta.push(accionRehacer.elemento.getLatLng());
     }
 }
 
@@ -226,6 +220,7 @@ function borrarTodo() {
     historialRehacer.forEach(item => map.removeLayer(item.elemento));
     historialAcciones = [];
     historialRehacer = [];
+    puntosRuta = [];
     contadorNumero = 1;
 }
 
@@ -438,14 +433,16 @@ async function cargarMapaDesdeGithub(nombreArchivo) {
                     }
                 }, 10);
 
-                marker.on('click', function() {
+                marker.on('click', function(ev) {
                     if (modoActual === 'borrar') {
+                        L.DomEvent.stopPropagation(ev);
                         map.removeLayer(marker);
                         historialAcciones = historialAcciones.filter(item => item.elemento !== marker);
                     }
                 });
 
                 historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: num, color: color });
+                puntosRuta.push(latlng);
                 bounds.push(latlng);
 
                 if (num >= contadorNumero) {
@@ -511,7 +508,7 @@ function importarGPX(event) {
             marker_options: {
                 startIconUrl: '',
                 endIconUrl: '',
-                shadowUrl: ''
+                    shadowUrl: ''
             }
         }).on('loaded', function (e) {
             map.fitBounds(e.target.getBounds());
