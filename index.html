@@ -2,62 +2,60 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gestor de Mapas y Rutas</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor de Mapas y Rutas</title>
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
-    <!-- Estilos personalizados -->
     <style>
-        * {
-            box-sizing: border-box;
-        }
-        html, body {
+        body, html {
             margin: 0;
             padding: 0;
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
-            font-family: Arial, sans-serif;
-            overscroll-behavior: none;
-        }
-        #map {
-            width: 100%;
             height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
-            touch-action: none;
-        }
-        
-        /* Barra de herramientas fija en el margen inferior */
-        #controls {
-            position: absolute;
-            bottom: 15px;
-            left: 10px;
-            right: 10px;
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.25);
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            overflow-x: auto;
-            white-space: nowrap;
-            -webkit-overflow-scrolling: touch;
-            touch-action: pan-x;
+            font-family: Arial, sans-serif;
         }
 
-        #controls::-webkit-scrollbar {
-            height: 4px;
+        #map {
+            width: 100%;
+            height: 100vh;
         }
-        #controls::-webkit-scrollbar-thumb {
-            background: #ccc;
-            border-radius: 4px;
+
+        /* Panel de control flotante */
+        #control-panel {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            max-width: 320px;
+        }
+
+        .control-group {
+            margin-bottom: 10px;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 3px;
+            color: #333;
+        }
+
+        .control-group input[type="color"],
+        .control-group input[type="range"],
+        .control-group select {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
         }
 
         .btn {
@@ -65,159 +63,135 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-weight: bold;
             font-size: 13px;
-            flex-shrink: 0;
-        }
-        .btn-primary { background: #007bff; color: white; }
-        .btn-secondary { background: #6c757d; color: white; }
-        .btn-success { background: #28a745; color: white; }
-        .btn-danger { background: #dc3545; color: white; }
-
-        /* Estilos para los controles deslizantes */
-        .slider-group {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: #f1f3f5;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 12px;
             font-weight: bold;
-            color: #333;
-            flex-shrink: 0;
-        }
-        .slider-group input[type="range"] {
-            width: 80px;
-            cursor: pointer;
-        }
-        .slider-group span {
-            min-width: 32px;
-            text-align: right;
-            font-family: monospace;
-        }
-
-        input[type="color"] {
-            padding: 2px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            flex-shrink: 0;
-            height: 33px;
-            width: 38px;
-            cursor: pointer;
-        }
-
-        /* Estilo visual de las etiquetas con número sobre el mapa */
-        .number-icon {
-            background-color: #007bff;
             color: white;
+            flex: 1;
+            text-align: center;
+        }
+
+        .btn-primary { background-color: #007bff; }
+        .btn-secondary { background-color: #6c757d; }
+        .btn-danger { background-color: #dc3545; }
+        .btn-success { background-color: #28a745; }
+        .btn-warning { background-color: #ffc107; color: #212529; }
+
+        /* Estilo para los números dentro de los marcadores circulares */
+        .number-icon {
+            background: #007bff;
             border: 2px solid white;
             border-radius: 50%;
+            color: white;
             font-weight: bold;
-            font-size: 13px;
-            display: flex !important;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+            text-align: center;
+            line-height: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        /* Ventana Modal */
-        .modal {
+        /* Modal simple para cargar mapas */
+        #modal-load {
             display: none;
             position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             z-index: 2000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            touch-action: auto;
-        }
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
+            background: white;
             padding: 20px;
-            border: 1px solid #888;
-            width: 85%;
-            max-width: 400px;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 90%;
         }
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .close:hover { color: black; }
+
         .map-item {
-            padding: 10px;
-            margin: 5px 0;
-            background: #f1f1f1;
-            border-radius: 4px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
         }
     </style>
 </head>
 <body>
 
-    <!-- Contenedor principal del Mapa -->
+    <!-- Panel de Control Interactivo -->
+    <div id="control-panel">
+        <h3>Editor de Mapas</h3>
+        
+        <div class="btn-container">
+            <button id="btn-number" class="btn btn-primary" onclick="setModo('numero')">Números</button>
+            <button id="btn-draw" class="btn btn-secondary" onclick="setModo('dibujar')">Libre</button>
+            <button id="btn-erase" class="btn btn-secondary" onclick="setModo('borrar')">Borrar</button>
+        </div>
+
+        <!-- Botón añadido para cortar el tramo en modo números -->
+        <div class="control-group">
+            <button id="btn-cortar" class="btn btn-warning" style="width: 100%; margin-bottom: 5px;" onclick="cortarTramoActual()">Cortar Tramo (Nuevo)</button>
+        </div>
+
+        <div class="control-group">
+            <label for="color">Color de Línea / Marcador:</label>
+            <input type="color" id="color" value="#007bff">
+        </div>
+
+        <div class="control-group">
+            <label for="grosor">Grosor de Línea (px):</label>
+            <input type="range" id="grosor" min="1" max="30" value="13">
+        </div>
+
+        <div class="control-group">
+            <label for="opacidad">Opacidad (%):</label>
+            <input type="range" id="opacidad" min="10" max="100" value="35">
+        </div>
+
+        <hr style="margin: 10px 0;">
+
+        <div class="btn-container">
+            <button class="btn btn-secondary" onclick="deshacerUltimo()">Deshacer</button>
+            <button class="btn btn-secondary" onclick="rehacerProximo()">Rehacer</button>
+        </div>
+
+        <div class="btn-container">
+            <button class="btn btn-danger" onclick="borrarTodo()">Limpiar</button>
+        </div>
+
+        <hr style="margin: 10px 0;">
+
+        <div class="btn-container">
+            <button class="btn btn-success" onclick="guardarEnGithub()">Guardar</button>
+            <button class="btn btn-primary" onclick="abrirModalCargarGithub()">Cargar</button>
+        </div>
+
+        <div class="btn-container">
+            <button class="btn btn-secondary" onclick="compartirMapaGithub()" style="font-size: 11px;">Compartir Enlace</button>
+            <button class="btn btn-secondary" onclick="cambiarToken()" style="font-size: 11px;">Token GitHub</button>
+        </div>
+
+        <div class="control-group" style="margin-top: 5px;">
+            <label for="gpx-file" style="font-size: 11px;">Importar GPX:</label>
+            <input type="file" id="gpx-file" accept=".gpx" onchange="importarGPX(event)" style="font-size: 11px;">
+        </div>
+    </div>
+
+    <!-- Modal para Cargar Mapas -->
+    <div id="modal-load">
+        <h3>Cargar Mapa desde GitHub</h3>
+        <div id="lista-mapas" style="max-height: 200px; overflow-y: auto; margin-bottom: 15px;">
+            Cargando...
+        </div>
+        <button class="btn btn-secondary" style="width: 100%;" onclick="cerrarModal()">Cerrar</button>
+    </div>
+
+    <!-- Contenedor del Mapa -->
     <div id="map"></div>
 
-    <!-- Barra de Controles y Herramientas -->
-    <div id="controls">
-        <button id="btn-draw" class="btn btn-primary" onclick="setModo('dibujar')">✏️ Dibujar</button>
-        <button id="btn-number" class="btn btn-secondary" onclick="setModo('numero')">🔢 Número</button>
-        <button id="btn-erase" class="btn btn-secondary" onclick="setModo('borrar')">🧹 Borrar</button>
-        <button class="btn btn-secondary" onclick="deshacerUltimo()">↩️ Deshacer</button>
-        <button class="btn btn-secondary" onclick="rehacerProximo()">↪️ Rehacer</button>
-        <button class="btn btn-danger" onclick="borrarTodo()">🗑️ Limpiar</button>
-
-        <!-- Color de trazo/marcador -->
-        <input type="color" id="color" value="#007bff" onchange="actualizarEstiloRuta()" title="Color del trazo o número">
-
-        <!-- Barra deslizante para el Grosor -->
-        <div class="slider-group">
-            <label for="grosor">📏 Grosor:</label>
-            <input type="range" id="grosor" min="1" max="30" value="5" oninput="document.getElementById('val-grosor').textContent = this.value + 'px'; actualizarEstiloRuta()">
-            <span id="val-grosor">5px</span>
-        </div>
-
-        <!-- Barra deslizante para la Opacidad -->
-        <div class="slider-group">
-            <label for="opacidad">💧 Opacidad:</label>
-            <input type="range" id="opacidad" min="10" max="100" value="100" step="5" oninput="document.getElementById('val-opacidad').textContent = this.value + '%'; actualizarEstiloRuta()">
-            <span id="val-opacidad">100%</span>
-        </div>
-
-        <!-- Funciones de Sync y Archivos -->
-        <button class="btn btn-success" onclick="guardarEnGithub()">☁️ Guardar</button>
-        <button class="btn btn-primary" onclick="abrirModalCargarGithub()">📂 Cargar</button>
-        <button class="btn btn-primary" onclick="compartirMapaGithub()">🔗 Compartir</button>
-        <button class="btn btn-secondary" onclick="cambiarToken()">🔑 Token</button>
-
-        <!-- Carga de GPX -->
-        <input type="file" id="gpx-file" accept=".gpx" style="display:none;" onchange="importarGPX(event)">
-        <button class="btn btn-secondary" onclick="document.getElementById('gpx-file').click()">📥 GPX</button>
-    </div>
-
-    <!-- Modal para la gestión de mapas -->
-    <div id="modal-load" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="cerrarModal()">&times;</span>
-            <h3 style="margin-top: 0;">Gestión de Mapas</h3>
-            <div id="lista-mapas">Cargando...</div>
-        </div>
-    </div>
-
-    <!-- Scripts de Leaflet y Complementos -->
+    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Leaflet GPX Plugin -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/1.7.0/gpx.min.js"></script>
-    
-    <!-- Script lógico principal -->
+
+    <!-- Script de la lógica del mapa -->
     <script src="app.js"></script>
 </body>
 </html>
