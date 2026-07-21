@@ -34,7 +34,6 @@ document.addEventListener("DOMContentLoaded", function () {
         attribution: '© OpenTopoMap'
     });
 
-    // Capa híbrida de Google Maps (Satélite + Carreteras y etiquetas superpuestas)
     const googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
         maxZoom: 20,
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
@@ -74,19 +73,13 @@ function inicializarInterfaz() {
     const grosorInput = document.getElementById('grosor');
     const opacidadInput = document.getElementById('opacidad');
 
-    // Establecer opacidad al 35% y grosor a 13 píxeles por defecto
-    if (opacidadInput) {
-        opacidadInput.value = 35;
-    }
-    if (grosorInput) {
-        grosorInput.value = 13;
-    }
+    if (opacidadInput) opacidadInput.value = 35;
+    if (grosorInput) grosorInput.value = 13;
 
     if (btnNumber) btnNumber.addEventListener('click', () => setModo('numero'));
     if (btnDraw) btnDraw.addEventListener('click', () => setModo('dibujar'));
     if (btnErase) btnErase.addEventListener('click', () => setModo('borrar'));
 
-    // Actualizan TODAS las líneas del mapa de manera global y fluida
     if (colorPicker) colorPicker.addEventListener('input', actualizarEstilosGlobales);
     if (grosorInput) grosorInput.addEventListener('input', actualizarEstilosGlobales);
     if (opacidadInput) opacidadInput.addEventListener('input', actualizarEstilosGlobales);
@@ -146,7 +139,7 @@ async function gestionarPulsacion(e) {
     }
     ultimoToqueTiempo = tiempoActual;
 
-    // MODO BORRAR
+    // MODO BORRAR GLOBAL (Si se pulsa directamente en el mapa en modo borrar, no hace nada a menos que toque un elemento)
     if (modoActual === 'borrar') {
         return; 
     }
@@ -167,6 +160,15 @@ async function gestionarPulsacion(e) {
             fillOpacity: 1
         }).addTo(map);
 
+        // Evento de borrado individual para el punto libre
+        markerLibre.on('click', function(ev) {
+            if (modoActual === 'borrar') {
+                L.DomEvent.stopPropagation(ev);
+                map.removeLayer(markerLibre);
+                historialAcciones = historialAcciones.filter(item => item.elemento !== markerLibre);
+            }
+        });
+
         historialAcciones.push({ tipo: 'marcador-libre', elemento: markerLibre });
 
         if (window.puntosDibujoLibre.length > 1) {
@@ -176,8 +178,20 @@ async function gestionarPulsacion(e) {
                 weight: estilos.weight,
                 opacity: estilos.opacity
             }).addTo(map);
+
+            // Evento de borrado individual para el segmento libre
+            lineaLibre.on('click', function(ev) {
+                if (modoActual === 'borrar') {
+                    L.DomEvent.stopPropagation(ev);
+                    map.removeLayer(lineaLibre);
+                    historialAcciones = historialAcciones.filter(item => item.elemento !== lineaLibre);
+                }
+            });
+
             historialAcciones.push({ tipo: 'linea', elemento: lineaLibre });
         }
+
+        historialRehacer = [];
         return;
     }
 
@@ -194,12 +208,12 @@ async function gestionarPulsacion(e) {
 
         const marker = L.marker(latlng, { icon: numberIcon }).addTo(map);
         
-        // Aplica el color elegido al fondo del icono circular manteniendo los bordes perfectamente redondeados
         setTimeout(() => {
             const el = marker.getElement();
             if (el) el.style.backgroundColor = estilos.color;
         }, 10);
 
+        // Evento para borrar el marcador numérico en modo borrar
         marker.on('click', function(ev) {
             if (modoActual === 'borrar') {
                 L.DomEvent.stopPropagation(ev);
@@ -224,6 +238,15 @@ async function gestionarPulsacion(e) {
                     opacity: estilos.opacity,
                     smoothFactor: 1
                 }).addTo(map);
+
+                // Evento para borrar la línea asociada si se pulsa sobre ella en modo borrar
+                lineaAsociada.on('click', function(ev) {
+                    if (modoActual === 'borrar') {
+                        L.DomEvent.stopPropagation(ev);
+                        map.removeLayer(lineaAsociada);
+                        historialAcciones = historialAcciones.filter(item => item.elemento !== lineaAsociada);
+                    }
+                });
 
                 marker.lineaAsociada = lineaAsociada;
                 historialAcciones.push({ tipo: 'linea', elemento: lineaAsociada });
@@ -252,43 +275,31 @@ async function obtenerRutaPorCallesOSRM(origen, destino) {
             }
         }
     } catch (e) {
-        console.warn("Error en OSRM principal, intentando alternativa:", e);
-    }
-
-    const urlRespaldo = `https://routing.openstreetmap.de/routed-foot/route/v1/foot/${origen.lng},${origen.lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson`;
-    try {
-        const responseAlt = await fetch(urlRespaldo);
-        if (responseAlt.ok) {
-            const dataAlt = await responseAlt.json();
-            if (dataAlt.code === 'Ok' && dataAlt.routes && dataAlt.routes.length > 0) {
-                const coordenadasGeoJSON = dataAlt.routes[0].geometry.coordinates;
-                return coordenadasGeoJSON.map(coord => [coord[1], coord[0]]);
-            }
-        }
-    } catch (e2) {
-        console.warn("Error en respaldo OSRM, usando línea directa:", e2);
+        console.warn("Error en OSRM principal:", e);
     }
 
     return [origen, destino];
 }
 
-// Deshacer y Rehacer
+// Deshacer y Rehacer corregidos y robustos
 function deshacerUltimo() {
     if (historialAcciones.length === 0) return;
 
     const ultimaAccion = historialAcciones.pop();
-    map.removeLayer(ultimaAccion.elemento);
-    historialRehacer.push(ultimaAccion);
+    if (ultimaAccion && ultimaAccion.elemento) {
+        map.removeLayer(ultimaAccion.elemento);
+        historialRehacer.push(ultimaAccion);
 
-    if (ultimaAccion.tipo === 'marcador') {
-        contadorNumero = Math.max(1, contadorNumero - 1);
-        
-        if (ultimaAccion.elemento.lineaAsociada) {
-            map.removeLayer(ultimaAccion.elemento.lineaAsociada);
-            historialAcciones = historialAcciones.filter(item => item.elemento !== ultimaAccion.elemento.lineaAsociada);
-            historialRehacer.push({ tipo: 'linea', elemento: ultimaAccion.elemento.lineaAsociada });
+        if (ultimaAccion.tipo === 'marcador') {
+            contadorNumero = Math.max(1, contadorNumero - 1);
+            
+            if (ultimaAccion.elemento.lineaAsociada) {
+                map.removeLayer(ultimaAccion.elemento.lineaAsociada);
+                historialAcciones = historialAcciones.filter(item => item.elemento !== ultimaAccion.elemento.lineaAsociada);
+                historialRehacer.push({ tipo: 'linea', elemento: ultimaAccion.elemento.lineaAsociada });
+            }
+            ultimoPuntoTramo = historialAcciones.slice().reverse().find(item => item.tipo === 'marcador')?.elemento.getLatLng() || null;
         }
-        ultimoPuntoTramo = historialAcciones.slice().reverse().find(item => item.tipo === 'marcador')?.elemento.getLatLng() || null;
     }
 }
 
@@ -296,18 +307,24 @@ function rehacerProximo() {
     if (historialRehacer.length === 0) return;
 
     const accionRehacer = historialRehacer.pop();
-    accionRehacer.elemento.addTo(map);
-    historialAcciones.push(accionRehacer);
+    if (accionRehacer && accionRehacer.elemento) {
+        accionRehacer.elemento.addTo(map);
+        historialAcciones.push(accionRehacer);
 
-    if (accionRehacer.tipo === 'marcador') {
-        contadorNumero++;
-        ultimoPuntoTramo = accionRehacer.elemento.getLatLng();
+        if (accionRehacer.tipo === 'marcador') {
+            contadorNumero++;
+            ultimoPuntoTramo = accionRehacer.elemento.getLatLng();
+        }
     }
 }
 
 function borrarTodo() {
-    historialAcciones.forEach(item => map.removeLayer(item.elemento));
-    historialRehacer.forEach(item => map.removeLayer(item.elemento));
+    historialAcciones.forEach(item => {
+        if (item && item.elemento) map.removeLayer(item.elemento);
+    });
+    historialRehacer.forEach(item => {
+        if (item && item.elemento) map.removeLayer(item.elemento);
+    });
     historialAcciones = [];
     historialRehacer = [];
     ultimoPuntoTramo = null;
@@ -320,7 +337,7 @@ function borrarTodo() {
 function actualizarEstilosGlobales() {
     const estilos = obtenerEstilosActuales();
     historialAcciones.forEach(item => {
-        if (item.tipo === 'linea' && item.elemento) {
+        if ((item.tipo === 'linea' || item.tipo === 'linea-libre') && item.elemento) {
             item.elemento.setStyle({
                 color: estilos.color,
                 weight: estilos.weight,
@@ -356,6 +373,8 @@ function exportarDatosMapa() {
     const elementos = [];
 
     historialAcciones.forEach(item => {
+        if (!item || !item.elemento) return;
+        
         if (item.tipo === 'linea') {
             const latlngs = item.elemento.getLatLngs().map(ll => [ll.lng, ll.lat]);
             elementos.push({
@@ -377,6 +396,16 @@ function exportarDatosMapa() {
                     tipo: "marcador",
                     numero: item.numero,
                     color: item.color || "#007bff"
+                }
+            });
+        } else if (item.tipo === 'marcador-libre') {
+            const ll = item.elemento.getLatLng();
+            elementos.push({
+                type: "Feature",
+                geometry: { type: "Point", coordinates: [ll.lng, ll.lat] },
+                properties: {
+                    tipo: "marcador-libre",
+                    color: item.elemento.options.color
                 }
             });
         }
@@ -407,8 +436,6 @@ async function guardarEnGithub() {
         let mensajePrompt = "Elige un nombre de mapa existente para sobrescribir o escribe uno nuevo:\n\n";
         if (archivosDisponibles.length > 0) {
             mensajePrompt += "Mapas guardados actualmente:\n- " + archivosDisponibles.join("\n- ") + "\n\n";
-        } else {
-            mensajePrompt += "(No hay mapas previos, introduce uno nuevo)\n\n";
         }
 
         const nombreArchivo = prompt(mensajePrompt);
@@ -472,7 +499,7 @@ async function abrirModalCargarGithub() {
         const res = await fetch(url, {
             headers: { 'Authorization': `token ${token}` }
         });
-        if (!res.ok) throw new Error("No se pudo obtener la lista de mapas. Verifica tu token.");
+        if (!res.ok) throw new Error("No se pudo obtener la lista de mapas.");
 
         const archivos = await res.json();
         const jsonFiles = archivos.filter(f => f.name.endsWith('.json'));
@@ -486,7 +513,6 @@ async function abrirModalCargarGithub() {
         jsonFiles.forEach(file => {
             const nombreLimpio = file.name.replace('.json', '');
             const item = document.createElement('div');
-            item.className = 'map-item';
             item.style.display = 'flex';
             item.style.justifyContent = 'space-between';
             item.style.alignItems = 'center';
@@ -497,7 +523,7 @@ async function abrirModalCargarGithub() {
                 <span style="font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 170px;">${nombreLimpio}</span>
                 <div style="display: flex; gap: 6px;">
                     <button class="btn btn-primary" style="padding: 4px 10px; font-size: 13px;" onclick="cargarMapaDesdeGithub('${file.name}')">Cargar</button>
-                    <button class="btn btn-danger" style="padding: 4px 10px; font-size: 13px;" onclick="eliminarMapaDeGithub('${file.name}', '${file.sha}')" title="Eliminar mapa">🗑️</button>
+                    <button class="btn btn-danger" style="padding: 4px 10px; font-size: 13px;" onclick="eliminarMapaDeGithub('${file.name}', '${file.sha}')">🗑️</button>
                 </div>
             `;
             listaContainer.appendChild(item);
@@ -511,9 +537,7 @@ async function eliminarMapaDeGithub(fileName, sha) {
     const token = obtenerToken();
     if (!token) return;
 
-    if (!confirm(`¿Estás seguro de que deseas eliminar permanentemente el mapa "${fileName.replace('.json', '')}"?`)) {
-        return;
-    }
+    if (!confirm(`¿Eliminar permanentemente el mapa "${fileName.replace('.json', '')}"?`)) return;
 
     const path = `${GITHUB_FOLDER}/${fileName}`;
     const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`;
@@ -525,10 +549,7 @@ async function eliminarMapaDeGithub(fileName, sha) {
                 'Authorization': `token ${token}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                message: `Eliminar mapa ${fileName}`,
-                sha: sha
-            })
+            body: JSON.stringify({ message: `Eliminar ${fileName}`, sha: sha })
         });
 
         if (res.ok) {
@@ -569,12 +590,19 @@ async function cargarMapaDesdeGithub(nombreArchivo) {
                     opacity: feature.properties.opacity
                 }).addTo(map);
 
+                polyline.on('click', function(ev) {
+                    if (modoActual === 'borrar') {
+                        L.DomEvent.stopPropagation(ev);
+                        map.removeLayer(polyline);
+                        historialAcciones = historialAcciones.filter(item => item.elemento !== polyline);
+                    }
+                });
+
                 historialAcciones.push({ tipo: 'linea', elemento: polyline });
                 bounds.push(...latlngs);
             } else if (feature.properties.tipo === 'marcador') {
                 const coord = feature.geometry.coordinates;
                 const latlng = [coord[1], coord[0]];
-
                 const num = feature.properties.numero;
                 const color = feature.properties.color || "#007bff";
 
@@ -602,16 +630,31 @@ async function cargarMapaDesdeGithub(nombreArchivo) {
                 historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: num, color: color });
                 bounds.push(latlng);
 
-                if (num >= contadorNumero) {
-                    contadorNumero = num + 1;
-                }
+                if (num >= contadorNumero) contadorNumero = num + 1;
+            } else if (feature.properties.tipo === 'marcador-libre') {
+                const coord = feature.geometry.coordinates;
+                const latlng = [coord[1], coord[0]];
+                const markerLibre = L.circleMarker(latlng, {
+                    radius: 5,
+                    color: feature.properties.color,
+                    fillColor: feature.properties.color,
+                    fillOpacity: 1
+                }).addTo(map);
+
+                markerLibre.on('click', function(ev) {
+                    if (modoActual === 'borrar') {
+                        L.DomEvent.stopPropagation(ev);
+                        map.removeLayer(markerLibre);
+                        historialAcciones = historialAcciones.filter(item => item.elemento !== markerLibre);
+                    }
+                });
+
+                historialAcciones.push({ tipo: 'marcador-libre', elemento: markerLibre });
+                bounds.push(latlng);
             }
         });
 
-        if (bounds.length > 0) {
-            map.fitBounds(bounds);
-        }
-
+        if (bounds.length > 0) map.fitBounds(bounds);
         cerrarModal();
     } catch (e) {
         alert(`Error al cargar el mapa: ${e.message}`);
@@ -677,24 +720,4 @@ async function compartirMapaGithub() {
     } catch (e) {
         alert(`Error al compartir el mapa: ${e.message}`);
     }
-}
-
-function importarGPX(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function (e) {
-        new L.GPX(e.target.result, {
-            async: true,
-            marker_options: {
-                startIconUrl: '',
-                endIconUrl: '',
-                shadowUrl: ''
-            }
-        }).on('loaded', function (e) {
-            map.fitBounds(e.target.getBounds());
-        }).addTo(map);
-    };
-    reader.readAsText(file);
 }
