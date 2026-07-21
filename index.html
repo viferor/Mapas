@@ -32,27 +32,27 @@
             touch-action: none;
         }
         
-        /* Barra de herramientas adaptable para móviles */
+        /* Barra de herramientas fijada en la parte inferior */
         #controls {
             position: absolute;
-            top: 10px;
+            bottom: 15px;
             left: 10px;
-            right: 60px; /* Deja espacio a la derecha para el selector de capas */
+            right: 10px;
             z-index: 1000;
             background: rgba(255, 255, 255, 0.95);
-            padding: 8px 10px;
+            padding: 10px;
             border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.25);
             display: flex;
             gap: 6px;
             align-items: center;
-            overflow-x: auto; /* Permite deslizar horizontalmente si no caben los botones */
+            overflow-x: auto; /* Desplazamiento horizontal si no caben en pantallas estrechas */
             white-space: nowrap;
             -webkit-overflow-scrolling: touch;
-            touch-action: pan-x; /* Permite deslizar la barra de botones a los lados */
+            touch-action: pan-x;
         }
 
-        /* Ocultar barra de scroll estética */
+        /* Barra de scroll discreta */
         #controls::-webkit-scrollbar {
             height: 4px;
         }
@@ -62,13 +62,13 @@
         }
 
         .btn {
-            padding: 6px 10px;
+            padding: 8px 12px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
             font-size: 13px;
-            flex-shrink: 0; /* Evita que los botones se deformen */
+            flex-shrink: 0;
         }
         .btn-primary { background: #007bff; color: white; }
         .btn-secondary { background: #6c757d; color: white; }
@@ -76,10 +76,11 @@
         .btn-danger { background: #dc3545; color: white; }
 
         select, input[type="color"] {
-            padding: 4px;
+            padding: 6px;
             border-radius: 4px;
             border: 1px solid #ccc;
             flex-shrink: 0;
+            height: 33px;
         }
 
         /* Estilos de la ventana modal */
@@ -121,14 +122,6 @@
             justify-content: space-between;
             align-items: center;
         }
-
-        /* Ajuste de posición para los controles nativos de Leaflet */
-        .leaflet-top.leaflet-left {
-            top: 70px; /* Baja el Zoom (+/-) para que no choque con la barra */
-        }
-        .leaflet-top.leaflet-right {
-            top: 10px; /* Coloca el selector de capas arriba a la derecha */
-        }
     </style>
 </head>
 <body>
@@ -136,7 +129,7 @@
     <!-- Contenedor del Mapa -->
     <div id="map"></div>
 
-    <!-- Barra de Controles y Herramientas -->
+    <!-- Barra de Controles y Herramientas (Fijada abajo) -->
     <div id="controls">
         <button id="btn-draw" class="btn btn-primary" onclick="setModo('dibujar')">✏️ Dibujar</button>
         <button id="btn-erase" class="btn btn-secondary" onclick="setModo('borrar')">🧹 Borrar</button>
@@ -183,7 +176,7 @@
     <!-- Leaflet GPX plugin -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/1.7.0/gpx.min.js"></script>
     
-    <!-- Script principal de la aplicación -->
+    <!-- Script principal -->
     <script src="app.js"></script>
 </body>
 </html>
