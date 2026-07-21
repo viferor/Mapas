@@ -1,3 +1,4 @@
+
 // Configuración de GitHub
 const GITHUB_USER = "viferor"; 
 const GITHUB_REPO = "Mapas"; 
@@ -46,9 +47,9 @@ document.addEventListener("DOMContentLoaded", function () {
     };
     L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
 
-    // Configuración específica de eventos táctiles/pointer para tabletas
+    // Configuración específica de eventos pointer para tabletas
     const mapContainer = map.getContainer();
-    mapContainer.style.touchAction = 'none'; // Evita gestos nativos de la tablet al dibujar
+    mapContainer.style.touchAction = 'none'; // Evita que la tablet mueva el mapa al intentar dibujar
 
     mapContainer.addEventListener('pointerdown', iniciarTrazoTablet);
     mapContainer.addEventListener('pointermove', moverTrazoTablet);
@@ -79,12 +80,12 @@ function setModo(modo) {
         map.dragging.disable();
         map.touchZoom.disable();
         map.doubleClickZoom.disable();
-        mapContainer.style.touchAction = 'none'; // Bloquea gestos de la tablet para priorizar el trazo
+        mapContainer.style.touchAction = 'none'; 
     } else {
         map.dragging.enable();
         map.touchZoom.enable();
         map.doubleClickZoom.enable();
-        mapContainer.style.touchAction = 'auto'; // Restaura la navegación normal por la tablet
+        mapContainer.style.touchAction = 'auto'; 
     }
 
     document.getElementById('btn-draw').className = modo === 'dibujar' ? 'btn btn-primary' : 'btn btn-secondary';
@@ -100,11 +101,24 @@ function obtenerEstilosActuales() {
     };
 }
 
-// --- DIBUJO TÁCTIL OPTIMIZADO PARA TABLET (POINTER EVENTS) ---
+// --- FUNCIÓN DE CONVERSIÓN SEGURA PARA TABLET ---
+function obtenerLatLngDesdePointer(e) {
+    const mapContainer = map.getContainer();
+    const rect = mapContainer.getBoundingClientRect();
+    
+    // Obtenemos las coordenadas X e Y relativas al contenedor del mapa en la pantalla
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Convertimos directamente el punto de la pantalla a coordenadas del mapa de Leaflet
+    return map.containerPointToLatLng([x, y]);
+}
+
+// --- DIBUJO TÁCTIL OPTIMIZADO PARA TABLET ---
 function iniciarTrazoTablet(e) {
     if (modoActual !== 'dibujar') return;
     
-    // Si se pulsa sobre la botonera o controles de Leaflet, no se dibuja
+    // Si se pulsa sobre la botonera o controles de la interfaz, no se dibuja
     if (e.target.closest('.leaflet-control-container') || e.target.closest('button') || e.target.closest('input')) {
         return;
     }
@@ -112,7 +126,7 @@ function iniciarTrazoTablet(e) {
     e.preventDefault();
     dibujando = true;
 
-    const latlng = map.mouseEventToLatLng(e);
+    const latlng = obtenerLatLngDesdePointer(e);
     if (!latlng) return;
 
     const estilos = obtenerEstilosActuales();
@@ -130,7 +144,7 @@ function moverTrazoTablet(e) {
 
     e.preventDefault();
 
-    const latlng = map.mouseEventToLatLng(e);
+    const latlng = obtenerLatLngDesdePointer(e);
     if (latlng) {
         lineaActual.addLatLng(latlng);
     }
