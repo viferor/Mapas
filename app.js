@@ -77,7 +77,7 @@ function setModo(modo) {
 
     // Actualizar clases de botones de la interfaz
     const btnDraw = document.getElementById('btn-draw');
-    if (btnDraw) btnDraw.className = 'btn btn-secondary'; // El dibujo a mano alzada ya no es necesario
+    if (btnDraw) btnDraw.className = 'btn btn-secondary';
     
     document.getElementById('btn-number').className = modo === 'numero' ? 'btn btn-primary' : 'btn btn-secondary';
     document.getElementById('btn-erase').className = modo === 'borrar' ? 'btn btn-danger' : 'btn btn-secondary';
@@ -91,7 +91,7 @@ function obtenerEstilosActuales() {
     };
 }
 
-// --- GESTIÓN DE CLICS Y ENRUTAMIENTO AUTOMÁTICO POR CALLES ---
+// --- GESTIÓN DE CLICS Y ENRUTAMIENTO PEATONAL AUTOMÁTICO ---
 async function gestionarPulsacion(e) {
     if (modoActual !== 'numero') return;
 
@@ -136,10 +136,10 @@ async function gestionarPulsacion(e) {
 
     let lineaAsociada = null;
 
-    // 2. Si hay más de un punto, calculamos la ruta por calles desde el punto anterior hasta este
+    // 2. Si hay más de un punto, calculamos la ruta peatonal desde el punto anterior hasta este
     if (puntosRuta.length > 1) {
         const puntoAnterior = puntosRuta[puntosRuta.length - 2];
-        const latlngsRuta = await obtenerRutaCallejeroOSRM(puntoAnterior, latlng);
+        const latlngsRuta = await obtenerRutaPeatonalOSRM(puntoAnterior, latlng);
 
         if (latlngsRuta && latlngsRuta.length > 0) {
             lineaAsociada = L.polyline(latlngsRuta, {
@@ -159,10 +159,10 @@ async function gestionarPulsacion(e) {
     contadorNumero++;
 }
 
-// --- PETICIÓN AL MOTOR DE RUTAS OSRM (OpenStreetMap Routing) ---
-async function obtenerRutaCallejeroOSRM(origen, destino) {
-    // OSRM usa formato coordenadas: [longitud, latitud]
-    const url = `https://router.project-osrm.org/route/v1/driving/${origen.lng},${origen.lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson`;
+// --- PETICIÓN AL MOTOR OSRM EN MODO PEATONAL ('foot') ---
+async function obtenerRutaPeatonalOSRM(origen, destino) {
+    // Cambiamos 'driving' por 'foot' para que el enrutamiento sea peatonal
+    const url = `https://router.project-osrm.org/route/v1/foot/${origen.lng},${origen.lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson`;
 
     try {
         const response = await fetch(url);
@@ -174,10 +174,10 @@ async function obtenerRutaCallejeroOSRM(origen, destino) {
             return coordenadasGeoJSON.map(coord => [coord[1], coord[0]]);
         }
     } catch (e) {
-        console.error("Error al calcular la ruta ruteable:", e);
+        console.error("Error al calcular la ruta peatonal:", e);
     }
 
-    // Plan B de respaldo: Si falla internet o el servidor OSRM, une los puntos en línea recta directamente
+    // Plan B de respaldo: Si falla la conexión con el servidor de rutas, une los puntos en línea recta
     return [origen, destino];
 }
 
@@ -193,7 +193,6 @@ function deshacerUltimo() {
         contadorNumero = Math.max(1, contadorNumero - 1);
         puntosRuta.pop(); // Quitamos también la coordenada del array de ruta
         
-        // Si el marcador tenía una línea asociada en el historial, la quitamos también visualmente
         if (ultimaAccion.elemento.lineaAsociada) {
             map.removeLayer(ultimaAccion.elemento.lineaAsociada);
             historialAcciones = historialAcciones.filter(item => item.elemento !== ultimaAccion.elemento.lineaAsociada);
@@ -508,7 +507,7 @@ function importarGPX(event) {
             marker_options: {
                 startIconUrl: '',
                 endIconUrl: '',
-                    shadowUrl: ''
+                shadowUrl: ''
             }
         }).on('loaded', function (e) {
             map.fitBounds(e.target.getBounds());
