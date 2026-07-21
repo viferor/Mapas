@@ -8,7 +8,7 @@
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     
-    <!-- Estilo moderno con panel flotante inferior transparente -->
+    <!-- Estilo moderno con panel flotante inferior totalmente transparente -->
     <style>
         html, body {
             margin: 0;
@@ -35,12 +35,11 @@
             transform: translateX(-50%);
             width: 92%;
             max-width: 950px;
-            padding: 12px 15px;
-            background: rgba(255, 255, 255, 0.88);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            padding: 10px 12px;
+            background: transparent; /* Fondo 100% transparente */
+            backdrop-filter: none;   /* Sin desenfoque de fondo */
+            border: none;            /* Sin bordes */
+            box-shadow: none;        /* Sin sombras de caja para mantenerlo integrado */
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
@@ -67,6 +66,7 @@
             line-height: 1;
         }
 
+        /* Botones con una ligera sombra propia para destacar en total transparencia */
         .btn {
             padding: 6px 12px;
             border: none;
@@ -74,6 +74,7 @@
             cursor: pointer;
             font-weight: bold;
             font-size: 13px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
         }
         .btn-primary { background: #007bff; color: white; }
         .btn-secondary { background: #6c757d; color: white; }
@@ -81,6 +82,17 @@
         .btn-success { background: #28a745; color: white; }
         .btn-info { background: #17a2b8; color: white; }
         .btn-warning { background: #ffc107; color: black; }
+
+        /* Sombra de texto para legibilidad perfecta sobre cualquier fondo de mapa */
+        .control-panel label {
+            color: #222;
+            font-weight: bold;
+            text-shadow: 0 1px 3px rgba(255, 255, 255, 0.9), 0 0 5px rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+        }
     </style>
 </head>
 <body>
@@ -88,7 +100,7 @@
     <!-- Contenedor del Mapa -->
     <div id="map"></div>
 
-    <!-- Panel de Control Flotante Inferior Transparente -->
+    <!-- Panel de Control Flotante Inferior Totalmente Transparente -->
     <div id="control-panel" class="control-panel">
         <div class="grupo-botones" style="display: flex; gap: 5px;">
             <button id="btn-number" class="btn btn-primary">Números</button>
@@ -96,7 +108,7 @@
             <button id="btn-erase" class="btn btn-secondary">Borrar</button>
         </div>
 
-        <div class="grupo-estilos" style="display: flex; gap: 8px; align-items: center; font-size: 13px;">
+        <div class="grupo-estilos" style="display: flex; gap: 8px; align-items: center;">
             <label>Color: <input type="color" id="color" value="#007bff"></label>
             <label>Grosor: <input type="range" id="grosor" min="2" max="30" value="13" style="width: 70px;"></label>
             <label>Opacidad: <input type="range" id="opacidad" min="10" max="100" value="35" style="width: 70px;"></label>
