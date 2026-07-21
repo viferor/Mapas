@@ -73,12 +73,9 @@ function inicializarInterfaz() {
     const grosorInput = document.getElementById('grosor');
     const opacidadInput = document.getElementById('opacidad');
 
-    // Establecer opacidad por defecto al 35% y grosor a 13 píxeles si los controles existen
+    // Establecer opacidad por defecto al 35% si el control existe en el HTML
     if (opacidadInput) {
         opacidadInput.value = 35;
-    }
-    if (grosorInput) {
-        grosorInput.value = 13;
     }
 
     if (btnNumber) btnNumber.addEventListener('click', () => setModo('numero'));
@@ -119,7 +116,7 @@ function obtenerEstilosActuales() {
 
     return {
         color: colorEl ? colorEl.value : '#007bff',
-        weight: grosorEl ? parseInt(grosorEl.value) : 13, // Por defecto 13 píxeles si no está definido
+        weight: grosorEl ? parseInt(grosorEl.value) : 4,
         opacity: opacidadEl ? parseFloat(opacidadEl.value) / 100 : 0.35 // Por defecto 35% (0.35) si no está definido
     };
 }
@@ -611,4 +608,23 @@ function importarGPX(event) {
     };
     reader.readAsText(file);
 }
-    
+
+function importarGPX(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        new L.GPX(e.target.result, {
+            async: true,
+            marker_options: {
+                startIconUrl: '',
+                endIconUrl: '',
+                shadowUrl: ''
+            }
+        }).on('loaded', function (e) {
+            map.fitBounds(e.target.getBounds());
+        }).addTo(map);
+    };
+    reader.readAsText(file);
+}
