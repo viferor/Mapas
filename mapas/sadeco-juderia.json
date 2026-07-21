@@ -1605,28 +1605,6 @@
         "type": "LineString",
         "coordinates": [
           [
-            -4.779482499573069,
-            37.87957402077458
-          ],
-          [
-            -4.779691646499387,
-            37.88026407125436
-          ]
-        ]
-      },
-      "properties": {
-        "tipo": "linea",
-        "color": "#007bff",
-        "weight": 13,
-        "opacity": 0.35
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
             -4.779691646499387,
             37.88026407125436
           ],
