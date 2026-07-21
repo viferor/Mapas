@@ -397,7 +397,9 @@ async function guardarEnGithub() {
     
     try {
         let archivosDisponibles = [];
-        const resList = await fetch(urlDir);
+        const resList = await fetch(urlDir, {
+            headers: { 'Authorization': `token ${token}` }
+        });
         if (resList.ok) {
             const dataFiles = await resList.json();
             archivosDisponibles = dataFiles.filter(f => f.name.endsWith('.json')).map(f => f.name.replace('.json', ''));
@@ -455,6 +457,9 @@ async function guardarEnGithub() {
 }
 
 async function abrirModalCargarGithub() {
+    const token = obtenerToken();
+    if (!token) return alert("Se requiere un Token de GitHub para ver los mapas.");
+
     const modal = document.getElementById('modal-load');
     const listaContainer = document.getElementById('lista-mapas');
     if (!modal) return;
@@ -465,8 +470,10 @@ async function abrirModalCargarGithub() {
     const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FOLDER}`;
 
     try {
-        const res = await fetch(url);
-        if (!res.ok) throw new Error("No se pudo obtener la lista de mapas.");
+        const res = await fetch(url, {
+            headers: { 'Authorization': `token ${token}` }
+        });
+        if (!res.ok) throw new Error("No se pudo obtener la lista de mapas. Verifica tu token.");
 
         const archivos = await res.json();
         const jsonFiles = archivos.filter(f => f.name.endsWith('.json'));
@@ -495,7 +502,6 @@ function cerrarModal() {
     const modal = document.getElementById('modal-load');
     if (modal) modal.style.display = 'none';
 }
-
 async function cargarMapaDesdeGithub(nombreArchivo) {
     const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${GITHUB_FOLDER}/${nombreArchivo}`;
 
@@ -567,11 +573,16 @@ async function cargarMapaDesdeGithub(nombreArchivo) {
 }
 
 async function compartirMapaGithub() {
+    const token = obtenerToken();
+    if (!token) return alert("Se requiere un Token de GitHub.");
+
     const urlDir = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FOLDER}`;
 
     try {
         let archivosDisponibles = [];
-        const resList = await fetch(urlDir);
+        const resList = await fetch(urlDir, {
+            headers: { 'Authorization': `token ${token}` }
+        });
         if (resList.ok) {
             const dataFiles = await resList.json();
             archivosDisponibles = dataFiles.filter(f => f.name.endsWith('.json')).map(f => f.name.replace('.json', ''));
