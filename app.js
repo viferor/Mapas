@@ -1,4 +1,4 @@
-// Configuración de GitHub
+// ConfiguraciÃ³n de GitHub
 const GITHUB_USER = "viferor"; 
 const GITHUB_REPO = "Mapas"; 
 const GITHUB_FOLDER = "mapas"; 
@@ -17,36 +17,36 @@ let historialRehacer = [];
 let ultimoPuntoTramo = null; 
 let trazoLibreActivo = false; 
 
-// Inicialización del mapa y eventos de la interfaz
+// InicializaciÃ³n del mapa y eventos de la interfaz
 document.addEventListener("DOMContentLoaded", function () {
     map = L.map('map', {
         zoomControl: true,
         touchZoom: true
-    }).setView([37.8882, -4.7794], 13); // Centrado en Córdoba
+    }).setView([37.8882, -4.7794], 13); // Centrado en CÃ³rdoba
 
     // Capas base de mapas (Selector superior derecho)
     const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
-        attribution: '© OpenStreetMap'
+        attribution: 'Â© OpenStreetMap'
     });
 
     const topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
         maxZoom: 17,
-        attribution: '© OpenTopoMap'
+        attribution: 'Â© OpenTopoMap'
     });
 
     const googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
         maxZoom: 20,
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-        attribution: '© Google Maps'
+        attribution: 'Â© Google Maps'
     });
 
     osm.addTo(map);
 
     const baseMaps = {
         "Callejero": osm,
-        "Topográfico": topo,
-        "Híbrido Google": googleHybrid
+        "TopogrÃ¡fico": topo,
+        "HÃ­brido Google": googleHybrid
     };
     L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
 
@@ -86,7 +86,7 @@ function inicializarInterfaz() {
     if (opacidadInput) opacidadInput.addEventListener('input', actualizarEstilosGlobales);
 }
 
-// Selección de modos
+// SelecciÃ³n de modos
 function setModo(modo) {
     modoActual = modo;
     
@@ -102,7 +102,7 @@ function setModo(modo) {
     if (btnDrawEl) btnDrawEl.className = modo === 'dibujar' ? 'btn btn-primary' : 'btn btn-secondary';
     if (btnErrEl) btnErrEl.className = modo === 'borrar' ? 'btn btn-danger' : 'btn btn-secondary';
 
-    // Mostrar u ocultar el selector de comportamiento numérico según el modo activo
+    // Mostrar u ocultar el selector de comportamiento numÃ©rico segÃºn el modo activo
     const selectorSubmodo = document.getElementById('contenedor-submodo-numero');
     if (selectorSubmodo) {
         selectorSubmodo.style.display = (modo === 'numero') ? 'flex' : 'none';
@@ -116,7 +116,7 @@ function setModo(modo) {
 function cambiarSubmodoNumero(e) {
     submodoNumero = e.target.value;
     if (submodoNumero === 'aislado') {
-        ultimoPuntoTramo = null; // Si marcamos aislado, rompemos la cadena para que el siguiente no enrute automáticamente
+        ultimoPuntoTramo = null; // Rompemos el tramo al pasar a aislado
     }
 }
 
@@ -132,17 +132,17 @@ function obtenerEstilosActuales() {
     };
 }
 
-// --- FUNCIÓN PARA CORTAR TRAMO ACTUAL ---
+// --- FUNCIÃ“N PARA CORTAR TRAMO ACTUAL ---
 function cortarTramoActual() {
     ultimoPuntoTramo = null;
     window.puntosDibujoLibre = [];
     trazoLibreActivo = false; 
-    alert("Próximo punto iniciado como un trazado nuevo independiente.");
+    alert("PrÃ³ximo punto iniciado como un trazado nuevo independiente.");
 }
 
 let ultimoToqueTiempo = 0;
 
-// --- GESTIÓN DE CLICS / TOQUES ---
+// --- GESTIÃ“N DE CLICS / TOQUES ---
 async function gestionarPulsacion(e) {
     const latlng = e.latlng;
     const estilos = obtenerEstilosActuales();
@@ -206,7 +206,7 @@ async function gestionarPulsacion(e) {
         return;
     }
 
-    // MODO NÚMEROS Y RUTAS
+    // MODO NÃšMEROS Y RUTAS
     if (modoActual === 'numero') {
         const numeroActual = contadorNumero;
 
@@ -238,7 +238,7 @@ async function gestionarPulsacion(e) {
 
         let lineaAsociada = null;
 
-        // Solo intentamos rutear si estamos en el submodo 'ruta' y tenemos un punto previo válido
+        // VERIFICACIÃ“N ESTRICTA: Solo rutear si submodo es 'ruta' Y tenemos un punto previo vÃ¡lido
         if (submodoNumero === 'ruta' && ultimoPuntoTramo) {
             const coordenadasCalle = await obtenerRutaPorCallesOSRM(ultimoPuntoTramo, latlng);
 
@@ -263,14 +263,14 @@ async function gestionarPulsacion(e) {
             }
         }
 
-        // Si estamos en modo ruta, actualizamos el último punto. Si es aislado, no guardamos referencia de tramo para que el siguiente empiece limpio.
+        // Actualizar referencia de tramo segÃºn el submodo
         if (submodoNumero === 'ruta') {
             ultimoPuntoTramo = latlng;
         } else {
             ultimoPuntoTramo = null;
         }
 
-        historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: numeroActual, color: estilos.color });
+        historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: numeroActual, color: estilos.color, submodo: submodoNumero });
         historialRehacer = [];
         contadorNumero++;
     }
@@ -313,7 +313,9 @@ function deshacerUltimo() {
                 historialAcciones = historialAcciones.filter(item => item.elemento !== ultimaAccion.elemento.lineaAsociada);
                 historialRehacer.push({ tipo: 'linea', elemento: ultimaAccion.elemento.lineaAsociada });
             }
-            ultimoPuntoTramo = historialAcciones.slice().reverse().find(item => item.tipo === 'marcador')?.elemento.getLatLng() || null;
+            // Recalcular ultimoPuntoTramo con base en el historial restante
+            const ultimoMarcadorRuta = historialAcciones.slice().reverse().find(item => item.tipo === 'marcador' && item.submodo === 'ruta');
+            ultimoPuntoTramo = ultimoMarcadorRuta ? ultimoMarcadorRuta.elemento.getLatLng() : null;
         }
     }
 }
@@ -328,7 +330,7 @@ function rehacerProximo() {
 
         if (accionRehacer.tipo === 'marcador') {
             contadorNumero++;
-            if (submodoNumero === 'ruta') {
+            if (accionRehacer.submodo === 'ruta') {
                 ultimoPuntoTramo = accionRehacer.elemento.getLatLng();
             }
         }
@@ -363,7 +365,7 @@ function actualizarEstilosGlobales() {
     });
 }
 
-// --- GESTIÓN CON GITHUB ---
+// --- GESTIÃ“N CON GITHUB ---
 
 function obtenerToken() {
     let token = localStorage.getItem('github_token');
@@ -411,7 +413,8 @@ function exportarDatosMapa() {
                 properties: {
                     tipo: "marcador",
                     numero: item.numero,
-                    color: item.color || "#007bff"
+                    color: item.color || "#007bff",
+                    submodo: item.submodo || "ruta"
                 }
             });
         } else if (item.tipo === 'marcador-libre') {
@@ -449,9 +452,15 @@ async function guardarEnGithub() {
             archivosDisponibles = dataFiles.filter(f => f.name.endsWith('.json')).map(f => f.name.replace('.json', ''));
         }
 
-        let mensajePrompt = "Elige un nombre de mapa existente para sobrescribir o escribe uno nuevo:\n\n";
+        let mensajePrompt = "Elige un nombre de mapa existente para sobrescribir o escribe uno nuevo:
+
+";
         if (archivosDisponibles.length > 0) {
-            mensajePrompt += "Mapas guardados actualmente:\n- " + archivosDisponibles.join("\n- ") + "\n\n";
+            mensajePrompt += "Mapas guardados actualmente:
+- " + archivosDisponibles.join("
+- ") + "
+
+";
         }
 
         const nombreArchivo = prompt(mensajePrompt);
@@ -488,13 +497,13 @@ async function guardarEnGithub() {
         });
 
         if (res.ok) {
-            alert("¡Mapa guardado con éxito en tu repositorio!");
+            alert("Â¡Mapa guardado con Ã©xito en tu repositorio!");
         } else {
             const errData = await res.json();
             alert(`Error al guardar: ${errData.message}`);
         }
     } catch (e) {
-        alert(`Error de conexión: ${e.message}`);
+        alert(`Error de conexiÃ³n: ${e.message}`);
     }
 }
 
@@ -539,7 +548,7 @@ async function abrirModalCargarGithub() {
                 <span style="font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 170px;">${nombreLimpio}</span>
                 <div style="display: flex; gap: 6px;">
                     <button class="btn btn-primary" style="padding: 4px 10px; font-size: 13px;" onclick="cargarMapaDesdeGithub('${file.name}')">Cargar</button>
-                    <button class="btn btn-danger" style="padding: 4px 10px; font-size: 13px;" onclick="eliminarMapaDeGithub('${file.name}', '${file.sha}')">🗑️</button>
+                    <button class="btn btn-danger" style="padding: 4px 10px; font-size: 13px;" onclick="eliminarMapaDeGithub('${file.name}', '${file.sha}')">ðŸ—‘ï¸</button>
                 </div>
             `;
             listaContainer.appendChild(item);
@@ -553,7 +562,7 @@ async function eliminarMapaDeGithub(fileName, sha) {
     const token = obtenerToken();
     if (!token) return;
 
-    if (!confirm(`¿Eliminar permanentemente el mapa "${fileName.replace('.json', '')}"?`)) return;
+    if (!confirm(`Â¿Eliminar permanentemente el mapa "${fileName.replace('.json', '')}"?`)) return;
 
     const path = `${GITHUB_FOLDER}/${fileName}`;
     const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`;
@@ -576,7 +585,7 @@ async function eliminarMapaDeGithub(fileName, sha) {
             alert(`Error al eliminar: ${errData.message}`);
         }
     } catch (e) {
-        alert(`Error de conexión: ${e.message}`);
+        alert(`Error de conexiÃ³n: ${e.message}`);
     }
 }
 
@@ -621,6 +630,7 @@ async function cargarMapaDesdeGithub(nombreArchivo) {
                 const latlng = [coord[1], coord[0]];
                 const num = feature.properties.numero;
                 const color = feature.properties.color || "#007bff";
+                const sub = feature.properties.submodo || "ruta";
 
                 const numberIcon = L.divIcon({
                     className: 'number-icon',
@@ -643,8 +653,12 @@ async function cargarMapaDesdeGithub(nombreArchivo) {
                     }
                 });
 
-                historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: num, color: color });
+                historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: num, color: color, submodo: sub });
                 bounds.push(latlng);
+
+                if (sub === 'ruta') {
+                    ultimoPuntoTramo = latlng;
+                }
 
                 if (num >= contadorNumero) contadorNumero = num + 1;
             } else if (feature.properties.tipo === 'marcador-libre') {
@@ -697,25 +711,30 @@ async function compartirMapaGithub() {
             return alert("No hay mapas guardados en GitHub para compartir.");
         }
 
-        let mensajePrompt = "Elige el número del mapa que quieres compartir:\n\n";
+        let mensajePrompt = "Elige el nÃºmero del mapa que quieres compartir:
+
+";
         archivosDisponibles.forEach((file, index) => {
-            mensajePrompt += `${index + 1}. ${file.replace('.json', '')}\n`;
+            mensajePrompt += `${index + 1}. ${file.replace('.json', '')}
+`;
         });
-        mensajePrompt += "\nIntroduce el número correspondiente:";
+        mensajePrompt += "
+Introduce el nÃºmero correspondiente:";
 
         const seleccion = prompt(mensajePrompt);
         if (!seleccion) return;
 
         const indice = parseInt(seleccion.trim()) - 1;
         if (isNaN(indice) || indice < 0 || indice >= archivosDisponibles.length) {
-            return alert("Selección no válida.");
+            return alert("SelecciÃ³n no vÃ¡lida.");
         }
 
         const fileName = archivosDisponibles[indice];
         const nombreMapaLimpio = fileName.replace('.json', '');
         const baseUrl = window.location.href.split('?')[0];
         const shareUrl = `${baseUrl}?mapa=${fileName}`;
-        const textoMensaje = `🗺️ ¡Mira esta ruta guardada "${nombreMapaLimpio}"!\n${shareUrl}`;
+        const textoMensaje = `ðŸ—ºï¸ Â¡Mira esta ruta guardada "${nombreMapaLimpio}"!
+${shareUrl}`;
 
         if (navigator.share) {
             try {
