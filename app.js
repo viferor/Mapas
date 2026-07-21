@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     osm.addTo(map);
 
-    // Selector de capas
+    // Selector de capas superior derecho (Callejero, Topográfico, Satélite)
     const baseMaps = {
         "Callejero": osm,
         "Topográfico": topo,
@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const mapContainer = map.getContainer();
     mapContainer.style.touchAction = 'auto';
 
-    // Evento de clic/toque en el mapa para colocar los números y enrutar
+    // Evento de clic/toque en el mapa para colocar los números y trazar
     map.on('click', gestionarPulsacion);
 
     // Conectar eventos de los elementos de la interfaz (botones y selectores)
@@ -80,22 +80,19 @@ function inicializarInterfaz() {
     if (btnNumber) btnNumber.addEventListener('click', () => setModo('numero'));
     if (btnErase) btnErase.addEventListener('click', () => setModo('borrar'));
 
-    // Si cambian los estilos de línea/color en caliente, actualizamos la última línea activa
     if (colorPicker) colorPicker.addEventListener('input', actualizarEstiloRuta);
     if (grosorInput) grosorInput.addEventListener('input', actualizarEstiloRuta);
     if (opacidadInput) opacidadInput.addEventListener('input', actualizarEstiloRuta);
 }
 
-// Selección de modo
+// Selección de modo (Número o Borrar)
 function setModo(modo) {
     modoActual = modo;
     
-    // Habilitar siempre la navegación libre del mapa (zoom y desplazamiento perfectos)
     map.dragging.enable();
     map.touchZoom.enable();
     map.doubleClickZoom.enable();
 
-    // Actualizar clases de botones de la interfaz
     const btnDraw = document.getElementById('btn-draw');
     if (btnDraw) btnDraw.className = 'btn btn-secondary';
     
@@ -118,7 +115,7 @@ function obtenerEstilosActuales() {
     };
 }
 
-// --- GESTIÓN DE CLICS Y ENRUTAMIENTO PEATONAL LIBRE Y SECUENCIAL ---
+// --- GESTIÓN DE CLICS Y TRAZADO LIBRE PEATONAL SIN RESTRICCIONES ---
 function gestionarPulsacion(e) {
     if (modoActual !== 'numero') return;
 
@@ -128,7 +125,6 @@ function gestionarPulsacion(e) {
     const estilos = obtenerEstilosActuales();
     const numeroActual = contadorNumero;
 
-    // 1. Crear el marcador numerado en el punto pulsado
     const numberIcon = L.divIcon({
         className: 'number-icon',
         html: `<span>${numeroActual}</span>`,
@@ -145,14 +141,12 @@ function gestionarPulsacion(e) {
         }
     }, 10);
 
-    // Permitir borrar el marcador individualmente en modo borrar
     marker.on('click', function(ev) {
         if (modoActual === 'borrar') {
-            L.DomEvent.stopPropagation(ev); // Evitar que el mapa interprete el clic
+            L.DomEvent.stopPropagation(ev);
             map.removeLayer(marker);
             historialAcciones = historialAcciones.filter(item => item.elemento !== marker);
             
-            // Si el marcador borrado tenía una línea asociada, la eliminamos también de la vista
             if (marker.lineaAsociada) {
                 map.removeLayer(marker.lineaAsociada);
                 historialAcciones = historialAcciones.filter(item => item.elemento !== marker.lineaAsociada);
@@ -162,7 +156,7 @@ function gestionarPulsacion(e) {
 
     let lineaAsociada = null;
 
-    // 2. Si hay más de un punto, unimos secuencialmente del punto anterior al actual con total libertad peatonal
+    // Conexión libre punto a punto (Libertad peatonal y espacial total)
     if (puntosRuta.length > 1) {
         const puntoAnterior = puntosRuta[puntosRuta.length - 2];
         const coordenadasTramo = [puntoAnterior, latlng];
@@ -183,7 +177,6 @@ function gestionarPulsacion(e) {
     contadorNumero++;
 }
 
-// Deshacer y Rehacer
 function deshacerUltimo() {
     if (historialAcciones.length === 0) return;
 
@@ -193,7 +186,7 @@ function deshacerUltimo() {
 
     if (ultimaAccion.tipo === 'marcador') {
         contadorNumero = Math.max(1, contadorNumero - 1);
-        puntosRuta.pop(); // Quitamos también la coordenada del array de ruta
+        puntosRuta.pop();
         
         if (ultimaAccion.elemento.lineaAsociada) {
             map.removeLayer(ultimaAccion.elemento.lineaAsociada);
@@ -225,7 +218,6 @@ function borrarTodo() {
     contadorNumero = 1;
 }
 
-// Actualizar estilo visual de la línea actual si se cambian los selectores
 function actualizarEstiloRuta() {
     const estilos = obtenerEstilosActuales();
     if (historialAcciones.length > 0) {
@@ -239,7 +231,6 @@ function actualizarEstiloRuta() {
         }
     }
 }
-
 // --- GESTIÓN CON GITHUB ---
 
 function obtenerToken() {
@@ -297,7 +288,6 @@ function exportarDatosMapa() {
     };
 }
 
-// Guardar permitiendo elegir un mapa existente de la lista o crear uno nuevo
 async function guardarEnGithub() {
     const token = obtenerToken();
     if (!token) return alert("Se requiere un Token de GitHub para guardar.");
@@ -478,7 +468,6 @@ async function cargarMapaDesdeGithub(nombreArchivo) {
     }
 }
 
-// Compartir mostrando listado previo de mapas existentes
 async function compartirMapaGithub() {
     const urlDir = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FOLDER}`;
 
