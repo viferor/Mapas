@@ -8,7 +8,7 @@
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     
-    <!-- Estilo de diseño estricto por Flexbox para asegurar visibilidad del mapa -->
+    <!-- Estilo moderno con panel flotante inferior transparente -->
     <style>
         html, body {
             margin: 0;
@@ -17,31 +17,61 @@
             height: 100%;
             overflow: hidden;
             font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column; /* Organiza el panel arriba y el mapa abajo en columna */
-        }
-
-        .control-panel {
-            padding: 8px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #ccc;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            align-items: center;
-            z-index: 1000;
-            flex-shrink: 0; /* Evita que el panel se deforme */
         }
 
         #map {
             width: 100%;
-            flex-grow: 1; /* OBLIGA al mapa a ocupar el 100% del espacio restante de la pantalla */
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
         }
+
+        .control-panel {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 900px;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.85); /* Fondo blanco semitransparente */
+            backdrop-filter: blur(8px); /* Efecto cristal desenfocado */
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        /* Estética general de botones para que destaquen sobre el mapa */
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-info { background: #17a2b8; color: white; }
+        .btn-warning { background: #ffc107; color: black; }
     </style>
 </head>
 <body>
 
-    <!-- Panel de Control / Controles Superiores -->
+    <!-- Contenedor del Mapa (Ocupa toda la pantalla de fondo) -->
+    <div id="map"></div>
+
+    <!-- Panel de Control Flotante Inferior Transparente -->
     <div id="control-panel" class="control-panel">
         <div class="grupo-botones" style="display: flex; gap: 5px;">
             <button id="btn-number" class="btn btn-primary">Números</button>
@@ -49,10 +79,10 @@
             <button id="btn-erase" class="btn btn-secondary">Borrar</button>
         </div>
 
-        <div class="grupo-estilos" style="display: flex; gap: 8px; align-items: center;">
+        <div class="grupo-estilos" style="display: flex; gap: 8px; align-items: center; font-size: 13px;">
             <label>Color: <input type="color" id="color" value="#007bff"></label>
-            <label>Grosor: <input type="range" id="grosor" min="2" max="30" value="13"></label>
-            <label>Opacidad: <input type="range" id="opacidad" min="10" max="100" value="35"></label>
+            <label>Grosor: <input type="range" id="grosor" min="2" max="30" value="13" style="width: 80px;"></label>
+            <label>Opacidad: <input type="range" id="opacidad" min="10" max="100" value="35" style="width: 80px;"></label>
         </div>
 
         <div class="grupo-acciones" style="display: flex; gap: 5px;">
@@ -62,18 +92,15 @@
         </div>
 
         <div class="grupo-github" style="display: flex; gap: 5px;">
-            <button class="btn btn-success" onclick="guardarEnGithub()">Guardar en GitHub</button>
-            <button class="btn btn-info" onclick="abrirModalCargarGithub()">Cargar de GitHub</button>
-            <button class="btn btn-warning" onclick="compartirMapaGithub()">Compartir Mapa</button>
+            <button class="btn btn-success" onclick="guardarEnGithub()">Guardar</button>
+            <button class="btn btn-info" onclick="abrirModalCargarGithub()">Cargar</button>
+            <button class="btn btn-warning" onclick="compartirMapaGithub()">Compartir</button>
             <button class="btn btn-secondary" onclick="cambiarToken()">Token</button>
         </div>
     </div>
 
-    <!-- Contenedor del Mapa -->
-    <div id="map"></div>
-
     <!-- Modal para cargar / eliminar mapas de GitHub -->
-    <div id="modal-load" class="modal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5);">
+    <div id="modal-load" class="modal" style="display:none; position:fixed; z-index:2000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5);">
         <div class="modal-content" style="background-color:white; margin: 15% auto; padding: 20px; width: 80%; max-width: 400px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
             <h3 style="margin-top: 0; margin-bottom: 15px;">Mapas Guardados</h3>
             <div id="lista-mapas" style="max-height: 250px; overflow-y: auto; margin: 15px 0; display: flex; flex-direction: column; gap: 8px;">

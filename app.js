@@ -651,14 +651,24 @@ async function compartirMapaGithub() {
         }
 
         const fileName = archivosDisponibles[indice];
+        const nombreMapaLimpio = fileName.replace('.json', '');
         const baseUrl = window.location.href.split('?')[0];
         const shareUrl = `${baseUrl}?mapa=${fileName}`;
+        const textoMensaje = `¡Échale un vistazo a esta ruta "${nombreMapaLimpio}"!: ${shareUrl}`;
 
-        navigator.clipboard.writeText(shareUrl).then(() => {
-            alert(`¡Enlace copiado al portapapeles!\n\n${shareUrl}`);
-        }).catch(() => {
-            prompt("Copia este enlace para compartir:", shareUrl);
-        });
+        // Si el dispositivo móvil soporta compartir de forma nativa (abre directamente WhatsApp, Telegram, etc.)
+        if (navigator.share) {
+            navigator.share({
+                title: 'Compartir Mapa',
+                text: `Ruta de mapa: ${nombreMapaLimpio}`,
+                url: shareUrl,
+            }).catch(() => {});
+        } else {
+            // Si no soporta share nativo, abre directamente la API web de WhatsApp con el texto preparado
+            const urlWhatsApp = `https://api.whatsapp.com/send?text=${encodeURIComponent(textoMensaje)}`;
+            window.open(urlWhatsApp, '_blank');
+        }
+
     } catch (e) {
         alert(`Error al obtener los mapas: ${e.message}`);
     }
