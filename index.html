@@ -32,7 +32,7 @@
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.25);
             width: 92%;
-            max-width: 650px;
+            max-width: 680px;
             box-sizing: border-box;
             backdrop-filter: blur(5px);
         }
@@ -46,7 +46,7 @@
 
         .panel-row {
             display: flex;
-            gap: 6px;
+            gap: 5px;
             align-items: center;
             justify-content: space-between;
             flex-wrap: nowrap;
@@ -75,15 +75,15 @@
         }
 
         .control-group-inline input[type="range"] {
-            width: 55px;
+            width: 50px;
         }
 
         .btn {
-            padding: 6px 10px;
+            padding: 6px 8px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
             color: white;
             text-align: center;
@@ -98,8 +98,8 @@
         .btn-warning { background-color: #ffc107; color: #212529; }
 
         .btn-sm {
-            padding: 5px 8px;
-            font-size: 11px;
+            padding: 5px 6px;
+            font-size: 10px;
             flex: unset;
         }
 
@@ -143,16 +143,16 @@
         @media (max-width: 500px) {
             #control-panel {
                 bottom: 8px;
-                padding: 8px;
+                padding: 6px;
                 width: 96%;
             }
             .btn {
-                font-size: 11px;
-                padding: 5px 4px;
+                font-size: 10px;
+                padding: 5px 3px;
             }
             .control-group-inline {
-                font-size: 10px;
-                padding: 2px 4px;
+                font-size: 9px;
+                padding: 2px 3px;
             }
         }
     </style>
@@ -172,7 +172,7 @@
                 <button class="btn btn-secondary btn-sm" onclick="rehacerProximo()" title="Rehacer">↪</button>
             </div>
 
-            <!-- LÍNEA 2: Estilos rápidos, gestión de archivos y sincronización -->
+            <!-- LÍNEA 2: Estilos rápidos, gestión de archivos, token y sincronización -->
             <div class="panel-row">
                 <div class="control-group-inline" title="Color de línea">
                     <input type="color" id="color" value="#007bff">
@@ -187,8 +187,9 @@
                 </div>
                 <button class="btn btn-success btn-sm" onclick="guardarEnGithub()">Guardar</button>
                 <button class="btn btn-primary btn-sm" onclick="abrirModalCargarGithub()">Cargar</button>
-                <button class="btn btn-danger btn-sm" onclick="borrarTodo()">Limpiar</button>
+                <button class="btn btn-secondary btn-sm" onclick="cambiarToken()" title="Configurar Token GitHub">🔑 Token</button>
                 <button class="btn btn-secondary btn-sm" onclick="compartirMapaGithub()" title="Compartir enlace">🔗</button>
+                <button class="btn btn-danger btn-sm" onclick="borrarTodo()">Limpiar</button>
             </div>
         </div>
     </div>
@@ -214,3 +215,4 @@
     <script src="app.js"></script>
 </body>
 </html>
+
