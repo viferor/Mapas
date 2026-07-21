@@ -32,7 +32,7 @@
             touch-action: none;
         }
         
-        /* Barra de herramientas fijada en la parte inferior */
+        /* Barra de herramientas fija en el margen inferior */
         #controls {
             position: absolute;
             bottom: 15px;
@@ -44,15 +44,14 @@
             border-radius: 8px;
             box-shadow: 0 -2px 10px rgba(0,0,0,0.25);
             display: flex;
-            gap: 6px;
+            gap: 10px;
             align-items: center;
-            overflow-x: auto; /* Desplazamiento horizontal si no caben en pantallas estrechas */
+            overflow-x: auto;
             white-space: nowrap;
             -webkit-overflow-scrolling: touch;
             touch-action: pan-x;
         }
 
-        /* Barra de scroll discreta */
         #controls::-webkit-scrollbar {
             height: 4px;
         }
@@ -75,15 +74,54 @@
         .btn-success { background: #28a745; color: white; }
         .btn-danger { background: #dc3545; color: white; }
 
-        select, input[type="color"] {
-            padding: 6px;
+        /* Estilos para los controles deslizantes */
+        .slider-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #f1f3f5;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #333;
+            flex-shrink: 0;
+        }
+        .slider-group input[type="range"] {
+            width: 80px;
+            cursor: pointer;
+        }
+        .slider-group span {
+            min-width: 32px;
+            text-align: right;
+            font-family: monospace;
+        }
+
+        input[type="color"] {
+            padding: 2px;
             border-radius: 4px;
             border: 1px solid #ccc;
             flex-shrink: 0;
             height: 33px;
+            width: 38px;
+            cursor: pointer;
         }
 
-        /* Estilos de la ventana modal */
+        /* Estilo visual de las etiquetas con número sobre el mapa */
+        .number-icon {
+            background-color: #007bff;
+            color: white;
+            border: 2px solid white;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 13px;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+        }
+
+        /* Ventana Modal */
         .modal {
             display: none;
             position: fixed;
@@ -126,43 +164,47 @@
 </head>
 <body>
 
-    <!-- Contenedor del Mapa -->
+    <!-- Contenedor principal del Mapa -->
     <div id="map"></div>
 
-    <!-- Barra de Controles y Herramientas (Fijada abajo) -->
+    <!-- Barra de Controles y Herramientas -->
     <div id="controls">
         <button id="btn-draw" class="btn btn-primary" onclick="setModo('dibujar')">✏️ Dibujar</button>
+        <button id="btn-number" class="btn btn-secondary" onclick="setModo('numero')">🔢 Número</button>
         <button id="btn-erase" class="btn btn-secondary" onclick="setModo('borrar')">🧹 Borrar</button>
         <button class="btn btn-secondary" onclick="deshacerUltimo()">↩️ Deshacer</button>
         <button class="btn btn-secondary" onclick="rehacerProximo()">↪️ Rehacer</button>
         <button class="btn btn-danger" onclick="borrarTodo()">🗑️ Limpiar</button>
 
-        <!-- Selectores de Estilo de Línea -->
-        <input type="color" id="color" value="#ff0000" onchange="actualizarEstiloRuta()" title="Color de línea">
-        <select id="grosor" onchange="actualizarEstiloRuta()" title="Grosor de línea">
-            <option value="3">Fino</option>
-            <option value="5" selected>Medio</option>
-            <option value="8">Grueso</option>
-            <option value="12">Muy Grueso</option>
-        </select>
-        <select id="opacidad" onchange="actualizarEstiloRuta()" title="Opacidad">
-            <option value="100">100%</option>
-            <option value="75" selected>75%</option>
-            <option value="50">50%</option>
-        </select>
+        <!-- Color de trazo/marcador -->
+        <input type="color" id="color" value="#007bff" onchange="actualizarEstiloRuta()" title="Color del trazo o número">
 
-        <!-- Botones de GitHub y Archivos -->
+        <!-- Barra deslizante para el Grosor -->
+        <div class="slider-group">
+            <label for="grosor">📏 Grosor:</label>
+            <input type="range" id="grosor" min="1" max="30" value="5" oninput="document.getElementById('val-grosor').textContent = this.value + 'px'; actualizarEstiloRuta()">
+            <span id="val-grosor">5px</span>
+        </div>
+
+        <!-- Barra deslizante para la Opacidad -->
+        <div class="slider-group">
+            <label for="opacidad">💧 Opacidad:</label>
+            <input type="range" id="opacidad" min="10" max="100" value="100" step="5" oninput="document.getElementById('val-opacidad').textContent = this.value + '%'; actualizarEstiloRuta()">
+            <span id="val-opacidad">100%</span>
+        </div>
+
+        <!-- Funciones de Sync y Archivos -->
         <button class="btn btn-success" onclick="guardarEnGithub()">☁️ Guardar</button>
         <button class="btn btn-primary" onclick="abrirModalCargarGithub()">📂 Cargar</button>
         <button class="btn btn-primary" onclick="compartirMapaGithub()">🔗 Compartir</button>
         <button class="btn btn-secondary" onclick="cambiarToken()">🔑 Token</button>
 
-        <!-- Importar GPX -->
+        <!-- Carga de GPX -->
         <input type="file" id="gpx-file" accept=".gpx" style="display:none;" onchange="importarGPX(event)">
         <button class="btn btn-secondary" onclick="document.getElementById('gpx-file').click()">📥 GPX</button>
     </div>
 
-    <!-- Ventana Modal para la Lista de Mapas -->
+    <!-- Modal para la gestión de mapas -->
     <div id="modal-load" class="modal">
         <div class="modal-content">
             <span class="close" onclick="cerrarModal()">&times;</span>
@@ -171,12 +213,11 @@
         </div>
     </div>
 
-    <!-- Leaflet JS -->
+    <!-- Scripts de Leaflet y Complementos -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Leaflet GPX plugin -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/1.7.0/gpx.min.js"></script>
     
-    <!-- Script principal -->
+    <!-- Script lógico principal -->
     <script src="app.js"></script>
 </body>
 </html>
