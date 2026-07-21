@@ -14,7 +14,7 @@ let historialRehacer = [];
 
 // Control de tramos independientes
 let ultimoPuntoTramo = null; 
-let trazoLibreActivo = false; // Control robusto de trazo libre compatible con Brave y Chrome
+let trazoLibreActivo = false; 
 
 // Inicialización del mapa y eventos de la interfaz
 document.addEventListener("DOMContentLoaded", function () {
@@ -129,7 +129,7 @@ function obtenerEstilosActuales() {
 function cortarTramoActual() {
     ultimoPuntoTramo = null;
     window.puntosDibujoLibre = [];
-    trazoLibreActivo = false; // Fuerza el corte limpio e independiente en modo libre
+    trazoLibreActivo = false; 
     alert("Próximo punto iniciado como un trazado nuevo independiente.");
 }
 
@@ -140,7 +140,6 @@ async function gestionarPulsacion(e) {
     const latlng = e.latlng;
     const estilos = obtenerEstilosActuales();
 
-    // Control de doble toque rápido en tablet para cortar tramo (< 350ms)
     const tiempoActual = new Date().getTime();
     if (tiempoActual - ultimoToqueTiempo < 350) {
         cortarTramoActual();
@@ -152,7 +151,7 @@ async function gestionarPulsacion(e) {
         return; 
     }
 
-    // MODO DIBUJO LIBRE (Línea recta directa sin numeración)
+    // MODO DIBUJO LIBRE
     if (modoActual === 'dibujar') {
         if (!window.puntosDibujoLibre || !trazoLibreActivo) {
             window.puntosDibujoLibre = [];
@@ -214,7 +213,6 @@ async function gestionarPulsacion(e) {
 
         let lineaAsociada = null;
 
-        // Si hay un tramo previo activo y no se ha cortado, enrutamos por las calles respetando las curvas
         if (ultimoPuntoTramo) {
             const coordenadasCalle = await obtenerRutaPorCallesOSRM(ultimoPuntoTramo, latlng);
 
@@ -239,7 +237,7 @@ async function gestionarPulsacion(e) {
     }
 }
 
-// --- MOTOR DE ENRUTAMIENTO POR CALLES (ADAPTA CURVAS) ---
+// --- MOTOR DE ENRUTAMIENTO POR CALLES ---
 async function obtenerRutaPorCallesOSRM(origen, destino) {
     const url = `https://router.project-osrm.org/route/v1/foot/${origen.lng},${origen.lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson`;
 
@@ -488,11 +486,17 @@ async function abrirModalCargarGithub() {
             const nombreLimpio = file.name.replace('.json', '');
             const item = document.createElement('div');
             item.className = 'map-item';
+            item.style.display = 'flex';
+            item.style.justifyContent = 'space-between';
+            item.style.alignItems = 'center';
+            item.style.padding = '8px';
+            item.style.borderBottom = '1px solid #eee';
+
             item.innerHTML = `
-                <span style="font-weight: bold; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 180px;">${nombreLimpio}</span>
-                <div style="display: flex; gap: 5px;">
-                    <button class="btn btn-primary btn-sm" onclick="cargarMapaDesdeGithub('${file.name}')">Cargar</button>
-                    <button class="btn btn-danger btn-sm" onclick="eliminarMapaDeGithub('${file.name}', '${file.sha}')" title="Eliminar mapa">🗑️</button>
+                <span style="font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 170px;">${nombreLimpio}</span>
+                <div style="display: flex; gap: 6px;">
+                    <button class="btn btn-primary" style="padding: 4px 10px; font-size: 13px;" onclick="cargarMapaDesdeGithub('${file.name}')">Cargar</button>
+                    <button class="btn btn-danger" style="padding: 4px 10px; font-size: 13px;" onclick="eliminarMapaDeGithub('${file.name}', '${file.sha}')" title="Eliminar mapa">🗑️</button>
                 </div>
             `;
             listaContainer.appendChild(item);
@@ -528,7 +532,7 @@ async function eliminarMapaDeGithub(fileName, sha) {
 
         if (res.ok) {
             alert("Mapa eliminado correctamente.");
-            abrirModalCargarGithub(); // Refrescar la lista del modal automáticamente
+            abrirModalCargarGithub(); 
         } else {
             const errData = await res.json();
             alert(`Error al eliminar: ${errData.message}`);
@@ -632,7 +636,6 @@ async function compartirMapaGithub() {
             return alert("No hay mapas guardados en GitHub para compartir.");
         }
 
-        // Creamos una lista limpia limpia para que el usuario elija seleccionando mediante prompt o mostrando opciones
         let mensajePrompt = "Elige el número del mapa que quieres compartir:\n\n";
         archivosDisponibles.forEach((file, index) => {
             mensajePrompt += `${index + 1}. ${file.replace('.json', '')}\n`;
