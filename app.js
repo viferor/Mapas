@@ -1,4 +1,3 @@
-
 // Configuración de GitHub
 const GITHUB_USER = "viferor"; 
 const GITHUB_REPO = "Mapas"; 
@@ -18,12 +17,13 @@ let puntosRuta = [];
 
 // Inicialización del mapa y eventos de la interfaz
 document.addEventListener("DOMContentLoaded", function () {
+    // Inicializar el mapa de Leaflet con controles de zoom visibles
     map = L.map('map', {
         zoomControl: true,
         touchZoom: true
     }).setView([37.8882, -4.7794], 13); // Centrado en Córdoba
 
-    // Capas base de mapas
+    // Capas base de mapas (Selector superior derecho)
     const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '© OpenStreetMap'
@@ -38,9 +38,10 @@ document.addEventListener("DOMContentLoaded", function () {
         attribution: 'Tiles © Esri'
     });
 
+    // Capa por defecto al iniciar
     osm.addTo(map);
 
-    // Selector de capas superior derecho (Callejero, Topográfico, Satélite)
+    // Añadir el selector de capas (Callejero, Topográfico, Satélite) arriba a la derecha
     const baseMaps = {
         "Callejero": osm,
         "Topográfico": topo,
@@ -48,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
     L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
 
-    // Permitir navegación libre y fluida en todo momento con los dedos
+    // Permitir navegación libre y fluida en todo momento con los dedos o ratón
     const mapContainer = map.getContainer();
     mapContainer.style.touchAction = 'auto';
 
@@ -156,7 +157,7 @@ function gestionarPulsacion(e) {
 
     let lineaAsociada = null;
 
-    // Conexión libre punto a punto (Libertad peatonal y espacial total)
+    // Conexión libre punto a punto (Libertad total peatonal y espacial)
     if (puntosRuta.length > 1) {
         const puntoAnterior = puntosRuta[puntosRuta.length - 2];
         const coordenadasTramo = [puntoAnterior, latlng];
@@ -177,6 +178,7 @@ function gestionarPulsacion(e) {
     contadorNumero++;
 }
 
+// Deshacer y Rehacer
 function deshacerUltimo() {
     if (historialAcciones.length === 0) return;
 
@@ -231,6 +233,7 @@ function actualizarEstiloRuta() {
         }
     }
 }
+
 // --- GESTIÓN CON GITHUB ---
 
 function obtenerToken() {
