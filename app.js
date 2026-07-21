@@ -19,7 +19,7 @@ let historialRehacer = [];
 document.addEventListener("DOMContentLoaded", function () {
     map = L.map('map', {
         zoomControl: true,
-        touchZoom: true
+        touchZoom: false // Lo gestionamos de forma limpia según el modo
     }).setView([37.8882, -4.7794], 13); // Centrado en Córdoba
 
     // Capas base de mapas
@@ -47,9 +47,9 @@ document.addEventListener("DOMContentLoaded", function () {
     };
     L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
 
-    // Configuración de eventos táctiles nativos con pasividad anulada para garantizar trazo continuo
+    // Configuración de eventos táctiles puros para un dibujo continuo perfecto
     const mapContainer = map.getContainer();
-    mapContainer.style.touchAction = 'none'; // Evitamos gestos por defecto para que el trazo sea fluido
+    mapContainer.style.touchAction = 'none';
 
     mapContainer.addEventListener('touchstart', iniciarTrazoTacto, { passive: false });
     mapContainer.addEventListener('touchmove', moverTrazoTacto, { passive: false });
@@ -73,19 +73,20 @@ document.addEventListener("DOMContentLoaded", function () {
 // Selección de modo
 function setModo(modo) {
     modoActual = modo;
-    
     const mapContainer = map.getContainer();
 
     if (modo === 'dibujar') {
+        // En modo dibujo, bloqueamos el mapa para garantizar trazo libre y fluido sin cortes
         map.dragging.disable();
-        map.touchZoom.disable(); // Desactivamos temporalmente el zoom táctil nativo en modo dibujo para garantizar trazo fluido de un dedo
+        map.touchZoom.disable();
         map.doubleClickZoom.disable();
-        mapContainer.style.touchAction = 'none'; 
+        mapContainer.style.touchAction = 'none';
     } else {
+        // En otros modos, permitimos mover y hacer zoom libremente con los dedos
         map.dragging.enable();
         map.touchZoom.enable();
         map.doubleClickZoom.enable();
-        mapContainer.style.touchAction = 'auto'; 
+        mapContainer.style.touchAction = 'auto';
     }
 
     document.getElementById('btn-draw').className = modo === 'dibujar' ? 'btn btn-primary' : 'btn btn-secondary';
@@ -112,7 +113,7 @@ function obtenerLatLngDesdeTacto(touch) {
     return map.containerPointToLatLng([x, y]);
 }
 
-// --- DIBUJO TÁCTIL FLUIDO ---
+// --- DIBUJO TÁCTIL FLUIDO Y CONTINUO ---
 function iniciarTrazoTacto(e) {
     if (modoActual !== 'dibujar') return;
     
