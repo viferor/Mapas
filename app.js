@@ -9,7 +9,6 @@ let map;
 let modoActual = 'dibujar'; // 'dibujar', 'numero', 'borrar'
 let dibujando = false;
 let lineaActual = null;
-let idPointerActivo = null;
 let contadorNumero = 1;
 
 // Historial para deshacer / rehacer
@@ -48,14 +47,14 @@ document.addEventListener("DOMContentLoaded", function () {
     };
     L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
 
-    // Configuración de eventos pointer para tablets
+    // Configuración de eventos táctiles nativos con pasividad anulada para garantizar trazo continuo
     const mapContainer = map.getContainer();
-    mapContainer.style.touchAction = 'pan-x pan-y pinch-zoom';
+    mapContainer.style.touchAction = 'none'; // Evitamos gestos por defecto para que el trazo sea fluido
 
-    mapContainer.addEventListener('pointerdown', iniciarTrazoTablet);
-    mapContainer.addEventListener('pointermove', moverTrazoTablet);
-    window.addEventListener('pointerup', finalizarTrazoTablet);
-    window.addEventListener('pointercancel', finalizarTrazoTablet);
+    mapContainer.addEventListener('touchstart', iniciarTrazoTacto, { passive: false });
+    mapContainer.addEventListener('touchmove', moverTrazoTacto, { passive: false });
+    window.addEventListener('touchend', finalizarTrazoTacto);
+    window.addEventListener('touchcancel', finalizarTrazoTacto);
 
     // Evento de clic/toque clásico para los números
     map.on('click', gestionarPulsacion);
@@ -79,9 +78,9 @@ function setModo(modo) {
 
     if (modo === 'dibujar') {
         map.dragging.disable();
-        map.touchZoom.enable(); 
+        map.touchZoom.disable(); // Desactivamos temporalmente el zoom táctil nativo en modo dibujo para garantizar trazo fluido de un dedo
         map.doubleClickZoom.disable();
-        mapContainer.style.touchAction = 'pan-x pan-y pinch-zoom';
+        mapContainer.style.touchAction = 'none'; 
     } else {
         map.dragging.enable();
         map.touchZoom.enable();
@@ -102,19 +101,19 @@ function obtenerEstilosActuales() {
     };
 }
 
-// --- CONVERSIÓN SEGURA DE POINTER A LAT/LNG ---
-function obtenerLatLngDesdePointer(e) {
+// --- CONVERSIÓN DE TACTO A LAT/LNG ---
+function obtenerLatLngDesdeTacto(touch) {
     const mapContainer = map.getContainer();
     const rect = mapContainer.getBoundingClientRect();
     
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
 
     return map.containerPointToLatLng([x, y]);
 }
 
-// --- DIBUJO TÁCTIL CON CAPTURA DE PUNTERO ---
-function iniciarTrazoTablet(e) {
+// --- DIBUJO TÁCTIL FLUIDO ---
+function iniciarTrazoTacto(e) {
     if (modoActual !== 'dibujar') return;
     
     // Si se pulsa sobre la botonera o controles, no se dibuja
@@ -122,23 +121,11 @@ function iniciarTrazoTablet(e) {
         return;
     }
 
-    // Si ya hay un trazo activo o se usan varios dedos a la vez, ignoramos para permitir el zoom multitáctil
-    if (dibujando || (e.pointerType === 'touch' && !e.isPrimary)) {
-        return;
-    }
-
     e.preventDefault();
     dibujando = true;
-    idPointerActivo = e.pointerId;
 
-    // Forzamos al navegador a enviar todo el flujo de movimientos de este dedo concreto a este elemento
-    try {
-        e.target.setPointerCapture(e.pointerId);
-    } catch (err) {
-        // Ignorar si el elemento no soporta captura en algún entorno específico
-    }
-
-    const latlng = obtenerLatLngDesdePointer(e);
+    const touch = e.touches[0];
+    const latlng = obtenerLatLngDesdeTacto(touch);
     if (!latlng) return;
 
     const estilos = obtenerEstilosActuales();
@@ -151,32 +138,21 @@ function iniciarTrazoTablet(e) {
     }).addTo(map);
 }
 
-function moverTrazoTablet(e) {
-    if (modoActual !== 'dibujar' || !dibujando) return;
-    if (e.pointerId !== idPointerActivo) return;
+function moverTrazoTacto(e) {
+    if (modoActual !== 'dibujar' || !dibujando || !lineaActual) return;
 
     e.preventDefault();
 
-    const latlng = obtenerLatLngDesdePointer(e);
+    const touch = e.touches[0];
+    const latlng = obtenerLatLngDesdeTacto(touch);
     if (latlng) {
         lineaActual.addLatLng(latlng);
     }
 }
 
-function finalizarTrazoTablet(e) {
-    if (modoActual !== 'dibujar' || !dibujando) return;
-    if (e && e.pointerId !== undefined && e.pointerId !== idPointerActivo) return;
-
-    try {
-        if (e && e.target && e.target.releasePointerCapture) {
-            e.target.releasePointerCapture(idPointerActivo);
-        }
-    } catch (err) {
-        // Ignorar errores de liberación
-    }
-
+function finalizarTrazoTacto() {
+    if (!dibujando || modoActual !== 'dibujar') return;
     dibujando = false;
-    idPointerActivo = null;
 
     if (lineaActual) {
         historialAcciones.push({ tipo: 'linea', elemento: lineaActual });
