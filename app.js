@@ -9,7 +9,7 @@ let map;
 let modoActual = 'dibujar'; // 'dibujar', 'numero', 'borrar'
 let dibujando = false;
 let lineaActual = null;
-let idPointerActivo = null; // Controla estrictamente el dedo que está dibujando
+let idPointerActivo = null;
 let contadorNumero = 1;
 
 // Historial para deshacer / rehacer
@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
     L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
 
-    // Configuración de eventos pointer para permitir dibujo a un dedo y zoom multitáctil nativo
+    // Configuración de eventos pointer para tablets
     const mapContainer = map.getContainer();
     mapContainer.style.touchAction = 'pan-x pan-y pinch-zoom';
 
@@ -113,7 +113,7 @@ function obtenerLatLngDesdePointer(e) {
     return map.containerPointToLatLng([x, y]);
 }
 
-// --- DIBUJO TÁCTIL BLINDADO CON POINTER EVENTS ---
+// --- DIBUJO TÁCTIL CON CAPTURA DE PUNTERO ---
 function iniciarTrazoTablet(e) {
     if (modoActual !== 'dibujar') return;
     
@@ -122,14 +122,21 @@ function iniciarTrazoTablet(e) {
         return;
     }
 
-    // Si ya hay un dedo dibujando o intentan usar un segundo dedo, ignoramos para permitir el zoom de Leaflet
+    // Si ya hay un trazo activo o se usan varios dedos a la vez, ignoramos para permitir el zoom multitáctil
     if (dibujando || (e.pointerType === 'touch' && !e.isPrimary)) {
         return;
     }
 
     e.preventDefault();
     dibujando = true;
-    idPointerActivo = e.pointerId; // Guardamos el identificador exacto del dedo actual
+    idPointerActivo = e.pointerId;
+
+    // Forzamos al navegador a enviar todo el flujo de movimientos de este dedo concreto a este elemento
+    try {
+        e.target.setPointerCapture(e.pointerId);
+    } catch (err) {
+        // Ignorar si el elemento no soporta captura en algún entorno específico
+    }
 
     const latlng = obtenerLatLngDesdePointer(e);
     if (!latlng) return;
@@ -146,8 +153,6 @@ function iniciarTrazoTablet(e) {
 
 function moverTrazoTablet(e) {
     if (modoActual !== 'dibujar' || !dibujando) return;
-
-    // Solo procesamos el movimiento si pertenece exactamente al mismo dedo que inició el trazo
     if (e.pointerId !== idPointerActivo) return;
 
     e.preventDefault();
@@ -160,9 +165,15 @@ function moverTrazoTablet(e) {
 
 function finalizarTrazoTablet(e) {
     if (modoActual !== 'dibujar' || !dibujando) return;
-
-    // Solo finalizamos si se levanta el dedo que originó el trazo
     if (e && e.pointerId !== undefined && e.pointerId !== idPointerActivo) return;
+
+    try {
+        if (e && e.target && e.target.releasePointerCapture) {
+            e.target.releasePointerCapture(idPointerActivo);
+        }
+    } catch (err) {
+        // Ignorar errores de liberación
+    }
 
     dibujando = false;
     idPointerActivo = null;
