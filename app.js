@@ -86,17 +86,32 @@ function obtenerEstilosActuales() {
     };
 }
 
-// Dibujo a mano alzada
+// Dibujo a mano alzada optimizado
 function iniciarTrazo(e) {
     if (modoActual !== 'dibujar') return;
     
-    if (e.originalEvent && typeof e.originalEvent.preventDefault === 'function') {
-        e.originalEvent.preventDefault();
+    if (e.originalEvent) {
+        if (typeof e.originalEvent.preventDefault === 'function') {
+            e.originalEvent.preventDefault();
+        }
+        if (e.originalEvent.stopPropagation) {
+            e.originalEvent.stopPropagation();
+        }
     }
-    
+
     dibujando = true;
 
-    const latlng = e.latlng || map.mouseEventToLatLng(e.originalEvent.touches ? e.originalEvent.touches[0] : e.originalEvent);
+    let latlng;
+    if (e.latlng) {
+        latlng = e.latlng;
+    } else if (e.originalEvent && e.originalEvent.touches && e.originalEvent.touches[0]) {
+        latlng = map.mouseEventToLatLng(e.originalEvent.touches[0]);
+    } else if (e.originalEvent) {
+        latlng = map.mouseEventToLatLng(e.originalEvent);
+    }
+
+    if (!latlng) return;
+
     const estilos = obtenerEstilosActuales();
 
     lineaActual = L.polyline([latlng], {
@@ -108,19 +123,29 @@ function iniciarTrazo(e) {
 }
 
 function moverTrazo(e) {
-    if (!dibujando || modoActual !== 'dibujar') return;
-    
-    if (e.originalEvent && typeof e.originalEvent.preventDefault === 'function') {
-        e.originalEvent.preventDefault();
+    if (!dibujando || modoActual !== 'dibujar' || !lineaActual) return;
+
+    if (e.originalEvent) {
+        if (typeof e.originalEvent.preventDefault === 'function') {
+            e.originalEvent.preventDefault();
+        }
     }
 
-    const latlng = e.latlng || map.mouseEventToLatLng(e.originalEvent.touches ? e.originalEvent.touches[0] : e.originalEvent);
+    let latlng;
+    if (e.latlng) {
+        latlng = e.latlng;
+    } else if (e.originalEvent && e.originalEvent.touches && e.originalEvent.touches[0]) {
+        latlng = map.mouseEventToLatLng(e.originalEvent.touches[0]);
+    } else if (e.originalEvent) {
+        latlng = map.mouseEventToLatLng(e.originalEvent);
+    }
+
     if (latlng) {
         lineaActual.addLatLng(latlng);
     }
 }
 
-function finalizarTrazo() {
+function finalizarTrazo(e) {
     if (!dibujando || modoActual !== 'dibujar') return;
     dibujando = false;
 
