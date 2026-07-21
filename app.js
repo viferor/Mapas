@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Configuración específica de eventos pointer para tabletas
     const mapContainer = map.getContainer();
-    mapContainer.style.touchAction = 'none'; 
+    mapContainer.style.touchAction = 'pan-x pan-y pinch-zoom'; // Permite zoom nativo y paneo general
 
     mapContainer.addEventListener('pointerdown', iniciarTrazoTablet);
     mapContainer.addEventListener('pointermove', moverTrazoTablet);
@@ -78,9 +78,9 @@ function setModo(modo) {
 
     if (modo === 'dibujar') {
         map.dragging.disable();
-        map.touchZoom.enable(); // Habilitamos zoom táctil multitáctil
+        map.touchZoom.enable(); 
         map.doubleClickZoom.disable();
-        mapContainer.style.touchAction = 'none'; 
+        mapContainer.style.touchAction = 'pan-x pan-y pinch-zoom'; // Clave para permitir zoom de dos dedos en modo dibujo
     } else {
         map.dragging.enable();
         map.touchZoom.enable();
@@ -121,7 +121,7 @@ function iniciarTrazoTablet(e) {
         return;
     }
 
-    // Si entran dos o más dedos (para hacer zoom o paneo), cancelamos el trazo actual
+    // Si se usan dos o más dedos (para hacer zoom o mover con dos dedos), ignoramos el dibujo y dejamos actuar a la tablet
     if (e.pointerType === 'touch' && !e.isPrimary) {
         if (dibujando) {
             finalizarTrazoTablet(e);
@@ -148,7 +148,6 @@ function iniciarTrazoTablet(e) {
 function moverTrazoTablet(e) {
     if (modoActual !== 'dibujar') return;
 
-    // Si aparece un segundo dedo al vuelo, cortamos el trazo para ceder paso al zoom
     if (e.pointerType === 'touch' && !e.isPrimary) {
         if (dibujando) {
             finalizarTrazoTablet(e);
