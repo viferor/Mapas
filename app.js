@@ -24,21 +24,21 @@ function cambiarToken() {
 // Mapa inicializado con maxZoom en 20
 const map = L.map('map', { zoomControl: false, tap: false, maxZoom: 20 }).setView([37.8882, -4.7794], 14);
 
-// Callejero CartoDB Positron (Alta precisión, actualizado y soporta zoom nivel 20)
+// Callejero CartoDB Positron (Alta precisión, zoom nivel 20)
 const mapaCallejero = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { 
     attribution: '© OpenStreetMap, © CARTO',
     maxZoom: 20,
     maxNativeZoom: 19
 }).addTo(map);
 
-// Google Satélite (con zoom nivel 20)
+// NUEVO: Satélite Híbrido Actualizado (Fotografía aérea + Nombres de calles)
 const mapaSatelite = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { 
     attribution: '© Google Maps',
     maxZoom: 20,
     maxNativeZoom: 20
 });
 
-L.control.layers({ "🚶‍♂️ Callejero HD": mapaCallejero, "🛰️ Satélite": mapaSatelite }, null, { position: 'topright' }).addTo(map);
+L.control.layers({ "🚶‍♂️ Callejero HD": mapaCallejero, "🛰️ Híbrido HD": mapaSatelite }, null, { position: 'topright' }).addTo(map);
 L.control.zoom({ position: 'topleft' }).addTo(map);
 
 const contenedorControles = document.getElementById('controls');
@@ -217,7 +217,6 @@ async function abrirModalCargarGithub() {
             div.className = 'map-item';
             const nombreLimpio = file.name.replace('.json', '');
             
-            // Añadida la opción con botón de eliminar (papelera)
             div.innerHTML = `
                 <span style="cursor:pointer; flex:1;" onclick="cargarMapaDesdeGithub('${file.download_url}')">📍 ${nombreLimpio}</span>
                 <span style="cursor:pointer; margin-left:10px;" onclick="eliminarMapaGithub('${file.name}', '${file.sha}')">🗑️</span>
@@ -227,7 +226,6 @@ async function abrirModalCargarGithub() {
     } catch (err) { lista.innerHTML = "Error al conectar con GitHub."; }
 }
 
-// NUEVA FUNCIÓN: Eliminar mapa de GitHub
 async function eliminarMapaGithub(nombreArchivo, sha) {
     if (!confirm(`¿Seguro que quieres borrar el mapa '${nombreArchivo.replace('.json', '')}'?`)) return;
 
@@ -249,7 +247,7 @@ async function eliminarMapaGithub(nombreArchivo, sha) {
 
         if (res.ok) {
             alert("🗑️ Mapa eliminado correctamente.");
-            abrirModalCargarGithub(); // Recargar la lista de mapas
+            abrirModalCargarGithub();
         } else {
             alert("Error al intentar eliminar el mapa.");
         }
@@ -274,7 +272,6 @@ async function cargarMapaDesdeGithub(downloadUrl) {
 
 function cerrarModal() { document.getElementById('modal-load').style.display = 'none'; }
 
-// COMPARTIR POR WHATSAPP (Ruta Corta)
 function compartirMapaGithub() {
     const nombreMapa = prompt("Escribe el nombre del mapa guardado que quieres compartir:");
     if (!nombreMapa) return;
@@ -302,11 +299,9 @@ function importarGPX(event) {
     reader.readAsText(file);
 }
 
-// Cargar mapa recibido por enlace
 map.whenReady(() => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('g')) {
         cargarMapaDesdeGithub(decodeURIComponent(urlParams.get('g')));
     }
 });
-
