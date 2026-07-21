@@ -33,8 +33,11 @@ document.addEventListener("DOMContentLoaded", function () {
         attribution: '© OpenTopoMap'
     });
 
-    const esriSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles © Esri'
+    // Capa híbrida de Google Maps (Satélite + Carreteras y etiquetas superpuestas)
+    const googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        attribution: '© Google Maps'
     });
 
     osm.addTo(map);
@@ -42,7 +45,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const baseMaps = {
         "Callejero": osm,
         "Topográfico": topo,
-        "Satélite": esriSat
+        "Híbrido Google": googleHybrid
     };
     L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
 
@@ -69,6 +72,14 @@ function inicializarInterfaz() {
     const colorPicker = document.getElementById('color');
     const grosorInput = document.getElementById('grosor');
     const opacidadInput = document.getElementById('opacidad');
+
+    // Establecer opacidad por defecto al 35% y grosor a 13 píxeles si los controles existen
+    if (opacidadInput) {
+        opacidadInput.value = 35;
+    }
+    if (grosorInput) {
+        grosorInput.value = 13;
+    }
 
     if (btnNumber) btnNumber.addEventListener('click', () => setModo('numero'));
     if (btnDraw) btnDraw.addEventListener('click', () => setModo('dibujar'));
@@ -108,8 +119,8 @@ function obtenerEstilosActuales() {
 
     return {
         color: colorEl ? colorEl.value : '#007bff',
-        weight: grosorEl ? parseInt(grosorEl.value) : 4,
-        opacity: opacidadEl ? parseFloat(opacidadEl.value) / 100 : 1.0
+        weight: grosorEl ? parseInt(grosorEl.value) : 13, // Por defecto 13 píxeles si no está definido
+        opacity: opacidadEl ? parseFloat(opacidadEl.value) / 100 : 0.35 // Por defecto 35% (0.35) si no está definido
     };
 }
 
@@ -238,7 +249,6 @@ async function obtenerRutaPorCallesOSRM(origen, destino) {
         console.warn("Error en OSRM principal, intentando alternativa:", e);
     }
 
-    // Servidor de respaldo oficial OSRM por si el primero da problemas de CORS o red
     const urlRespaldo = `https://routing.openstreetmap.de/routed-foot/route/v1/foot/${origen.lng},${origen.lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson`;
     try {
         const responseAlt = await fetch(urlRespaldo);
@@ -601,4 +611,4 @@ function importarGPX(event) {
     };
     reader.readAsText(file);
 }
-           
+    
