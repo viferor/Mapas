@@ -96,7 +96,6 @@ function setModo(modo) {
     if (btnDrawEl) btnDrawEl.className = modo === 'dibujar' ? 'btn btn-primary' : 'btn btn-secondary';
     if (btnErrEl) btnErrEl.className = modo === 'borrar' ? 'btn btn-danger' : 'btn btn-secondary';
 
-    // Al cambiar al modo número o dibujar, si se pulsa dos veces o se reanuda, permitimos iniciar limpio
     if (modo === 'dibujar') {
         ultimoPuntoTramo = null;
     }
@@ -114,23 +113,20 @@ function obtenerEstilosActuales() {
     };
 }
 
-// --- FUNCIÓN TÁCTIL PARA CORTAR TRAMO (Ideal para tablets) ---
-// Puedes vincular esta función a un botón en tu HTML (ej: onclick="cortarTramoActual()") 
-// o se activará automáticamente si haces doble toque rápido en el mapa.
+// --- FUNCIÓN TÁCTIL PARA CORTAR TRAMO ---
 function cortarTramoActual() {
     ultimoPuntoTramo = null;
     alert("Próximo punto iniciado como un trazado nuevo independiente (sin conectar con el anterior).");
 }
 
-// Detección de doble toque rápido en la tablet para cortar el tramo automáticamente sin teclado
 let ultimoToqueTiempo = 0;
 
-// --- GESTIÓN DE CLICS / TQQUES: CALLES CURVEADAS Y TRAMOS INDEPENDIENTES ---
+// --- GESTIÓN DE CLICS / TOQUES: CALLES CURVEADAS Y TRAMOS INDEPENDIENTES ---
 async function gestionarPulsacion(e) {
     const latlng = e.latlng;
     const estilos = obtenerEstilosActuales();
 
-    // Control de doble toque rápido en tablet para cortar tramo (menos de 350ms entre toques)
+    // Control de doble toque rápido en tablet para cortar tramo (< 350ms)
     const tiempoActual = new Date().getTime();
     if (tiempoActual - ultimoToqueTiempo < 350) {
         cortarTramoActual();
@@ -227,7 +223,7 @@ async function gestionarPulsacion(e) {
 
 // --- MOTOR DE ENRUTAMIENTO POR CALLES (ADAPTA CURVAS) ---
 async function obtenerRutaPorCallesOSRM(origen, destino) {
-    const url = `https://routing.openstreetmap.de/routed-foot/route/v1/foot/${origen.lng},${origen.lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson`;
+    const url = `https://router.project-osrm.org/route/v1/foot/${origen.lng},${origen.lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson`;
 
     try {
         const response = await fetch(url);
@@ -239,7 +235,22 @@ async function obtenerRutaPorCallesOSRM(origen, destino) {
             }
         }
     } catch (e) {
-        console.warn("Error en OSRM, usando línea directa provisional:", e);
+        console.warn("Error en OSRM principal, intentando alternativa:", e);
+    }
+
+    // Servidor de respaldo oficial OSRM por si el primero da problemas de CORS o red
+    const urlRespaldo = `https://routing.openstreetmap.de/routed-foot/route/v1/foot/${origen.lng},${origen.lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson`;
+    try {
+        const responseAlt = await fetch(urlRespaldo);
+        if (responseAlt.ok) {
+            const dataAlt = await responseAlt.json();
+            if (dataAlt.code === 'Ok' && dataAlt.routes && dataAlt.routes.length > 0) {
+                const coordenadasGeoJSON = dataAlt.routes[0].geometry.coordinates;
+                return coordenadasGeoJSON.map(coord => [coord[1], coord[0]]);
+            }
+        }
+    } catch (e2) {
+        console.warn("Error en respaldo OSRM, usando línea directa:", e2);
     }
 
     return [origen, destino];
@@ -558,7 +569,7 @@ async function compartirMapaGithub() {
         if (!nombreMapa) return;
 
         const fileName = nombreMapa.trim().toLowerCase().replace(/\s+/g, '-') + '.json';
-const baseUrl = window.location.href.split('?')[0];
+        const baseUrl = window.location.href.split('?')[0];
         const shareUrl = `${baseUrl}?mapa=${fileName}`;
 
         navigator.clipboard.writeText(shareUrl).then(() => {
@@ -590,4 +601,4 @@ function importarGPX(event) {
     };
     reader.readAsText(file);
 }
-      
+           
