@@ -5,19 +5,18 @@ const GITHUB_FOLDER = "mapas";
 
 // Variables globales
 let map;
-let modoActual = 'numero'; // 'numero' o 'borrar' por defecto
+let modoActual = 'numero'; // 'numero', 'dibujar' (libre) o 'borrar'
 let contadorNumero = 1;
 
 // Historial para deshacer / rehacer
 let historialAcciones = [];
 let historialRehacer = [];
 
-// Almacén de coordenadas de los puntos numerados
-let puntosRuta = []; 
+// Control de tramos independientes
+let ultimoPuntoTramo = null; 
 
 // Inicialización del mapa y eventos de la interfaz
 document.addEventListener("DOMContentLoaded", function () {
-    // Inicializar el mapa de Leaflet con controles de zoom visibles
     map = L.map('map', {
         zoomControl: true,
         touchZoom: true
@@ -38,10 +37,8 @@ document.addEventListener("DOMContentLoaded", function () {
         attribution: 'Tiles © Esri'
     });
 
-    // Capa por defecto al iniciar
     osm.addTo(map);
 
-    // Añadir el selector de capas (Callejero, Topográfico, Satélite) arriba a la derecha
     const baseMaps = {
         "Callejero": osm,
         "Topográfico": topo,
@@ -49,20 +46,14 @@ document.addEventListener("DOMContentLoaded", function () {
     };
     L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
 
-    // Permitir navegación libre y fluida en todo momento con los dedos o ratón
     const mapContainer = map.getContainer();
     mapContainer.style.touchAction = 'auto';
 
-    // Evento de clic/toque en el mapa para colocar los números y trazar
     map.on('click', gestionarPulsacion);
 
-    // Conectar eventos de los elementos de la interfaz (botones y selectores)
     inicializarInterfaz();
-
-    // Establecer modo por defecto al cargar visualmente
     setModo('numero');
 
-    // Cargar mapa desde URL si viene con parámetro ?mapa=nombre.json
     const urlParams = new URLSearchParams(window.location.search);
     const mapaCompartido = urlParams.get('mapa');
     if (mapaCompartido) {
@@ -70,23 +61,26 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-// Enlazar los botones y controles del HTML de forma segura
+// Enlazar botones y controles del HTML
 function inicializarInterfaz() {
     const btnNumber = document.getElementById('btn-number');
+    const btnDraw = document.getElementById('btn-draw');
     const btnErase = document.getElementById('btn-erase');
     const colorPicker = document.getElementById('color');
     const grosorInput = document.getElementById('grosor');
     const opacidadInput = document.getElementById('opacidad');
 
     if (btnNumber) btnNumber.addEventListener('click', () => setModo('numero'));
+    if (btnDraw) btnDraw.addEventListener('click', () => setModo('dibujar'));
     if (btnErase) btnErase.addEventListener('click', () => setModo('borrar'));
 
-    if (colorPicker) colorPicker.addEventListener('input', actualizarEstiloRuta);
-    if (grosorInput) grosorInput.addEventListener('input', actualizarEstiloRuta);
-    if (opacidadInput) opacidadInput.addEventListener('input', actualizarEstiloRuta);
+    // Actualizan TODAS las líneas del mapa de manera global y fluida
+    if (colorPicker) colorPicker.addEventListener('input', actualizarEstilosGlobales);
+    if (grosorInput) grosorInput.addEventListener('input', actualizarEstilosGlobales);
+    if (opacidadInput) opacidadInput.addEventListener('input', actualizarEstilosGlobales);
 }
 
-// Selección de modo (Número o Borrar)
+// Selección de modos
 function setModo(modo) {
     modoActual = modo;
     
@@ -94,14 +88,18 @@ function setModo(modo) {
     map.touchZoom.enable();
     map.doubleClickZoom.enable();
 
-    const btnDraw = document.getElementById('btn-draw');
-    if (btnDraw) btnDraw.className = 'btn btn-secondary';
-    
     const btnNumEl = document.getElementById('btn-number');
+    const btnDrawEl = document.getElementById('btn-draw');
     const btnErrEl = document.getElementById('btn-erase');
     
     if (btnNumEl) btnNumEl.className = modo === 'numero' ? 'btn btn-primary' : 'btn btn-secondary';
+    if (btnDrawEl) btnDrawEl.className = modo === 'dibujar' ? 'btn btn-primary' : 'btn btn-secondary';
     if (btnErrEl) btnErrEl.className = modo === 'borrar' ? 'btn btn-danger' : 'btn btn-secondary';
+
+    // Al cambiar al modo número o dibujar, si se pulsa dos veces o se reanuda, permitimos iniciar limpio
+    if (modo === 'dibujar') {
+        ultimoPuntoTramo = null;
+    }
 }
 
 function obtenerEstilosActuales() {
@@ -116,66 +114,135 @@ function obtenerEstilosActuales() {
     };
 }
 
-// --- GESTIÓN DE CLICS Y TRAZADO LIBRE PEATONAL SIN RESTRICCIONES ---
-function gestionarPulsacion(e) {
-    if (modoActual !== 'numero') return;
+// --- FUNCIÓN TÁCTIL PARA CORTAR TRAMO (Ideal para tablets) ---
+// Puedes vincular esta función a un botón en tu HTML (ej: onclick="cortarTramoActual()") 
+// o se activará automáticamente si haces doble toque rápido en el mapa.
+function cortarTramoActual() {
+    ultimoPuntoTramo = null;
+    alert("Próximo punto iniciado como un trazado nuevo independiente (sin conectar con el anterior).");
+}
 
+// Detección de doble toque rápido en la tablet para cortar el tramo automáticamente sin teclado
+let ultimoToqueTiempo = 0;
+
+// --- GESTIÓN DE CLICS / TQQUES: CALLES CURVEADAS Y TRAMOS INDEPENDIENTES ---
+async function gestionarPulsacion(e) {
     const latlng = e.latlng;
-    puntosRuta.push(latlng);
-
     const estilos = obtenerEstilosActuales();
-    const numeroActual = contadorNumero;
 
-    const numberIcon = L.divIcon({
-        className: 'number-icon',
-        html: `<span>${numeroActual}</span>`,
-        iconSize: [28, 28],
-        iconAnchor: [14, 14]
-    });
+    // Control de doble toque rápido en tablet para cortar tramo (menos de 350ms entre toques)
+    const tiempoActual = new Date().getTime();
+    if (tiempoActual - ultimoToqueTiempo < 350) {
+        cortarTramoActual();
+    }
+    ultimoToqueTiempo = tiempoActual;
 
-    const marker = L.marker(latlng, { icon: numberIcon }).addTo(map);
-    
-    setTimeout(() => {
-        const el = marker.getElement();
-        if (el) {
-            el.style.backgroundColor = estilos.color;
-        }
-    }, 10);
-
-    marker.on('click', function(ev) {
-        if (modoActual === 'borrar') {
-            L.DomEvent.stopPropagation(ev);
-            map.removeLayer(marker);
-            historialAcciones = historialAcciones.filter(item => item.elemento !== marker);
-            
-            if (marker.lineaAsociada) {
-                map.removeLayer(marker.lineaAsociada);
-                historialAcciones = historialAcciones.filter(item => item.elemento !== marker.lineaAsociada);
-            }
-        }
-    });
-
-    let lineaAsociada = null;
-
-    // Conexión libre punto a punto (Libertad total peatonal y espacial)
-    if (puntosRuta.length > 1) {
-        const puntoAnterior = puntosRuta[puntosRuta.length - 2];
-        const coordenadasTramo = [puntoAnterior, latlng];
-
-        lineaAsociada = L.polyline(coordenadasTramo, {
-            color: estilos.color,
-            weight: estilos.weight,
-            opacity: estilos.opacity,
-            smoothFactor: 1
-        }).addTo(map);
-
-        marker.lineaAsociada = lineaAsociada;
-        historialAcciones.push({ tipo: 'linea', elemento: lineaAsociada });
+    // MODO BORRAR
+    if (modoActual === 'borrar') {
+        return; 
     }
 
-    historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: numeroActual, color: estilos.color });
-    historialRehacer = [];
-    contadorNumero++;
+    // MODO DIBUJO LIBRE (Línea recta directa sin numeración)
+    if (modoActual === 'dibujar') {
+        if (!window.puntosDibujoLibre) window.puntosDibujoLibre = [];
+        window.puntosDibujoLibre.push(latlng);
+
+        const markerLibre = L.circleMarker(latlng, {
+            radius: 5,
+            color: estilos.color,
+            fillColor: estilos.color,
+            fillOpacity: 1
+        }).addTo(map);
+
+        historialAcciones.push({ tipo: 'marcador-libre', elemento: markerLibre });
+
+        if (window.puntosDibujoLibre.length > 1) {
+            const pAnt = window.puntosDibujoLibre[window.puntosDibujoLibre.length - 2];
+            const lineaLibre = L.polyline([pAnt, latlng], {
+                color: estilos.color,
+                weight: estilos.weight,
+                opacity: estilos.opacity
+            }).addTo(map);
+            historialAcciones.push({ tipo: 'linea', elemento: lineaLibre });
+        }
+        return;
+    }
+
+    // MODO NÚMEROS Y RUTAS POR CALLES
+    if (modoActual === 'numero') {
+        const numeroActual = contadorNumero;
+
+        const numberIcon = L.divIcon({
+            className: 'number-icon',
+            html: `<span>${numeroActual}</span>`,
+            iconSize: [28, 28],
+            iconAnchor: [14, 14]
+        });
+
+        const marker = L.marker(latlng, { icon: numberIcon }).addTo(map);
+        
+        setTimeout(() => {
+            const el = marker.getElement();
+            if (el) el.style.backgroundColor = estilos.color;
+        }, 10);
+
+        marker.on('click', function(ev) {
+            if (modoActual === 'borrar') {
+                L.DomEvent.stopPropagation(ev);
+                map.removeLayer(marker);
+                historialAcciones = historialAcciones.filter(item => item.elemento !== marker);
+                if (marker.lineaAsociada) {
+                    map.removeLayer(marker.lineaAsociada);
+                    historialAcciones = historialAcciones.filter(item => item.elemento !== marker.lineaAsociada);
+                }
+            }
+        });
+
+        let lineaAsociada = null;
+
+        // Si hay un tramo previo activo y no se ha cortado, enrutamos por las calles respetando las curvas
+        if (ultimoPuntoTramo) {
+            const coordenadasCalle = await obtenerRutaPorCallesOSRM(ultimoPuntoTramo, latlng);
+
+            if (coordenadasCalle && coordenadasCalle.length > 0) {
+                lineaAsociada = L.polyline(coordenadasCalle, {
+                    color: estilos.color,
+                    weight: estilos.weight,
+                    opacity: estilos.opacity,
+                    smoothFactor: 1
+                }).addTo(map);
+
+                marker.lineaAsociada = lineaAsociada;
+                historialAcciones.push({ tipo: 'linea', elemento: lineaAsociada });
+            }
+        }
+
+        ultimoPuntoTramo = latlng;
+
+        historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: numeroActual, color: estilos.color });
+        historialRehacer = [];
+        contadorNumero++;
+    }
+}
+
+// --- MOTOR DE ENRUTAMIENTO POR CALLES (ADAPTA CURVAS) ---
+async function obtenerRutaPorCallesOSRM(origen, destino) {
+    const url = `https://routing.openstreetmap.de/routed-foot/route/v1/foot/${origen.lng},${origen.lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson`;
+
+    try {
+        const response = await fetch(url);
+        if (response.ok) {
+            const data = await response.json();
+            if (data.code === 'Ok' && data.routes && data.routes.length > 0) {
+                const coordenadasGeoJSON = data.routes[0].geometry.coordinates;
+                return coordenadasGeoJSON.map(coord => [coord[1], coord[0]]);
+            }
+        }
+    } catch (e) {
+        console.warn("Error en OSRM, usando línea directa provisional:", e);
+    }
+
+    return [origen, destino];
 }
 
 // Deshacer y Rehacer
@@ -188,13 +255,13 @@ function deshacerUltimo() {
 
     if (ultimaAccion.tipo === 'marcador') {
         contadorNumero = Math.max(1, contadorNumero - 1);
-        puntosRuta.pop();
         
         if (ultimaAccion.elemento.lineaAsociada) {
             map.removeLayer(ultimaAccion.elemento.lineaAsociada);
             historialAcciones = historialAcciones.filter(item => item.elemento !== ultimaAccion.elemento.lineaAsociada);
             historialRehacer.push({ tipo: 'linea', elemento: ultimaAccion.elemento.lineaAsociada });
         }
+        ultimoPuntoTramo = historialAcciones.slice().reverse().find(item => item.tipo === 'marcador')?.elemento.getLatLng() || null;
     }
 }
 
@@ -207,7 +274,7 @@ function rehacerProximo() {
 
     if (accionRehacer.tipo === 'marcador') {
         contadorNumero++;
-        puntosRuta.push(accionRehacer.elemento.getLatLng());
+        ultimoPuntoTramo = accionRehacer.elemento.getLatLng();
     }
 }
 
@@ -216,22 +283,23 @@ function borrarTodo() {
     historialRehacer.forEach(item => map.removeLayer(item.elemento));
     historialAcciones = [];
     historialRehacer = [];
-    puntosRuta = [];
+    ultimoPuntoTramo = null;
     contadorNumero = 1;
+    window.puntosDibujoLibre = [];
 }
 
-function actualizarEstiloRuta() {
+// Actualiza de forma GLOBAL el grosor, color y opacidad de TODAS las líneas del mapa
+function actualizarEstilosGlobales() {
     const estilos = obtenerEstilosActuales();
-    if (historialAcciones.length > 0) {
-        const ultimaLinea = historialAcciones.slice().reverse().find(item => item.tipo === 'linea');
-        if (ultimaLinea && ultimaLinea.elemento) {
-            ultimaLinea.elemento.setStyle({
+    historialAcciones.forEach(item => {
+        if (item.tipo === 'linea' && item.elemento) {
+            item.elemento.setStyle({
                 color: estilos.color,
                 weight: estilos.weight,
                 opacity: estilos.opacity
             });
         }
-    }
+    });
 }
 
 // --- GESTIÓN CON GITHUB ---
@@ -438,9 +506,7 @@ async function cargarMapaDesdeGithub(nombreArchivo) {
                 const marker = L.marker(latlng, { icon: numberIcon }).addTo(map);
                 setTimeout(() => {
                     const el = marker.getElement();
-                    if (el) {
-                        el.style.backgroundColor = color;
-                    }
+                    if (el) el.style.backgroundColor = color;
                 }, 10);
 
                 marker.on('click', function(ev) {
@@ -452,7 +518,6 @@ async function cargarMapaDesdeGithub(nombreArchivo) {
                 });
 
                 historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: num, color: color });
-                puntosRuta.push(latlng);
                 bounds.push(latlng);
 
                 if (num >= contadorNumero) {
@@ -493,7 +558,7 @@ async function compartirMapaGithub() {
         if (!nombreMapa) return;
 
         const fileName = nombreMapa.trim().toLowerCase().replace(/\s+/g, '-') + '.json';
-        const baseUrl = window.location.href.split('?')[0];
+const baseUrl = window.location.href.split('?')[0];
         const shareUrl = `${baseUrl}?mapa=${fileName}`;
 
         navigator.clipboard.writeText(shareUrl).then(() => {
@@ -525,3 +590,4 @@ function importarGPX(event) {
     };
     reader.readAsText(file);
 }
+      
