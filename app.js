@@ -73,9 +73,12 @@ function inicializarInterfaz() {
     const grosorInput = document.getElementById('grosor');
     const opacidadInput = document.getElementById('opacidad');
 
-    // Establecer opacidad por defecto al 35% si el control existe en el HTML
+    // Establecer opacidad por defecto al 35% y grosor a 13 píxeles si los controles existen
     if (opacidadInput) {
         opacidadInput.value = 35;
+    }
+    if (grosorInput) {
+        grosorInput.value = 13;
     }
 
     if (btnNumber) btnNumber.addEventListener('click', () => setModo('numero'));
@@ -116,20 +119,21 @@ function obtenerEstilosActuales() {
 
     return {
         color: colorEl ? colorEl.value : '#007bff',
-        weight: grosorEl ? parseInt(grosorEl.value) : 4,
-        opacity: opacidadEl ? parseFloat(opacidadEl.value) / 100 : 0.35 // Por defecto 35% (0.35) si no está definido
+        weight: grosorEl ? parseInt(grosorEl.value) : 13,
+        opacity: opacidadEl ? parseFloat(opacidadEl.value) / 100 : 0.35
     };
 }
 
-// --- FUNCIÓN TÁCTIL PARA CORTAR TRAMO ---
+// --- FUNCIÓN PARA CORTAR TRAMO ACTUAL (Sirve tanto para Números como para Dibujo Libre) ---
 function cortarTramoActual() {
     ultimoPuntoTramo = null;
-    alert("Próximo punto iniciado como un trazado nuevo independiente (sin conectar con el anterior).");
+    window.puntosDibujoLibre = []; // Limpia también la memoria del trazo libre
+    alert("Próximo punto iniciado como un trazado nuevo independiente.");
 }
 
 let ultimoToqueTiempo = 0;
 
-// --- GESTIÓN DE CLICS / TOQUES: CALLES CURVEADAS Y TRAMOS INDEPENDIENTES ---
+// --- GESTIÓN DE CLICS / TOQUES ---
 async function gestionarPulsacion(e) {
     const latlng = e.latlng;
     const estilos = obtenerEstilosActuales();
@@ -587,26 +591,6 @@ async function compartirMapaGithub() {
     } catch (e) {
         alert(`Error al obtener los mapas: ${e.message}`);
     }
-}
-
-function importarGPX(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function (e) {
-        new L.GPX(e.target.result, {
-            async: true,
-            marker_options: {
-                startIconUrl: '',
-                endIconUrl: '',
-                shadowUrl: ''
-            }
-        }).on('loaded', function (e) {
-            map.fitBounds(e.target.getBounds());
-        }).addTo(map);
-    };
-    reader.readAsText(file);
 }
 
 function importarGPX(event) {
