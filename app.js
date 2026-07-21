@@ -3,7 +3,6 @@ const GITHUB_USER = "viferor";
 const GITHUB_REPO = "Mapas";  
 const CARPETA_MAPAS = "mapas";                 
 
-// Obtiene el token guardado en el móvil o lo pide si es la primera vez
 function obtenerToken() {
     let token = localStorage.getItem("github_token_mapas");
     if (!token) {
@@ -16,18 +15,30 @@ function obtenerToken() {
     return token;
 }
 
-// Opción por si algún día necesitas cambiar de token
 function cambiarToken() {
     localStorage.removeItem("github_token_mapas");
     obtenerToken();
 }
 // ==============================================================
 
-const map = L.map('map', { zoomControl: false, tap: false }).setView([37.8882, -4.7794], 14);
+// Mapa inicializado con maxZoom en 20
+const map = L.map('map', { zoomControl: false, tap: false, maxZoom: 20 }).setView([37.8882, -4.7794], 14);
 
-const mapaCallejero = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
-const mapaSatelite = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { attribution: '© Google Maps' });
-L.control.layers({ "🚶‍♂️ Callejero": mapaCallejero, "🛰️ Satélite": mapaSatelite }, null, { position: 'topright' }).addTo(map);
+// Callejero CartoDB Positron (Alta precisión, actualizado y soporta zoom nivel 20)
+const mapaCallejero = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { 
+    attribution: '© OpenStreetMap, © CARTO',
+    maxZoom: 20,
+    maxNativeZoom: 19
+}).addTo(map);
+
+// Google Satélite (con zoom nivel 20)
+const mapaSatelite = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { 
+    attribution: '© Google Maps',
+    maxZoom: 20,
+    maxNativeZoom: 20
+});
+
+L.control.layers({ "🚶‍♂️ Callejero HD": mapaCallejero, "🛰️ Satélite": mapaSatelite }, null, { position: 'topright' }).addTo(map);
 L.control.zoom({ position: 'topleft' }).addTo(map);
 
 const contenedorControles = document.getElementById('controls');
@@ -165,10 +176,10 @@ async function guardarEnGithub() {
         if (res.ok) { 
             alert(`☁️ Mapa '${nombreArchivo}' guardado con éxito!`); 
         } else if (res.status === 401) {
-            alert("Token incorrecto o caducado. Vuelve a introducirlo.");
+            alert("Token incorrecto o caducado.");
             cambiarToken();
         } else { 
-            alert("Error al guardar en GitHub. Comprueba el nombre del mapa."); 
+            alert("Error al guardar en GitHub."); 
         }
     } catch (err) { alert("Error de conexión con GitHub."); }
 }
@@ -205,10 +216,46 @@ async function abrirModalCargarGithub() {
             const div = document.createElement('div');
             div.className = 'map-item';
             const nombreLimpio = file.name.replace('.json', '');
-            div.innerHTML = `<span style="cursor:pointer; flex:1;" onclick="cargarMapaDesdeGithub('${file.download_url}')">📍 ${nombreLimpio}</span>`;
+            
+            // Añadida la opción con botón de eliminar (papelera)
+            div.innerHTML = `
+                <span style="cursor:pointer; flex:1;" onclick="cargarMapaDesdeGithub('${file.download_url}')">📍 ${nombreLimpio}</span>
+                <span style="cursor:pointer; margin-left:10px;" onclick="eliminarMapaGithub('${file.name}', '${file.sha}')">🗑️</span>
+            `;
             lista.appendChild(div);
         });
     } catch (err) { lista.innerHTML = "Error al conectar con GitHub."; }
+}
+
+// NUEVA FUNCIÓN: Eliminar mapa de GitHub
+async function eliminarMapaGithub(nombreArchivo, sha) {
+    if (!confirm(`¿Seguro que quieres borrar el mapa '${nombreArchivo.replace('.json', '')}'?`)) return;
+
+    const token = obtenerToken();
+    if (!token) return;
+
+    const path = `${CARPETA_MAPAS}/${nombreArchivo}`;
+    const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`;
+
+    try {
+        const res = await fetch(url, {
+            method: "DELETE",
+            headers: { "Authorization": `token ${token}`, "Content-Type": "application/json" },
+            body: JSON.stringify({
+                message: `Borrado: ${nombreArchivo}`,
+                sha: sha
+            })
+        });
+
+        if (res.ok) {
+            alert("🗑️ Mapa eliminado correctamente.");
+            abrirModalCargarGithub(); // Recargar la lista de mapas
+        } else {
+            alert("Error al intentar eliminar el mapa.");
+        }
+    } catch (err) {
+        alert("Error de conexión al eliminar el mapa.");
+    }
 }
 
 async function cargarMapaDesdeGithub(downloadUrl) {
