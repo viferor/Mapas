@@ -1,401 +1,425 @@
-// ==================== CONFIGURACIÓN GITHUB ====================
-const GITHUB_USER = "viferor";      
-const GITHUB_REPO = "Mapas";  
-const CARPETA_MAPAS = "mapas";                 
+// Configuración de GitHub
+const GITHUB_USER = "viferor"; 
+const GITHUB_REPO = "Mapas"; 
+const GITHUB_FOLDER = "mapas"; 
+
+// Variables globales
+let map;
+let modoActual = 'dibujar'; // 'dibujar', 'numero', 'borrar'
+let dibujando = false;
+let lineaActual = null;
+let contadorNumero = 1;
+
+// Historial para deshacer / rehacer
+let historialAcciones = [];
+let historialRehacer = [];
+
+// Inicialización del mapa
+document.addEventListener("DOMContentLoaded", function () {
+    map = L.map('map', {
+        zoomControl: true,
+        touchZoom: true
+    }).setView([37.8882, -4.7794], 13); // Centrado en Córdoba
+
+    // Capas base de mapas
+    const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+    });
+
+    const topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+        maxZoom: 17,
+        attribution: '© OpenTopoMap'
+    });
+
+    const esriSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles © Esri'
+    });
+
+    osm.addTo(map);
+
+    // Selector de capas
+    const baseMaps = {
+        "Callejero": osm,
+        "Topográfico": topo,
+        "Satélite": esriSat
+    };
+    L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
+
+    // Eventos de interacción sobre el mapa
+    map.on('mousedown touchstart', iniciarTrazo);
+    map.on('mousemove touchmove', moverTrazo);
+    map.on('mouseup touchend', finalizarTrazo);
+    map.on('click', gestionarPulsacion);
+
+    // Cargar mapa desde URL si viene con parámetro ?mapa=nombre.json
+    const urlParams = new URLSearchParams(window.location.search);
+    const mapaCompartido = urlParams.get('mapa');
+    if (mapaCompartido) {
+        cargarMapaDesdeGithub(mapaCompartido);
+    }
+});
+
+// Selección de modo
+function setModo(modo) {
+    modoActual = modo;
+    
+    if (modo === 'dibujar') {
+        map.dragging.disable();
+    } else {
+        map.dragging.enable();
+    }
+
+    document.getElementById('btn-draw').className = modo === 'dibujar' ? 'btn btn-primary' : 'btn btn-secondary';
+    document.getElementById('btn-number').className = modo === 'numero' ? 'btn btn-primary' : 'btn btn-secondary';
+    document.getElementById('btn-erase').className = modo === 'borrar' ? 'btn btn-danger' : 'btn btn-secondary';
+}
+
+function obtenerEstilosActuales() {
+    return {
+        color: document.getElementById('color').value,
+        weight: parseInt(document.getElementById('grosor').value),
+        opacity: parseFloat(document.getElementById('opacidad').value) / 100
+    };
+}
+
+// Dibujo a mano alzada
+function iniciarTrazo(e) {
+    if (modoActual !== 'dibujar') return;
+    dibujando = true;
+
+    const latlng = e.latlng || map.mouseEventToLatLng(e.originalEvent.touches ? e.originalEvent.touches[0] : e.originalEvent);
+    const estilos = obtenerEstilosActuales();
+
+    lineaActual = L.polyline([latlng], {
+        color: estilos.color,
+        weight: estilos.weight,
+        opacity: estilos.opacity,
+        smoothFactor: 1
+    }).addTo(map);
+}
+
+function moverTrazo(e) {
+    if (!dibujando || modoActual !== 'dibujar') return;
+
+    const latlng = e.latlng || map.mouseEventToLatLng(e.originalEvent.touches ? e.originalEvent.touches[0] : e.originalEvent);
+    if (latlng) {
+        lineaActual.addLatLng(latlng);
+    }
+}
+
+function finalizarTrazo() {
+    if (!dibujando || modoActual !== 'dibujar') return;
+    dibujando = false;
+
+    if (lineaActual) {
+        historialAcciones.push({ tipo: 'linea', elemento: lineaActual });
+        historialRehacer = [];
+        lineaActual = null;
+    }
+}
+
+// Numeración paso a paso
+function gestionarPulsacion(e) {
+    if (modoActual === 'numero') {
+        const color = document.getElementById('color').value;
+
+        const numberIcon = L.divIcon({
+            className: 'number-icon',
+            html: `<span>${contadorNumero}</span>`,
+            iconSize: [28, 28],
+            iconAnchor: [14, 14]
+        });
+
+        const marker = L.marker(e.latlng, { icon: numberIcon }).addTo(map);
+        
+        setTimeout(() => {
+            if (marker.getElement()) {
+                marker.getElement().style.backgroundColor = color;
+            }
+        }, 10);
+
+        historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: contadorNumero, color: color });
+        historialRehacer = [];
+        contadorNumero++;
+    }
+}
+
+// Deshacer y Rehacer
+function deshacerUltimo() {
+    if (historialAcciones.length === 0) return;
+
+    const ultimaAccion = historialAcciones.pop();
+    map.removeLayer(ultimaAccion.elemento);
+    historialRehacer.push(ultimaAccion);
+
+    if (ultimaAccion.tipo === 'marcador') {
+        contadorNumero = Math.max(1, contadorNumero - 1);
+    }
+}
+
+function rehacerProximo() {
+    if (historialRehacer.length === 0) return;
+
+    const accionRehacer = historialRehacer.pop();
+    accionRehacer.elemento.addTo(map);
+    historialAcciones.push(accionRehacer);
+
+    if (accionRehacer.tipo === 'marcador') {
+        contadorNumero++;
+    }
+}
+
+function borrarTodo() {
+    historialAcciones.forEach(item => map.removeLayer(item.elemento));
+    historialRehacer.forEach(item => map.removeLayer(item.elemento));
+    historialAcciones = [];
+    historialRehacer = [];
+    contadorNumero = 1;
+}
+
+function actualizarEstiloRuta() {}
+
+// --- GESTIÓN CON GITHUB ---
 
 function obtenerToken() {
-    let token = localStorage.getItem("github_token_mapas");
+    let token = localStorage.getItem('github_token');
     if (!token) {
-        token = prompt("Introduce tu Token de GitHub (solo se pedirá una vez):");
+        token = prompt("Introduce tu Personal Access Token de GitHub:");
         if (token) {
-            token = token.trim();
-            localStorage.setItem("github_token_mapas", token);
+            localStorage.setItem('github_token', token.trim());
         }
     }
     return token;
 }
 
 function cambiarToken() {
-    localStorage.removeItem("github_token_mapas");
-    obtenerToken();
-}
-// ==============================================================
-
-// Mapa inicializado con zoom máximo en nivel 22
-const map = L.map('map', { zoomControl: false, tap: false, maxZoom: 22 }).setView([37.8882, -4.7794], 14);
-
-// CALLEJERO GOOGLE COMPLETO
-const mapaCallejero = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', { 
-    attribution: '© Google Maps',
-    maxZoom: 22,
-    maxNativeZoom: 20
-}).addTo(map);
-
-// HÍBRIDO HD+ (Google Satélite + Nombres)
-const mapaSatelite = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { 
-    attribution: '© Google Maps',
-    maxZoom: 22,
-    maxNativeZoom: 20
-});
-
-L.control.layers({ "🚶‍♂️ Callejero Detallado": mapaCallejero, "🛰️ Híbrido HD+": mapaSatelite }, null, { position: 'topright' }).addTo(map);
-L.control.zoom({ position: 'topleft' }).addTo(map);
-
-const contenedorControles = document.getElementById('controls');
-L.DomEvent.disableClickPropagation(contenedorControles);
-L.DomEvent.disableScrollPropagation(contenedorControles);
-
-let modoActual = 'navegar', puntosRutaActual = [], lineaActual = null;
-let historialTrazos = [], papeleraTrazos = [], capasGPX = [];
-
-function getEstilos() {
-    return { color: document.getElementById('color').value, weight: parseInt(document.getElementById('grosor').value), opacity: parseFloat(document.getElementById('opacidad').value) / 100 };
-}
-
-function setModo(nuevoModo) {
-    map.getContainer().removeEventListener('mousedown', iniciarTrazo);
-    map.getContainer().removeEventListener('touchstart', iniciarTrazo);
-    modoActual = (modoActual === nuevoModo) ? 'navegar' : nuevoModo;
-    document.getElementById('btn-draw').className = modoActual === 'dibujar' ? "btn btn-active-draw" : "btn btn-primary";
-    document.getElementById('btn-erase').className = modoActual === 'borrar' ? "btn btn-active-erase" : "btn btn-secondary";
-    
-    if (modoActual !== 'navegar') {
-        map.dragging.disable();
-        map.getContainer().addEventListener('mousedown', iniciarTrazo, {passive: false});
-        map.getContainer().addEventListener('touchstart', iniciarTrazo, {passive: false});
-    } else { map.dragging.enable(); }
-}
-
-function iniciarTrazo(e) {
-    if (e.touches && e.touches.length > 1) { abortarTrazado(); return; }
-    const eReal = e.touches ? e.touches[0] : e;
-    if (contenedorControles.contains(eReal.target)) return;
-
-    const latlng = map.mouseEventToLatLng(eReal);
-    if (modoActual === 'dibujar') {
-        papeleraTrazos = [];
-        puntosRutaActual = [latlng];
-        lineaActual = L.polyline(puntosRutaActual, getEstilos()).addTo(map);
-        vincularEventoGoma(lineaActual);
-        window.addEventListener('mousemove', dibujarTrazo, {passive: false});
-        window.addEventListener('touchmove', dibujarTrazo, {passive: false});
-        window.addEventListener('mouseup', terminarTrazo);
-        window.addEventListener('touchend', terminarTrazo);
-    } else if (modoActual === 'borrar') {
-        ejecutarBorradoInmediato(eReal);
-        window.addEventListener('mousemove', arrastrarBorrado, {passive: false});
-        window.addEventListener('touchmove', arrastrarBorrado, {passive: false});
-        window.addEventListener('mouseup', terminarBorrado);
-        window.addEventListener('touchend', terminarBorrado);
+    const nuevoToken = prompt("Introduce tu nuevo Personal Access Token de GitHub:");
+    if (nuevoToken) {
+        localStorage.setItem('github_token', nuevoToken.trim());
+        alert("Token actualizado correctamente.");
     }
 }
 
-function dibujarTrazo(e) {
-    if (e.touches && e.touches.length > 1) { abortarTrazado(); return; }
-    const eReal = e.touches ? e.touches[0] : e;
-    const latlng = map.mouseEventToLatLng(eReal);
-    if (lineaActual) { puntosRutaActual.push(latlng); lineaActual.setLatLngs(puntosRutaActual); }
-}
+function exportarDatosMapa() {
+    const elementos = [];
 
-function abortarTrazado() {
-    window.removeEventListener('mousemove', dibujarTrazo); window.removeEventListener('mouseup', terminarTrazo);
-    window.removeEventListener('touchmove', dibujarTrazo); window.removeEventListener('touchend', terminarTrazo);
-    if (lineaActual) { map.removeLayer(lineaActual); lineaActual = null; }
-}
-
-function terminarTrazo() {
-    window.removeEventListener('mousemove', dibujarTrazo); window.removeEventListener('mouseup', terminarTrazo);
-    window.removeEventListener('touchmove', dibujarTrazo); window.removeEventListener('touchend', terminarTrazo);
-    if (lineaActual) { historialTrazos.push(lineaActual); lineaActual = null; }
-}
-
-function vincularEventoGoma(linea) { 
-    linea.on('click touchstart', function(e) { 
-        if (modoActual === 'borrar') { 
-            L.DomEvent.stopPropagation(e);
-            map.removeLayer(linea); 
-            papeleraTrazos.push(linea); 
-            historialTrazos = historialTrazos.filter(h => h !== linea); 
-        } 
-    }); 
-}
-
-function ejecutarBorradoInmediato(eReal) {
-    const el = document.elementFromPoint(eReal.clientX, eReal.clientY);
-    if(el && el.tagName === 'path') {
-        historialTrazos.forEach(linea => { if(linea._path === el) { map.removeLayer(linea); papeleraTrazos.push(linea); historialTrazos = historialTrazos.filter(h => h !== linea); } });
-    }
-}
-
-function arrastrarBorrado(e) { ejecutarBorradoInmediato(e.touches ? e.touches[0] : e); }
-function terminarBorrado() { 
-    window.removeEventListener('mousemove', arrastrarBorrado); window.removeEventListener('mouseup', terminarBorrado); 
-    window.removeEventListener('touchmove', arrastrarBorrado); window.removeEventListener('touchend', terminarBorrado); 
-}
-
-function actualizarEstiloRuta() { const s = getEstilos(); historialTrazos.forEach(l => l.setStyle(s)); capasGPX.forEach(g => g.setStyle(s)); }
-function deshacerUltimo() { if (historialTrazos.length > 0) { const l = historialTrazos.pop(); map.removeLayer(l); papeleraTrazos.push(l); } }
-function rehacerProximo() { if (papeleraTrazos.length > 0) { const l = papeleraTrazos.pop(); l.addTo(map); historialTrazos.push(l); } }
-function borrarTodo() { historialTrazos.forEach(l => map.removeLayer(l)); capasGPX.forEach(g => map.removeLayer(g)); historialTrazos = []; papeleraTrazos = []; }
-
-function extraerCoordenadasActuales() { return historialTrazos.map(linea => linea.getLatLngs().map(ll => [parseFloat(ll.lat.toFixed(5)), parseFloat(ll.lng.toFixed(5))])); }
-
-// ==================== API GITHUB Y MODALES ====================
-
-// Ventana para GUARDAR (Seleccionar existente o crear nuevo)
-async function guardarEnGithub() {
-    if (historialTrazos.length === 0) return alert("Dibuja una ruta antes de guardar.");
-    
-    const token = obtenerToken();
-    if (!token) return alert("Necesitas introducir un Token para guardar.");
-
-    const lista = document.getElementById('lista-mapas');
-    lista.innerHTML = "Cargando lista de mapas...";
-    document.getElementById('modal-load').style.display = 'block';
-
-    const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${CARPETA_MAPAS}`;
-    try {
-        const res = await fetch(url, { headers: { "Authorization": `token ${token}` } });
-        let files = [];
-        if (res.status === 200) {
-            files = await res.json();
-        }
-
-        lista.innerHTML = "";
-        
-        // Opción para crear uno nuevo
-        const divNuevo = document.createElement('div');
-        divNuevo.className = 'map-item';
-        divNuevo.style.background = '#e8f5e9';
-        divNuevo.style.fontWeight = 'bold';
-        divNuevo.innerHTML = `<span style="cursor:pointer; flex:1;" onclick="ejecutarGuardadoComoNuevo()">➕ Guardar como mapa nuevo...</span>`;
-        lista.appendChild(divNuevo);
-
-        const jsonFiles = files.filter(f => f.name.endsWith('.json'));
-        if (jsonFiles.length > 0) {
-            const hr = document.createElement('hr');
-            hr.style.margin = '8px 0';
-            lista.appendChild(hr);
-
-            jsonFiles.forEach(file => {
-                const div = document.createElement('div');
-                div.className = 'map-item';
-                const nombreLimpio = file.name.replace('.json', '');
-                
-                div.innerHTML = `
-                    <span style="cursor:pointer; flex:1;" onclick="ejecutarSobrescribirMapa('${nombreLimpio}')">💾 Sobrescribir '${nombreLimpio}'</span>
-                `;
-                lista.appendChild(div);
+    historialAcciones.forEach(item => {
+        if (item.tipo === 'linea') {
+            const latlngs = item.elemento.getLatLngs().map(ll => [ll.lng, ll.lat]);
+            elementos.push({
+                type: "Feature",
+                geometry: { type: "LineString", coordinates: latlngs },
+                properties: {
+                    tipo: "linea",
+                    color: item.elemento.options.color,
+                    weight: item.elemento.options.weight,
+                    opacity: item.elemento.options.opacity
+                }
+            });
+        } else if (item.tipo === 'marcador') {
+            const ll = item.elemento.getLatLng();
+            elementos.push({
+                type: "Feature",
+                geometry: { type: "Point", coordinates: [ll.lng, ll.lat] },
+                properties: {
+                    tipo: "marcador",
+                    numero: item.numero,
+                    color: item.color || "#007bff"
+                }
             });
         }
-    } catch (err) { lista.innerHTML = "Error al conectar con GitHub."; }
+    });
+
+    return {
+        type: "FeatureCollection",
+        features: elementos
+    };
 }
 
-async function ejecutarGuardadoComoNuevo() {
-    let nombre = prompt("Escribe el nombre para el nuevo mapa:");
-    if (!nombre) return;
-    await procesarGuardado(nombre);
-}
-
-async function ejecutarSobrescribirMapa(nombre) {
-    if (!confirm(`¿Quieres sobrescribir el mapa '${nombre}' con los trazos actuales?`)) return;
-    await procesarGuardado(nombre);
-}
-
-async function procesarGuardado(nombreMapa) {
+async function guardarEnGithub() {
     const token = obtenerToken();
-    const nombreArchivo = nombreMapa.toLowerCase().replace(/[^a-z0-9_-]/g, '_');
-    const path = `${CARPETA_MAPAS}/${nombreArchivo}.json`;
-    const content = btoa(JSON.stringify(extraerCoordenadasActuales(), null, 2));
+    if (!token) return alert("Se requiere un Token de GitHub para guardar.");
+
+    const nombreArchivo = prompt("Nombre para guardar el mapa (ej. ruta-sierra):");
+    if (!nombreArchivo) return;
+
+    const path = `${GITHUB_FOLDER}/${nombreArchivo.trim().toLowerCase().replace(/\s+/g, '-')}.json`;
+    const contenido = JSON.stringify(exportarDatosMapa(), null, 2);
+    const contenidoBase64 = btoa(unescape(encodeURIComponent(contenido)));
+
     const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`;
 
     try {
-        let sha = "";
-        const checkRes = await fetch(url, { headers: { "Authorization": `token ${token}` } });
-        if (checkRes.status === 200) {
-            const data = await checkRes.json();
-            sha = data.sha;
+        let sha = null;
+        const resExist = await fetch(url, {
+            headers: { 'Authorization': `token ${token}` }
+        });
+        if (resExist.ok) {
+            const dataExist = await resExist.json();
+            sha = dataExist.sha;
         }
+
+        const body = {
+            message: `Guardar mapa: ${nombreArchivo}`,
+            content: contenidoBase64
+        };
+        if (sha) body.sha = sha;
 
         const res = await fetch(url, {
-            method: "PUT",
-            headers: { "Authorization": `token ${token}`, "Content-Type": "application/json" },
-            body: JSON.stringify({
-                message: `Guardado: ${nombreArchivo}`,
-                content: content,
-                sha: sha !== "" ? sha : undefined
-            })
-        });
-
-        if (res.ok) { 
-            alert(`☁️ Mapa '${nombreArchivo}' guardado con éxito!`); 
-            cerrarModal();
-        } else if (res.status === 401) {
-            alert("Token incorrecto o caducado.");
-            cambiarToken();
-        } else { 
-            alert("Error al guardar en GitHub."); 
-        }
-    } catch (err) { alert("Error de conexión con GitHub."); }
-}
-
-// Ventana para CARGAR
-async function abrirModalCargarGithub() {
-    const token = obtenerToken();
-    if (!token) return alert("Necesitas introducir un Token para ver tus mapas.");
-
-    const lista = document.getElementById('lista-mapas');
-    lista.innerHTML = "Cargando...";
-    document.getElementById('modal-load').style.display = 'block';
-
-    const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${CARPETA_MAPAS}`;
-    try {
-        const res = await fetch(url, { headers: { "Authorization": `token ${token}` } });
-        if (res.status === 404) { lista.innerHTML = "<p style='font-size:12px;'>No hay carpeta 'mapas'.</p>"; return; }
-        if (res.status === 401) {
-            alert("Token inválido.");
-            cambiarToken();
-            cerrarModal();
-            return;
-        }
-        
-        const files = await res.json();
-        lista.innerHTML = "";
-        const jsonFiles = files.filter(f => f.name.endsWith('.json'));
-        
-        if (jsonFiles.length === 0) {
-            lista.innerHTML = "<p style='font-size:12px;'>No hay mapas guardados aún.</p>";
-            return;
-        }
-
-        jsonFiles.forEach(file => {
-            const div = document.createElement('div');
-            div.className = 'map-item';
-            const nombreLimpio = file.name.replace('.json', '');
-            
-            div.innerHTML = `
-                <span style="cursor:pointer; flex:1;" onclick="cargarMapaDesdeGithub('${file.download_url}')">📍 ${nombreLimpio}</span>
-                <span style="cursor:pointer; margin-left:10px;" onclick="eliminarMapaGithub('${file.name}', '${file.sha}')">🗑️</span>
-            `;
-            lista.appendChild(div);
-        });
-    } catch (err) { lista.innerHTML = "Error al conectar con GitHub."; }
-}
-
-// Ventana para COMPARTIR
-async function compartirMapaGithub() {
-    const token = obtenerToken();
-    if (!token) return alert("Necesitas introducir un Token para compartir.");
-
-    const lista = document.getElementById('lista-mapas');
-    lista.innerHTML = "Cargando mapas para compartir...";
-    document.getElementById('modal-load').style.display = 'block';
-
-    const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${CARPETA_MAPAS}`;
-    try {
-        const res = await fetch(url, { headers: { "Authorization": `token ${token}` } });
-        if (res.status === 404 || res.status === 401) {
-            lista.innerHTML = "<p style='font-size:12px;'>No se encontraron mapas.</p>";
-            return;
-        }
-
-        const files = await res.json();
-        lista.innerHTML = "";
-        const jsonFiles = files.filter(f => f.name.endsWith('.json'));
-
-        if (jsonFiles.length === 0) {
-            lista.innerHTML = "<p style='font-size:12px;'>No hay mapas guardados para compartir.</p>";
-            return;
-        }
-
-        jsonFiles.forEach(file => {
-            const div = document.createElement('div');
-            div.className = 'map-item';
-            const nombreLimpio = file.name.replace('.json', '');
-
-            div.innerHTML = `
-                <span style="cursor:pointer; flex:1;" onclick="ejecutarAccionCompartir('${nombreLimpio}')">🔗 Compartir '${nombreLimpio}'</span>
-            `;
-            lista.appendChild(div);
-        });
-    } catch (err) { lista.innerHTML = "Error al conectar con GitHub."; }
-}
-
-function ejecutarAccionCompartir(nombreMapa) {
-    const nombreArchivo = nombreMapa.toLowerCase().replace(/[^a-z0-9_-]/g, '_');
-    const urlRawGithub = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${CARPETA_MAPAS}/${nombreArchivo}.json`;
-    const urlAppCompartir = `${window.location.origin}${window.location.pathname}?g=${encodeURIComponent(urlRawGithub)}`;
-
-    cerrarModal();
-
-    if (navigator.share) {
-        navigator.share({ title: `Mi recorrido: ${nombreArchivo}`, url: urlAppCompartir });
-    } else {
-        navigator.clipboard.writeText(urlAppCompartir).then(() => alert("🔗 Link copiado al portapapeles"));
-    }
-}
-
-async function eliminarMapaGithub(nombreArchivo, sha) {
-    if (!confirm(`¿Seguro que quieres borrar el mapa '${nombreArchivo.replace('.json', '')}'?`)) return;
-
-    const token = obtenerToken();
-    if (!token) return;
-
-    const path = `${CARPETA_MAPAS}/${nombreArchivo}`;
-    const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`;
-
-    try {
-        const res = await fetch(url, {
-            method: "DELETE",
-            headers: { "Authorization": `token ${token}`, "Content-Type": "application/json" },
-            body: JSON.stringify({
-                message: `Borrado: ${nombreArchivo}`,
-                sha: sha
-            })
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
         });
 
         if (res.ok) {
-            alert("🗑️ Mapa eliminado correctamente.");
-            abrirModalCargarGithub();
+            alert("¡Mapa guardado con éxito en tu repositorio!");
         } else {
-            alert("Error al intentar eliminar el mapa.");
+            const errData = await res.json();
+            alert(`Error al guardar: ${errData.message}`);
         }
-    } catch (err) {
-        alert("Error de conexión al eliminar el mapa.");
+    } catch (e) {
+        alert(`Error de conexión: ${e.message}`);
     }
 }
 
-async function cargarMapaDesdeGithub(downloadUrl) {
+async function abrirModalCargarGithub() {
+    const modal = document.getElementById('modal-load');
+    const listaContainer = document.getElementById('lista-mapas');
+    modal.style.display = 'block';
+    listaContainer.innerHTML = 'Cargando mapas...';
+
+    const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FOLDER}`;
+
     try {
-        const res = await fetch(downloadUrl);
-        const coordenadas = await res.json();
-        borrarTodo();
-        coordenadas.forEach(c => {
-            const l = L.polyline(c, getEstilos()).addTo(map);
-            vincularEventoGoma(l);
-            historialTrazos.push(l);
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("No se pudo obtener la lista de mapas.");
+
+        const archivos = await res.json();
+        const jsonFiles = archivos.filter(f => f.name.endsWith('.json'));
+
+        if (jsonFiles.length === 0) {
+            listaContainer.innerHTML = 'No se encontraron mapas guardados.';
+            return;
+        }
+
+        listaContainer.innerHTML = '';
+        jsonFiles.forEach(file => {
+            const item = document.createElement('div');
+            item.className = 'map-item';
+            item.innerHTML = `
+                <span>${file.name.replace('.json', '')}</span>
+                <button class="btn btn-primary" onclick="cargarMapaDesdeGithub('${file.name}')">Cargar</button>
+            `;
+            listaContainer.appendChild(item);
         });
-        cerrarModal();
-    } catch (err) { alert("Error al descargar el mapa."); }
+    } catch (e) {
+        listaContainer.innerHTML = `Error: ${e.message}`;
+    }
 }
 
-function cerrarModal() { document.getElementById('modal-load').style.display = 'none'; }
+function cerrarModal() {
+    document.getElementById('modal-load').style.display = 'none';
+}
+
+async function cargarMapaDesdeGithub(nombreArchivo) {
+    const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${GITHUB_FOLDER}/${nombreArchivo}`;
+
+    try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("No se pudo descargar el archivo del mapa.");
+
+        const geojson = await res.json();
+        borrarTodo();
+
+        const bounds = [];
+
+        geojson.features.forEach(feature => {
+            if (feature.properties.tipo === 'linea') {
+                const latlngs = feature.geometry.coordinates.map(coord => [coord[1], coord[0]]);
+                const polyline = L.polyline(latlngs, {
+                    color: feature.properties.color,
+                    weight: feature.properties.weight,
+                    opacity: feature.properties.opacity
+                }).addTo(map);
+
+                historialAcciones.push({ tipo: 'linea', elemento: polyline });
+                bounds.push(...latlngs);
+            } else if (feature.properties.tipo === 'marcador') {
+                const coord = feature.geometry.coordinates;
+                const latlng = [coord[1], coord[0]];
+
+                const num = feature.properties.numero;
+                const color = feature.properties.color || "#007bff";
+
+                const numberIcon = L.divIcon({
+                    className: 'number-icon',
+                    html: `<span>${num}</span>`,
+                    iconSize: [28, 28],
+                    iconAnchor: [14, 14]
+                });
+
+                const marker = L.marker(latlng, { icon: numberIcon }).addTo(map);
+                setTimeout(() => {
+                    if (marker.getElement()) {
+                        marker.getElement().style.backgroundColor = color;
+                    }
+                }, 10);
+
+                historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: num, color: color });
+                bounds.push(latlng);
+
+                if (num >= contadorNumero) {
+                    contadorNumero = num + 1;
+                }
+            }
+        });
+
+        if (bounds.length > 0) {
+            map.fitBounds(bounds);
+        }
+
+        cerrarModal();
+    } catch (e) {
+        alert(`Error al cargar el mapa: ${e.message}`);
+    }
+}
+
+function compartirMapaGithub() {
+    const nombreMapa = prompt("Nombre del mapa guardado a compartir (ej. ruta-sierra):");
+    if (!nombreMapa) return;
+
+    const fileName = nombreMapa.trim().toLowerCase().replace(/\s+/g, '-') + '.json';
+    const baseUrl = window.location.href.split('?')[0];
+    const shareUrl = `${baseUrl}?mapa=${fileName}`;
+
+    navigator.clipboard.writeText(shareUrl).then(() => {
+        alert(`¡Enlace copiado al portapapeles!\n\n${shareUrl}`);
+    }).catch(() => {
+        prompt("Copia este enlace para compartir:", shareUrl);
+    });
+}
 
 function importarGPX(event) {
     const file = event.target.files[0];
     if (!file) return;
+
     const reader = new FileReader();
-    reader.onload = function(e) {
-        const gpxLayer = new L.GPX(e.target.result, { async: true, polyline_options: getEstilos() })
-        .on('loaded', function(e) { map.fitBounds(e.target.getBounds()); }).addTo(map);
-        capasGPX.push(gpxLayer);
+    reader.onload = function (e) {
+        new L.GPX(e.target.result, {
+            async: true,
+            marker_options: {
+                startIconUrl: '',
+                endIconUrl: '',
+                shadowUrl: ''
+            }
+        }).on('loaded', function (e) {
+            map.fitBounds(e.target.getBounds());
+        }).addTo(map);
     };
     reader.readAsText(file);
 }
 
-map.whenReady(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('g')) {
-        cargarMapaDesdeGithub(decodeURIComponent(urlParams.get('g')));
-    }
-});
