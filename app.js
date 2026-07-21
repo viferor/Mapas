@@ -6,6 +6,7 @@ const GITHUB_FOLDER = "mapas";
 // Variables globales
 let map;
 let modoActual = 'numero'; // 'numero', 'dibujar' (libre) o 'borrar'
+let submodoNumero = 'ruta'; // 'ruta' o 'aislado'
 let contadorNumero = 1;
 
 // Historial para deshacer / rehacer
@@ -101,8 +102,21 @@ function setModo(modo) {
     if (btnDrawEl) btnDrawEl.className = modo === 'dibujar' ? 'btn btn-primary' : 'btn btn-secondary';
     if (btnErrEl) btnErrEl.className = modo === 'borrar' ? 'btn btn-danger' : 'btn btn-secondary';
 
+    // Mostrar u ocultar el selector de comportamiento numérico según el modo activo
+    const selectorSubmodo = document.getElementById('contenedor-submodo-numero');
+    if (selectorSubmodo) {
+        selectorSubmodo.style.display = (modo === 'numero') ? 'flex' : 'none';
+    }
+
     if (modo === 'dibujar') {
         ultimoPuntoTramo = null;
+    }
+}
+
+function cambiarSubmodoNumero(e) {
+    submodoNumero = e.target.value;
+    if (submodoNumero === 'aislado') {
+        ultimoPuntoTramo = null; // Si marcamos aislado, rompemos la cadena para que el siguiente no enrute automáticamente
     }
 }
 
@@ -139,7 +153,6 @@ async function gestionarPulsacion(e) {
     }
     ultimoToqueTiempo = tiempoActual;
 
-    // MODO BORRAR GLOBAL (Si se pulsa directamente en el mapa en modo borrar, no hace nada a menos que toque un elemento)
     if (modoActual === 'borrar') {
         return; 
     }
@@ -160,7 +173,6 @@ async function gestionarPulsacion(e) {
             fillOpacity: 1
         }).addTo(map);
 
-        // Evento de borrado individual para el punto libre
         markerLibre.on('click', function(ev) {
             if (modoActual === 'borrar') {
                 L.DomEvent.stopPropagation(ev);
@@ -179,7 +191,6 @@ async function gestionarPulsacion(e) {
                 opacity: estilos.opacity
             }).addTo(map);
 
-            // Evento de borrado individual para el segmento libre
             lineaLibre.on('click', function(ev) {
                 if (modoActual === 'borrar') {
                     L.DomEvent.stopPropagation(ev);
@@ -195,7 +206,7 @@ async function gestionarPulsacion(e) {
         return;
     }
 
-    // MODO NÚMEROS Y RUTAS POR CALLES
+    // MODO NÚMEROS Y RUTAS
     if (modoActual === 'numero') {
         const numeroActual = contadorNumero;
 
@@ -213,7 +224,6 @@ async function gestionarPulsacion(e) {
             if (el) el.style.backgroundColor = estilos.color;
         }, 10);
 
-        // Evento para borrar el marcador numérico en modo borrar
         marker.on('click', function(ev) {
             if (modoActual === 'borrar') {
                 L.DomEvent.stopPropagation(ev);
@@ -228,7 +238,8 @@ async function gestionarPulsacion(e) {
 
         let lineaAsociada = null;
 
-        if (ultimoPuntoTramo) {
+        // Solo intentamos rutear si estamos en el submodo 'ruta' y tenemos un punto previo válido
+        if (submodoNumero === 'ruta' && ultimoPuntoTramo) {
             const coordenadasCalle = await obtenerRutaPorCallesOSRM(ultimoPuntoTramo, latlng);
 
             if (coordenadasCalle && coordenadasCalle.length > 0) {
@@ -239,7 +250,6 @@ async function gestionarPulsacion(e) {
                     smoothFactor: 1
                 }).addTo(map);
 
-                // Evento para borrar la línea asociada si se pulsa sobre ella en modo borrar
                 lineaAsociada.on('click', function(ev) {
                     if (modoActual === 'borrar') {
                         L.DomEvent.stopPropagation(ev);
@@ -253,7 +263,12 @@ async function gestionarPulsacion(e) {
             }
         }
 
-        ultimoPuntoTramo = latlng;
+        // Si estamos en modo ruta, actualizamos el último punto. Si es aislado, no guardamos referencia de tramo para que el siguiente empiece limpio.
+        if (submodoNumero === 'ruta') {
+            ultimoPuntoTramo = latlng;
+        } else {
+            ultimoPuntoTramo = null;
+        }
 
         historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: numeroActual, color: estilos.color });
         historialRehacer = [];
@@ -281,7 +296,7 @@ async function obtenerRutaPorCallesOSRM(origen, destino) {
     return [origen, destino];
 }
 
-// Deshacer y Rehacer corregidos y robustos
+// Deshacer y Rehacer
 function deshacerUltimo() {
     if (historialAcciones.length === 0) return;
 
@@ -313,7 +328,9 @@ function rehacerProximo() {
 
         if (accionRehacer.tipo === 'marcador') {
             contadorNumero++;
-            ultimoPuntoTramo = accionRehacer.elemento.getLatLng();
+            if (submodoNumero === 'ruta') {
+                ultimoPuntoTramo = accionRehacer.elemento.getLatLng();
+            }
         }
     }
 }
@@ -333,7 +350,6 @@ function borrarTodo() {
     trazoLibreActivo = false;
 }
 
-// Actualiza de forma GLOBAL el grosor, color y opacidad de TODAS las líneas del mapa
 function actualizarEstilosGlobales() {
     const estilos = obtenerEstilosActuales();
     historialAcciones.forEach(item => {

@@ -102,8 +102,15 @@
 
     <!-- Panel de Control Flotante Inferior Totalmente Transparente -->
     <div id="control-panel" class="control-panel">
-        <div class="grupo-botones" style="display: flex; gap: 5px;">
+        <div class="grupo-botones" style="display: flex; gap: 5px; align-items: center;">
             <button id="btn-number" class="btn btn-primary">Números</button>
+            <!-- Selector de comportamiento para el modo número -->
+            <div id="contenedor-submodo-numero" style="display: flex; align-items: center;">
+                <select id="select-submodo-numero" onchange="cambiarSubmodoNumero(event)" class="btn" style="background: white; color: #333; padding: 6px; cursor: pointer;">
+                    <option value="ruta">Ruta (Callejero)</option>
+                    <option value="aislado">Solo Número (Aislado)</option>
+                </select>
+            </div>
             <button id="btn-draw" class="btn btn-secondary">Dibujo Libre</button>
             <button id="btn-erase" class="btn btn-secondary">Borrar</button>
         </div>
