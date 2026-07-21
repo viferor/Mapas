@@ -485,16 +485,56 @@ async function abrirModalCargarGithub() {
 
         listaContainer.innerHTML = '';
         jsonFiles.forEach(file => {
+            const nombreLimpio = file.name.replace('.json', '');
             const item = document.createElement('div');
             item.className = 'map-item';
             item.innerHTML = `
-                <span>${file.name.replace('.json', '')}</span>
-                <button class="btn btn-primary" onclick="cargarMapaDesdeGithub('${file.name}')">Cargar</button>
+                <span style="font-weight: bold; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 180px;">${nombreLimpio}</span>
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn btn-primary btn-sm" onclick="cargarMapaDesdeGithub('${file.name}')">Cargar</button>
+                    <button class="btn btn-danger btn-sm" onclick="eliminarMapaDeGithub('${file.name}', '${file.sha}')" title="Eliminar mapa">🗑️</button>
+                </div>
             `;
             listaContainer.appendChild(item);
         });
     } catch (e) {
         listaContainer.innerHTML = `Error: ${e.message}`;
+    }
+}
+
+async function eliminarMapaDeGithub(fileName, sha) {
+    const token = obtenerToken();
+    if (!token) return;
+
+    if (!confirm(`¿Estás seguro de que deseas eliminar permanentemente el mapa "${fileName.replace('.json', '')}"?`)) {
+        return;
+    }
+
+    const path = `${GITHUB_FOLDER}/${fileName}`;
+    const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`;
+
+    try {
+        const res = await fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `token ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: `Eliminar mapa ${fileName}`,
+                sha: sha
+            })
+        });
+
+        if (res.ok) {
+            alert("Mapa eliminado correctamente.");
+            abrirModalCargarGithub(); // Refrescar la lista del modal automáticamente
+        } else {
+            const errData = await res.json();
+            alert(`Error al eliminar: ${errData.message}`);
+        }
+    } catch (e) {
+        alert(`Error de conexión: ${e.message}`);
     }
 }
 
@@ -585,20 +625,29 @@ async function compartirMapaGithub() {
         });
         if (resList.ok) {
             const dataFiles = await resList.json();
-            archivosDisponibles = dataFiles.filter(f => f.name.endsWith('.json')).map(f => f.name.replace('.json', ''));
+            archivosDisponibles = dataFiles.filter(f => f.name.endsWith('.json')).map(f => f.name);
         }
 
-        let mensajePrompt = "Introduce el nombre del mapa guardado que quieres compartir:\n\n";
-        if (archivosDisponibles.length > 0) {
-            mensajePrompt += "Mapas disponibles:\n- " + archivosDisponibles.join("\n- ") + "\n\n";
-        } else {
-            mensajePrompt += "(No hay mapas guardados todavía)\n\n";
+        if (archivosDisponibles.length === 0) {
+            return alert("No hay mapas guardados en GitHub para compartir.");
         }
 
-        const nombreMapa = prompt(mensajePrompt);
-        if (!nombreMapa) return;
+        // Creamos una lista limpia limpia para que el usuario elija seleccionando mediante prompt o mostrando opciones
+        let mensajePrompt = "Elige el número del mapa que quieres compartir:\n\n";
+        archivosDisponibles.forEach((file, index) => {
+            mensajePrompt += `${index + 1}. ${file.replace('.json', '')}\n`;
+        });
+        mensajePrompt += "\nIntroduce el número correspondiente:";
 
-        const fileName = nombreMapa.trim().toLowerCase().replace(/\s+/g, '-') + '.json';
+        const seleccion = prompt(mensajePrompt);
+        if (!seleccion) return;
+
+        const indice = parseInt(seleccion.trim()) - 1;
+        if (isNaN(indice) || indice < 0 || indice >= archivosDisponibles.length) {
+            return alert("Selección no válida.");
+        }
+
+        const fileName = archivosDisponibles[indice];
         const baseUrl = window.location.href.split('?')[0];
         const shareUrl = `${baseUrl}?mapa=${fileName}`;
 
