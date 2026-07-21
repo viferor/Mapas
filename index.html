@@ -33,11 +33,11 @@
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            width: 90%;
-            max-width: 900px;
+            width: 92%;
+            max-width: 950px;
             padding: 12px 15px;
-            background: rgba(255, 255, 255, 0.85); /* Fondo blanco semitransparente */
-            backdrop-filter: blur(8px); /* Efecto cristal desenfocado */
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(8px);
             border: 1px solid rgba(255, 255, 255, 0.4);
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
@@ -49,7 +49,24 @@
             z-index: 1000;
         }
 
-        /* Estética general de botones para que destaquen sobre el mapa */
+        /* Estilo perfecto y redondo para los números con fondo dinámico */
+        .number-icon {
+            background: #007bff;
+            border: 2px solid white;
+            border-radius: 50%;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .number-icon span {
+            font-size: 13px;
+            line-height: 1;
+        }
+
         .btn {
             padding: 6px 12px;
             border: none;
@@ -68,7 +85,7 @@
 </head>
 <body>
 
-    <!-- Contenedor del Mapa (Ocupa toda la pantalla de fondo) -->
+    <!-- Contenedor del Mapa -->
     <div id="map"></div>
 
     <!-- Panel de Control Flotante Inferior Transparente -->
@@ -81,11 +98,12 @@
 
         <div class="grupo-estilos" style="display: flex; gap: 8px; align-items: center; font-size: 13px;">
             <label>Color: <input type="color" id="color" value="#007bff"></label>
-            <label>Grosor: <input type="range" id="grosor" min="2" max="30" value="13" style="width: 80px;"></label>
-            <label>Opacidad: <input type="range" id="opacidad" min="10" max="100" value="35" style="width: 80px;"></label>
+            <label>Grosor: <input type="range" id="grosor" min="2" max="30" value="13" style="width: 70px;"></label>
+            <label>Opacidad: <input type="range" id="opacidad" min="10" max="100" value="35" style="width: 70px;"></label>
         </div>
 
         <div class="grupo-acciones" style="display: flex; gap: 5px;">
+            <button class="btn btn-secondary" onclick="cortarTramoActual()" title="Corta el tramo actual para empezar una ruta independiente">Cortar Tramo</button>
             <button class="btn btn-secondary" onclick="deshacerUltimo()">Deshacer</button>
             <button class="btn btn-secondary" onclick="rehacerProximo()">Rehacer</button>
             <button class="btn btn-danger" onclick="borrarTodo()">Borrar Todo</button>

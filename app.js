@@ -194,6 +194,7 @@ async function gestionarPulsacion(e) {
 
         const marker = L.marker(latlng, { icon: numberIcon }).addTo(map);
         
+        // Aplica el color elegido al fondo del icono circular manteniendo los bordes perfectamente redondeados
         setTimeout(() => {
             const el = marker.getElement();
             if (el) el.style.backgroundColor = estilos.color;
@@ -546,6 +547,7 @@ function cerrarModal() {
     const modal = document.getElementById('modal-load');
     if (modal) modal.style.display = 'none';
 }
+
 async function cargarMapaDesdeGithub(nombreArchivo) {
     const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${GITHUB_FOLDER}/${nombreArchivo}`;
 
@@ -654,23 +656,26 @@ async function compartirMapaGithub() {
         const nombreMapaLimpio = fileName.replace('.json', '');
         const baseUrl = window.location.href.split('?')[0];
         const shareUrl = `${baseUrl}?mapa=${fileName}`;
-        const textoMensaje = `¡Échale un vistazo a esta ruta "${nombreMapaLimpio}"!: ${shareUrl}`;
+        const textoMensaje = `🗺️ ¡Mira esta ruta guardada "${nombreMapaLimpio}"!\n${shareUrl}`;
 
-        // Si el dispositivo móvil soporta compartir de forma nativa (abre directamente WhatsApp, Telegram, etc.)
         if (navigator.share) {
-            navigator.share({
-                title: 'Compartir Mapa',
-                text: `Ruta de mapa: ${nombreMapaLimpio}`,
-                url: shareUrl,
-            }).catch(() => {});
-        } else {
-            // Si no soporta share nativo, abre directamente la API web de WhatsApp con el texto preparado
-            const urlWhatsApp = `https://api.whatsapp.com/send?text=${encodeURIComponent(textoMensaje)}`;
-            window.open(urlWhatsApp, '_blank');
+            try {
+                await navigator.share({
+                    title: 'Ruta en Visor de Mapas',
+                    text: textoMensaje,
+                    url: shareUrl,
+                });
+                return;
+            } catch (err) {
+                if (err.name === 'AbortError') return;
+            }
         }
 
+        const urlWhatsApp = `https://api.whatsapp.com/send?text=${encodeURIComponent(textoMensaje)}`;
+        window.open(urlWhatsApp, '_blank');
+
     } catch (e) {
-        alert(`Error al obtener los mapas: ${e.message}`);
+        alert(`Error al compartir el mapa: ${e.message}`);
     }
 }
 
