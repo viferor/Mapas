@@ -14,6 +14,7 @@ let historialRehacer = [];
 
 // Control de tramos independientes
 let ultimoPuntoTramo = null; 
+let nuevoTrazoLibre = true; // Control específico para romper la línea en modo libre
 
 // Inicialización del mapa y eventos de la interfaz
 document.addEventListener("DOMContentLoaded", function () {
@@ -73,7 +74,7 @@ function inicializarInterfaz() {
     const grosorInput = document.getElementById('grosor');
     const opacidadInput = document.getElementById('opacidad');
 
-    // Establecer opacidad por defecto al 35% y grosor a 13 píxeles si los controles existen
+    // Establecer opacidad al 35% y grosor a 13 píxeles por defecto
     if (opacidadInput) {
         opacidadInput.value = 35;
     }
@@ -124,10 +125,11 @@ function obtenerEstilosActuales() {
     };
 }
 
-// --- FUNCIÓN PARA CORTAR TRAMO ACTUAL (Sirve tanto para Números como para Dibujo Libre) ---
+// --- FUNCIÓN PARA CORTAR TRAMO ACTUAL (Sirve para Números y Dibujo Libre) ---
 function cortarTramoActual() {
     ultimoPuntoTramo = null;
-    window.puntosDibujoLibre = []; // Limpia también la memoria del trazo libre
+    window.puntosDibujoLibre = [];
+    nuevoTrazoLibre = true; // Fuerza a que el próximo punto libre empiece sin conectar
     alert("Próximo punto iniciado como un trazado nuevo independiente.");
 }
 
@@ -153,6 +155,13 @@ async function gestionarPulsacion(e) {
     // MODO DIBUJO LIBRE (Línea recta directa sin numeración)
     if (modoActual === 'dibujar') {
         if (!window.puntosDibujoLibre) window.puntosDibujoLibre = [];
+
+        // Si se acaba de pulsar el botón de cortar o se inicia de cero, reseteamos el array de puntos del trazo anterior
+        if (nuevoTrazoLibre) {
+            window.puntosDibujoLibre = [];
+            nuevoTrazoLibre = false;
+        }
+
         window.puntosDibujoLibre.push(latlng);
 
         const markerLibre = L.circleMarker(latlng, {
@@ -308,6 +317,7 @@ function borrarTodo() {
     ultimoPuntoTramo = null;
     contadorNumero = 1;
     window.puntosDibujoLibre = [];
+    nuevoTrazoLibre = true;
 }
 
 // Actualiza de forma GLOBAL el grosor, color y opacidad de TODAS las líneas del mapa
