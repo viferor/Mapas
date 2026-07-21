@@ -24,14 +24,14 @@ function cambiarToken() {
 // Mapa inicializado con zoom máximo en nivel 22
 const map = L.map('map', { zoomControl: false, tap: false, maxZoom: 22 }).setView([37.8882, -4.7794], 14);
 
-// CALLEJERO ULTRA DETALLADO (OpenStreetMap Estándar: incluye todas las callejas, pasajes y nombres locales)
-const mapaCallejero = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { 
-    attribution: '© OpenStreetMap contributors',
+// CALLEJERO GOOGLE COMPLETO (Sustituido únicamente este layer por el más detallado)
+const mapaCallejero = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', { 
+    attribution: '© Google Maps',
     maxZoom: 22,
-    maxNativeZoom: 19
+    maxNativeZoom: 20
 }).addTo(map);
 
-// HÍBRIDO HD+ (Google Satélite + Nombres de Calles)
+// HÍBRIDO HD+ (Se mantiene exactamente igual que tenías)
 const mapaSatelite = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { 
     attribution: '© Google Maps',
     maxZoom: 22,
