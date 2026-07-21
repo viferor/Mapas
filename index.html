@@ -20,7 +20,6 @@
             height: 100vh;
             overflow: hidden;
             font-family: Arial, sans-serif;
-            /* Inhabilita el "arrastrar para refrescar" en móviles */
             overscroll-behavior: none;
         }
         #map {
@@ -30,38 +29,58 @@
             top: 0;
             left: 0;
             z-index: 1;
-            /* Desactiva gestos nativos del navegador en el mapa */
             touch-action: none;
         }
-        /* Controles flotantes superiores */
+        
+        /* Barra de herramientas adaptable para móviles */
         #controls {
             position: absolute;
             top: 10px;
-            left: 50px;
+            left: 10px;
+            right: 60px; /* Deja espacio a la derecha para el selector de capas */
             z-index: 1000;
             background: rgba(255, 255, 255, 0.95);
-            padding: 10px;
+            padding: 8px 10px;
             border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
             display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
+            gap: 6px;
             align-items: center;
-            max-width: calc(100% - 60px);
-            touch-action: auto;
+            overflow-x: auto; /* Permite deslizar horizontalmente si no caben los botones */
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-x; /* Permite deslizar la barra de botones a los lados */
         }
+
+        /* Ocultar barra de scroll estética */
+        #controls::-webkit-scrollbar {
+            height: 4px;
+        }
+        #controls::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 4px;
+        }
+
         .btn {
-            padding: 6px 12px;
+            padding: 6px 10px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 13px;
+            flex-shrink: 0; /* Evita que los botones se deformen */
         }
         .btn-primary { background: #007bff; color: white; }
         .btn-secondary { background: #6c757d; color: white; }
         .btn-success { background: #28a745; color: white; }
         .btn-danger { background: #dc3545; color: white; }
+
+        select, input[type="color"] {
+            padding: 4px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            flex-shrink: 0;
+        }
 
         /* Estilos de la ventana modal */
         .modal {
@@ -80,7 +99,7 @@
             margin: 15% auto;
             padding: 20px;
             border: 1px solid #888;
-            width: 80%;
+            width: 85%;
             max-width: 400px;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
@@ -101,6 +120,14 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+        }
+
+        /* Ajuste de posición para los controles nativos de Leaflet */
+        .leaflet-top.leaflet-left {
+            top: 70px; /* Baja el Zoom (+/-) para que no choque con la barra */
+        }
+        .leaflet-top.leaflet-right {
+            top: 10px; /* Coloca el selector de capas arriba a la derecha */
         }
     </style>
 </head>
@@ -156,7 +183,7 @@
     <!-- Leaflet GPX plugin -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/1.7.0/gpx.min.js"></script>
     
-    <!-- Script principal -->
+    <!-- Script principal de la aplicación -->
     <script src="app.js"></script>
 </body>
 </html>
