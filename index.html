@@ -8,32 +8,60 @@
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     
-    <!-- Estilos personalizados -->
-    <link rel="stylesheet" href="style.css">
+    <!-- Estilo de diseño estricto por Flexbox para asegurar visibilidad del mapa -->
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column; /* Organiza el panel arriba y el mapa abajo en columna */
+        }
+
+        .control-panel {
+            padding: 8px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            z-index: 1000;
+            flex-shrink: 0; /* Evita que el panel se deforme */
+        }
+
+        #map {
+            width: 100%;
+            flex-grow: 1; /* OBLIGA al mapa a ocupar el 100% del espacio restante de la pantalla */
+        }
+    </style>
 </head>
 <body>
 
     <!-- Panel de Control / Controles Superiores -->
     <div id="control-panel" class="control-panel">
-        <div class="grupo-botones">
+        <div class="grupo-botones" style="display: flex; gap: 5px;">
             <button id="btn-number" class="btn btn-primary">Números</button>
             <button id="btn-draw" class="btn btn-secondary">Dibujo Libre</button>
             <button id="btn-erase" class="btn btn-secondary">Borrar</button>
         </div>
 
-        <div class="grupo-estilos">
+        <div class="grupo-estilos" style="display: flex; gap: 8px; align-items: center;">
             <label>Color: <input type="color" id="color" value="#007bff"></label>
             <label>Grosor: <input type="range" id="grosor" min="2" max="30" value="13"></label>
             <label>Opacidad: <input type="range" id="opacidad" min="10" max="100" value="35"></label>
         </div>
 
-        <div class="grupo-acciones">
+        <div class="grupo-acciones" style="display: flex; gap: 5px;">
             <button class="btn btn-secondary" onclick="deshacerUltimo()">Deshacer</button>
             <button class="btn btn-secondary" onclick="rehacerProximo()">Rehacer</button>
             <button class="btn btn-danger" onclick="borrarTodo()">Borrar Todo</button>
         </div>
 
-        <div class="grupo-github">
+        <div class="grupo-github" style="display: flex; gap: 5px;">
             <button class="btn btn-success" onclick="guardarEnGithub()">Guardar en GitHub</button>
             <button class="btn btn-info" onclick="abrirModalCargarGithub()">Cargar de GitHub</button>
             <button class="btn btn-warning" onclick="compartirMapaGithub()">Compartir Mapa</button>
@@ -65,3 +93,4 @@
     <script src="app.js"></script>
 </body>
 </html>
+
