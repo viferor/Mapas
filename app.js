@@ -52,6 +52,9 @@ document.addEventListener("DOMContentLoaded", function () {
     map.on('mouseup touchend', finalizarTrazo);
     map.on('click', gestionarPulsacion);
 
+    // Establecer modo por defecto al cargar
+    setModo('dibujar');
+
     // Cargar mapa desde URL si viene con parámetro ?mapa=nombre.json
     const urlParams = new URLSearchParams(window.location.search);
     const mapaCompartido = urlParams.get('mapa');
@@ -60,11 +63,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-// Selección de modo
+// Selección de modo (CORREGIDO: Desactiva arrastre también en modo 'numero')
 function setModo(modo) {
     modoActual = modo;
     
-    if (modo === 'dibujar') {
+    if (modo === 'dibujar' || modo === 'numero') {
         map.dragging.disable();
     } else {
         map.dragging.enable();
@@ -119,7 +122,7 @@ function finalizarTrazo() {
     }
 }
 
-// Numeración paso a paso
+// Numeración paso a paso (CORREGIDO)
 function gestionarPulsacion(e) {
     if (modoActual === 'numero') {
         const color = document.getElementById('color').value;
@@ -134,10 +137,19 @@ function gestionarPulsacion(e) {
         const marker = L.marker(e.latlng, { icon: numberIcon }).addTo(map);
         
         setTimeout(() => {
-            if (marker.getElement()) {
-                marker.getElement().style.backgroundColor = color;
+            const el = marker.getElement();
+            if (el) {
+                el.style.backgroundColor = color;
             }
         }, 10);
+
+        // Borrado directo si se pulsa sobre el número en modo borrar
+        marker.on('click', function() {
+            if (modoActual === 'borrar') {
+                map.removeLayer(marker);
+                historialAcciones = historialAcciones.filter(item => item.elemento !== marker);
+            }
+        });
 
         historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: contadorNumero, color: color });
         historialRehacer = [];
@@ -364,10 +376,18 @@ async function cargarMapaDesdeGithub(nombreArchivo) {
 
                 const marker = L.marker(latlng, { icon: numberIcon }).addTo(map);
                 setTimeout(() => {
-                    if (marker.getElement()) {
-                        marker.getElement().style.backgroundColor = color;
+                    const el = marker.getElement();
+                    if (el) {
+                        el.style.backgroundColor = color;
                     }
                 }, 10);
+
+                marker.on('click', function() {
+                    if (modoActual === 'borrar') {
+                        map.removeLayer(marker);
+                        historialAcciones = historialAcciones.filter(item => item.elemento !== marker);
+                    }
+                });
 
                 historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: num, color: color });
                 bounds.push(latlng);
@@ -422,4 +442,3 @@ function importarGPX(event) {
     };
     reader.readAsText(file);
 }
-
