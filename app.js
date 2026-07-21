@@ -91,7 +91,7 @@ function obtenerEstilosActuales() {
     };
 }
 
-// --- GESTIÓN DE CLICS Y ENRUTAMIENTO PEATONAL AUTOMÁTICO ---
+// --- GESTIÓN DE CLICS Y ENRUTAMIENTO PEATONAL SECUENCIAL (Del 1 al 2, del 2 al 3...) ---
 async function gestionarPulsacion(e) {
     if (modoActual !== 'numero') return;
 
@@ -136,7 +136,7 @@ async function gestionarPulsacion(e) {
 
     let lineaAsociada = null;
 
-    // 2. Si hay más de un punto, calculamos la ruta peatonal desde el punto anterior hasta este
+    // 2. Si hay más de un punto, calculamos automáticamente la ruta peatonal desde el punto anterior hasta este actual
     if (puntosRuta.length > 1) {
         const puntoAnterior = puntosRuta[puntosRuta.length - 2];
         const latlngsRuta = await obtenerRutaPeatonalOSRM(puntoAnterior, latlng);
@@ -161,7 +161,7 @@ async function gestionarPulsacion(e) {
 
 // --- PETICIÓN AL MOTOR OSRM EN MODO PEATONAL ('foot') ---
 async function obtenerRutaPeatonalOSRM(origen, destino) {
-    // Cambiamos 'driving' por 'foot' para que el enrutamiento sea peatonal
+    // Parámetro 'foot' para asegurar trazado peatonal por aceras, paseos y zonas autorizadas
     const url = `https://router.project-osrm.org/route/v1/foot/${origen.lng},${origen.lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson`;
 
     try {
@@ -170,14 +170,14 @@ async function obtenerRutaPeatonalOSRM(origen, destino) {
 
         if (data.code === 'Ok' && data.routes && data.routes.length > 0) {
             const coordenadasGeoJSON = data.routes[0].geometry.coordinates;
-            // Convertimos de [lng, lat] de OSRM a [lat, lng] que utiliza Leaflet
+            // OSRM devuelve [lng, lat], Leaflet necesita [lat, lng]
             return coordenadasGeoJSON.map(coord => [coord[1], coord[0]]);
         }
     } catch (e) {
         console.error("Error al calcular la ruta peatonal:", e);
     }
 
-    // Plan B de respaldo: Si falla la conexión con el servidor de rutas, une los puntos en línea recta
+    // Plan B de respaldo: Si el servidor falla o no hay conexión, une los puntos en línea recta directamente
     return [origen, destino];
 }
 
