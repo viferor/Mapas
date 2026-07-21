@@ -46,10 +46,13 @@ document.addEventListener("DOMContentLoaded", function () {
     };
     L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
 
-    // Eventos de interacción sobre el mapa
-    map.on('mousedown touchstart', iniciarTrazo);
-    map.on('mousemove touchmove', moverTrazo);
-    map.on('mouseup touchend', finalizarTrazo);
+    // Eventos robustos basados en punteros DOM sobre el contenedor del mapa para asegurar el dibujo
+    const mapContainer = map.getContainer();
+    mapContainer.addEventListener('pointerdown', iniciarTrazoDOM);
+    mapContainer.addEventListener('pointermove', moverTrazoDOM);
+    window.addEventListener('pointerup', finalizarTrazoDOM);
+
+    // Evento de clic clásico para los números
     map.on('click', gestionarPulsacion);
 
     // Establecer modo por defecto al cargar visualmente
@@ -86,30 +89,16 @@ function obtenerEstilosActuales() {
     };
 }
 
-// Dibujo a mano alzada optimizado
-function iniciarTrazo(e) {
+// --- DIBUJO LIBRE MEDIANTE PUNTEROS DOM ---
+function iniciarTrazoDOM(e) {
     if (modoActual !== 'dibujar') return;
     
-    if (e.originalEvent) {
-        if (typeof e.originalEvent.preventDefault === 'function') {
-            e.originalEvent.preventDefault();
-        }
-        if (e.originalEvent.stopPropagation) {
-            e.originalEvent.stopPropagation();
-        }
-    }
-
+    // Evitamos comportamientos predeterminados del navegador
+    e.preventDefault();
     dibujando = true;
 
-    let latlng;
-    if (e.latlng) {
-        latlng = e.latlng;
-    } else if (e.originalEvent && e.originalEvent.touches && e.originalEvent.touches[0]) {
-        latlng = map.mouseEventToLatLng(e.originalEvent.touches[0]);
-    } else if (e.originalEvent) {
-        latlng = map.mouseEventToLatLng(e.originalEvent);
-    }
-
+    // Convertimos las coordenadas de la pantalla directamente a coordenadas geográficas de Leaflet
+    const latlng = map.mouseEventToLatLng(e);
     if (!latlng) return;
 
     const estilos = obtenerEstilosActuales();
@@ -122,30 +111,18 @@ function iniciarTrazo(e) {
     }).addTo(map);
 }
 
-function moverTrazo(e) {
+function moverTrazoDOM(e) {
     if (!dibujando || modoActual !== 'dibujar' || !lineaActual) return;
 
-    if (e.originalEvent) {
-        if (typeof e.originalEvent.preventDefault === 'function') {
-            e.originalEvent.preventDefault();
-        }
-    }
+    e.preventDefault();
 
-    let latlng;
-    if (e.latlng) {
-        latlng = e.latlng;
-    } else if (e.originalEvent && e.originalEvent.touches && e.originalEvent.touches[0]) {
-        latlng = map.mouseEventToLatLng(e.originalEvent.touches[0]);
-    } else if (e.originalEvent) {
-        latlng = map.mouseEventToLatLng(e.originalEvent);
-    }
-
+    const latlng = map.mouseEventToLatLng(e);
     if (latlng) {
         lineaActual.addLatLng(latlng);
     }
 }
 
-function finalizarTrazo(e) {
+function finalizarTrazoDOM(e) {
     if (!dibujando || modoActual !== 'dibujar') return;
     dibujando = false;
 
