@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Configuración específica de eventos pointer para tabletas
     const mapContainer = map.getContainer();
-    mapContainer.style.touchAction = 'none'; // Evita que la tablet mueva el mapa al intentar dibujar
+    mapContainer.style.touchAction = 'none'; 
 
     mapContainer.addEventListener('pointerdown', iniciarTrazoTablet);
     mapContainer.addEventListener('pointermove', moverTrazoTablet);
@@ -78,7 +78,7 @@ function setModo(modo) {
 
     if (modo === 'dibujar') {
         map.dragging.disable();
-        map.touchZoom.disable();
+        map.touchZoom.enable(); // Habilitamos zoom táctil multitáctil
         map.doubleClickZoom.disable();
         mapContainer.style.touchAction = 'none'; 
     } else {
@@ -106,20 +106,26 @@ function obtenerLatLngDesdePointer(e) {
     const mapContainer = map.getContainer();
     const rect = mapContainer.getBoundingClientRect();
     
-    // Obtenemos las coordenadas X e Y relativas al contenedor del mapa en la pantalla
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    // Convertimos directamente el punto de la pantalla a coordenadas del mapa de Leaflet
     return map.containerPointToLatLng([x, y]);
 }
 
-// --- DIBUJO TÁCTIL OPTIMIZADO PARA TABLET ---
+// --- DIBUJO TÁCTIL OPTIMIZADO PARA TABLET (SOPORTA MULTITOUCH) ---
 function iniciarTrazoTablet(e) {
     if (modoActual !== 'dibujar') return;
     
     // Si se pulsa sobre la botonera o controles de la interfaz, no se dibuja
     if (e.target.closest('.leaflet-control-container') || e.target.closest('button') || e.target.closest('input')) {
+        return;
+    }
+
+    // Si entran dos o más dedos (para hacer zoom o paneo), cancelamos el trazo actual
+    if (e.pointerType === 'touch' && !e.isPrimary) {
+        if (dibujando) {
+            finalizarTrazoTablet(e);
+        }
         return;
     }
 
@@ -140,7 +146,17 @@ function iniciarTrazoTablet(e) {
 }
 
 function moverTrazoTablet(e) {
-    if (!dibujando || modoActual !== 'dibujar' || !lineaActual) return;
+    if (modoActual !== 'dibujar') return;
+
+    // Si aparece un segundo dedo al vuelo, cortamos el trazo para ceder paso al zoom
+    if (e.pointerType === 'touch' && !e.isPrimary) {
+        if (dibujando) {
+            finalizarTrazoTablet(e);
+        }
+        return;
+    }
+
+    if (!dibujando || !lineaActual) return;
 
     e.preventDefault();
 
