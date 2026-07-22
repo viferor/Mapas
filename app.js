@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-// Enlazar botones y controles del HTML (Corregido con los IDs exactos)
+// Enlazar botones y controles del HTML
 function inicializarInterfaz() {
     const btnNumber = document.getElementById('btn-numeros');
     const btnDraw = document.getElementById('btn-dibujo');
@@ -100,7 +100,7 @@ function inicializarInterfaz() {
     if (btnDeshacer) btnDeshacer.addEventListener('click', deshacerUltimo);
     if (btnRehacer) btnRehacer.addEventListener('click', rehacerProximo);
     if (btnBorrarTodo) btnBorrarTodo.addEventListener('click', borrarTodo);
-    if (btnGuardar) btnGuardar.addEventListener('click', guardarEnGithub);
+    if (btnGuardar) btnGuardar.addEventListener('click', abrirModalGuardarGithub); // Ahora abre selector visual
     if (btnCargar) btnCargar.addEventListener('click', abrirModalCargarGithub);
     if (btnCompartir) btnCompartir.addEventListener('click', compartirMapaGithub);
     if (btnToken) btnToken.addEventListener('click', cambiarToken);
@@ -447,36 +447,17 @@ function exportarDatosMapa() {
     };
 }
 
-async function guardarEnGithub() {
+async function guardarEnGithub(nombreArchivo) {
     const token = obtenerToken();
     if (!token) return alert("Se requiere un Token de GitHub para guardar.");
 
-    const urlDir = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FOLDER}`;
-    
+    const path = `${GITHUB_FOLDER}/${nombreArchivo.trim().toLowerCase().replace(/\s+/g, '-')}.json`;
+    const contenido = JSON.stringify(exportarDatosMapa(), null, 2);
+    const contenidoBase64 = btoa(unescape(encodeURIComponent(contenido)));
+
+    const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`;
+
     try {
-        let archivosDisponibles = [];
-        const resList = await fetch(urlDir, {
-            headers: { 'Authorization': `token ${token}` }
-        });
-        if (resList.ok) {
-            const dataFiles = await resList.json();
-            archivosDisponibles = dataFiles.filter(f => f.name.endsWith('.json')).map(f => f.name.replace('.json', ''));
-        }
-
-        let mensajePrompt = "Elige un nombre de mapa existente para sobrescribir o escribe uno nuevo:\n\n";
-        if (archivosDisponibles.length > 0) {
-            mensajePrompt += "Mapas guardados actualmente:\n- " + archivosDisponibles.join("\n- ") + "\n\n";
-        }
-
-        const nombreArchivo = prompt(mensajePrompt);
-        if (!nombreArchivo) return;
-
-        const path = `${GITHUB_FOLDER}/${nombreArchivo.trim().toLowerCase().replace(/\s+/g, '-')}.json`;
-        const contenido = JSON.stringify(exportarDatosMapa(), null, 2);
-        const contenidoBase64 = btoa(unescape(encodeURIComponent(contenido)));
-
-        const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`;
-
         let sha = null;
         const resExist = await fetch(url, {
             headers: { 'Authorization': `token ${token}` }
@@ -503,12 +484,83 @@ async function guardarEnGithub() {
 
         if (res.ok) {
             alert("¡Mapa guardado con éxito en tu repositorio!");
+            cerrarModal();
         } else {
             const errData = await res.json();
             alert(`Error al guardar: ${errData.message}`);
         }
     } catch (e) {
         alert(`Error de conexión: ${e.message}`);
+    }
+}
+
+async function abrirModalGuardarGithub() {
+    const token = obtenerToken();
+    if (!token) return alert("Se requiere un Token de GitHub para ver los mapas.");
+
+    const modal = document.getElementById('modal-load');
+    const listaContainer = document.getElementById('lista-mapas');
+    if (!modal) return;
+    
+    modal.style.display = 'flex'; // Forzar display flex para centrar correctamente
+    listaContainer.innerHTML = 'Cargando mapas para sobrescribir...';
+
+    const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FOLDER}`;
+
+    try {
+        const res = await fetch(url, {
+            headers: { 'Authorization': `token ${token}` }
+        });
+        
+        let jsonFiles = [];
+        if (res.ok) {
+            const archivos = await res.json();
+            jsonFiles = archivos.filter(f => f.name.endsWith('.json'));
+        }
+
+        listaContainer.innerHTML = '';
+
+        // Opción para crear un mapa nuevo mediante prompt limpio
+        const divNuevo = document.createElement('div');
+        divNuevo.style.marginBottom = '12px';
+        divNuevo.innerHTML = `
+            <button class="btn btn-blue" style="width: 100%; padding: 8px;" onclick="promptGuardarNuevo()">+ Guardar como mapa nuevo...</button>
+        `;
+        listaContainer.appendChild(divNuevo);
+
+        if (jsonFiles.length > 0) {
+            const titulo = document.createElement('div');
+            titulo.style.fontSize = '12px';
+            titulo.style.color = '#666';
+            titulo.style.marginBottom = '6px';
+            titulo.innerText = 'O sobrescribir existente:';
+            listaContainer.appendChild(titulo);
+
+            jsonFiles.forEach(file => {
+                const nombreLimpio = file.name.replace('.json', '');
+                const item = document.createElement('div');
+                item.style.display = 'flex';
+                item.style.justifyContent = 'space-between';
+                item.style.alignItems = 'center';
+                item.style.padding = '8px';
+                item.style.borderBottom = '1px solid #eee';
+
+                item.innerHTML = `
+                    <span style="font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 190px;">${nombreLimpio}</span>
+                    <button class="btn btn-blue" style="padding: 4px 10px; font-size: 13px;" onclick="guardarEnGithub('${nombreLimpio}')">Sobrescribir</button>
+                `;
+                listaContainer.appendChild(item);
+            });
+        }
+    } catch (e) {
+        listaContainer.innerHTML = `Error: ${e.message}`;
+    }
+}
+
+function promptGuardarNuevo() {
+    const nombre = prompt("Introduce el nombre para el nuevo mapa:");
+    if (nombre && nombre.trim() !== "") {
+        guardarEnGithub(nombre.trim());
     }
 }
 
@@ -520,7 +572,7 @@ async function abrirModalCargarGithub() {
     const listaContainer = document.getElementById('lista-mapas');
     if (!modal) return;
     
-    modal.style.display = 'block';
+    modal.style.display = 'flex'; // Forzar display flex correcto
     listaContainer.innerHTML = 'Cargando mapas...';
 
     const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FOLDER}`;
