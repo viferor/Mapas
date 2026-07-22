@@ -1,4 +1,4 @@
-// ConfiguraciÃ³n de GitHub
+// Configuración de GitHub
 const GITHUB_USER = "viferor"; 
 const GITHUB_REPO = "Mapas"; 
 const GITHUB_FOLDER = "mapas"; 
@@ -17,36 +17,36 @@ let historialRehacer = [];
 let ultimoPuntoTramo = null; 
 let trazoLibreActivo = false; 
 
-// InicializaciÃ³n del mapa y eventos de la interfaz
+// Inicialización del mapa y eventos de la interfaz
 document.addEventListener("DOMContentLoaded", function () {
     map = L.map('map', {
         zoomControl: true,
         touchZoom: true
-    }).setView([37.8882, -4.7794], 13); // Centrado en CÃ³rdoba
+    }).setView([37.8882, -4.7794], 13); // Centrado en Córdoba
 
     // Capas base de mapas (Selector superior derecho)
     const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
-        attribution: 'Â© OpenStreetMap'
+        attribution: '&copy; OpenStreetMap'
     });
 
     const topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
         maxZoom: 17,
-        attribution: 'Â© OpenTopoMap'
+        attribution: '&copy; OpenTopoMap'
     });
 
     const googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
         maxZoom: 20,
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-        attribution: 'Â© Google Maps'
+        attribution: '&copy; Google Maps'
     });
 
     osm.addTo(map);
 
     const baseMaps = {
         "Callejero": osm,
-        "TopogrÃ¡fico": topo,
-        "HÃ­brido Google": googleHybrid
+        "Topográfico": topo,
+        "Híbrido Google": googleHybrid
     };
     L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
 
@@ -65,17 +65,17 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-// Enlazar botones y controles del HTML
+// Enlazar botones y controles del HTML (Corregido con los IDs exactos)
 function inicializarInterfaz() {
-    const btnNumber = document.getElementById('btn-number');
-    const btnDraw = document.getElementById('btn-draw');
-    const btnErase = document.getElementById('btn-erase');
-    const colorPicker = document.getElementById('color');
-    const grosorInput = document.getElementById('grosor');
-    const opacidadInput = document.getElementById('opacidad');
+    const btnNumber = document.getElementById('btn-numeros');
+    const btnDraw = document.getElementById('btn-dibujo');
+    const btnErase = document.getElementById('btn-borrar');
+    const colorPicker = document.getElementById('color-picker');
+    const grosorInput = document.getElementById('grosor-range');
+    const opacidadInput = document.getElementById('opacidad-range');
 
-    if (opacidadInput) opacidadInput.value = 35;
-    if (grosorInput) grosorInput.value = 13;
+    if (opacidadInput) opacidadInput.value = 1;
+    if (grosorInput) grosorInput.value = 4;
 
     if (btnNumber) btnNumber.addEventListener('click', () => setModo('numero'));
     if (btnDraw) btnDraw.addEventListener('click', () => setModo('dibujar'));
@@ -84,9 +84,36 @@ function inicializarInterfaz() {
     if (colorPicker) colorPicker.addEventListener('input', actualizarEstilosGlobales);
     if (grosorInput) grosorInput.addEventListener('input', actualizarEstilosGlobales);
     if (opacidadInput) opacidadInput.addEventListener('input', actualizarEstilosGlobales);
+
+    // Enlazar botones adicionales del panel inferior
+    const btnCortar = document.getElementById('btn-cortar');
+    const btnDeshacer = document.getElementById('btn-deshacer');
+    const btnRehacer = document.getElementById('btn-rehacer');
+    const btnBorrarTodo = document.getElementById('btn-borrar-todo');
+    const btnGuardar = document.getElementById('btn-guardar');
+    const btnCargar = document.getElementById('btn-cargar');
+    const btnCompartir = document.getElementById('btn-compartir');
+    const btnToken = document.getElementById('btn-token');
+    const selectRutaType = document.getElementById('route-type-select');
+
+    if (btnCortar) btnCortar.addEventListener('click', cortarTramoActual);
+    if (btnDeshacer) btnDeshacer.addEventListener('click', deshacerUltimo);
+    if (btnRehacer) btnRehacer.addEventListener('click', rehacerProximo);
+    if (btnBorrarTodo) btnBorrarTodo.addEventListener('click', borrarTodo);
+    if (btnGuardar) btnGuardar.addEventListener('click', guardarEnGithub);
+    if (btnCargar) btnCargar.addEventListener('click', abrirModalCargarGithub);
+    if (btnCompartir) btnCompartir.addEventListener('click', compartirMapaGithub);
+    if (btnToken) btnToken.addEventListener('click', cambiarToken);
+    
+    if (selectRutaType) {
+        selectRutaType.addEventListener('change', (e) => {
+            submodoNumero = (e.target.value === 'callejero') ? 'ruta' : 'aislado';
+            if (submodoNumero === 'aislado') ultimoPuntoTramo = null;
+        });
+    }
 }
 
-// SelecciÃ³n de modos
+// Selección de modos
 function setModo(modo) {
     modoActual = modo;
     
@@ -94,55 +121,42 @@ function setModo(modo) {
     map.touchZoom.enable();
     map.doubleClickZoom.enable();
 
-    const btnNumEl = document.getElementById('btn-number');
-    const btnDrawEl = document.getElementById('btn-draw');
-    const btnErrEl = document.getElementById('btn-erase');
+    const btnNumEl = document.getElementById('btn-numeros');
+    const btnDrawEl = document.getElementById('btn-dibujo');
+    const btnErrEl = document.getElementById('btn-borrar');
     
-    if (btnNumEl) btnNumEl.className = modo === 'numero' ? 'btn btn-primary' : 'btn btn-secondary';
-    if (btnDrawEl) btnDrawEl.className = modo === 'dibujar' ? 'btn btn-primary' : 'btn btn-secondary';
-    if (btnErrEl) btnErrEl.className = modo === 'borrar' ? 'btn btn-danger' : 'btn btn-secondary';
-
-    // Mostrar u ocultar el selector de comportamiento numÃ©rico segÃºn el modo activo
-    const selectorSubmodo = document.getElementById('contenedor-submodo-numero');
-    if (selectorSubmodo) {
-        selectorSubmodo.style.display = (modo === 'numero') ? 'flex' : 'none';
-    }
+    if (btnNumEl) btnNumEl.className = modo === 'numero' ? 'btn btn-blue' : 'btn btn-gray';
+    if (btnDrawEl) btnDrawEl.className = modo === 'dibujar' ? 'btn btn-blue' : 'btn btn-gray';
+    if (btnErrEl) btnErrEl.className = modo === 'borrar' ? 'btn btn-red' : 'btn btn-gray';
 
     if (modo === 'dibujar') {
         ultimoPuntoTramo = null;
     }
 }
 
-function cambiarSubmodoNumero(e) {
-    submodoNumero = e.target.value;
-    if (submodoNumero === 'aislado') {
-        ultimoPuntoTramo = null; // Rompemos el tramo al pasar a aislado
-    }
-}
-
 function obtenerEstilosActuales() {
-    const colorEl = document.getElementById('color');
-    const grosorEl = document.getElementById('grosor');
-    const opacidadEl = document.getElementById('opacidad');
+    const colorEl = document.getElementById('color-picker');
+    const grosorEl = document.getElementById('grosor-range');
+    const opacidadEl = document.getElementById('opacidad-range');
 
     return {
-        color: colorEl ? colorEl.value : '#007bff',
-        weight: grosorEl ? parseInt(grosorEl.value) : 13,
-        opacity: opacidadEl ? parseFloat(opacidadEl.value) / 100 : 0.35
+        color: colorEl ? colorEl.value : '#3388ff',
+        weight: grosorEl ? parseInt(grosorEl.value) : 4,
+        opacity: opacidadEl ? parseFloat(opacidadEl.value) : 1
     };
 }
 
-// --- FUNCIÃ“N PARA CORTAR TRAMO ACTUAL ---
+// --- FUNCIÓN PARA CORTAR TRAMO ACTUAL ---
 function cortarTramoActual() {
     ultimoPuntoTramo = null;
     window.puntosDibujoLibre = [];
     trazoLibreActivo = false; 
-    alert("PrÃ³ximo punto iniciado como un trazado nuevo independiente.");
+    alert("Próximo punto iniciado como un trazado nuevo independiente.");
 }
 
 let ultimoToqueTiempo = 0;
 
-// --- GESTIÃ“N DE CLICS / TOQUES ---
+// --- GESTIÓN DE CLICS / TOQUES ---
 async function gestionarPulsacion(e) {
     const latlng = e.latlng;
     const estilos = obtenerEstilosActuales();
@@ -206,7 +220,7 @@ async function gestionarPulsacion(e) {
         return;
     }
 
-    // MODO NÃšMEROS Y RUTAS
+    // MODO NÚMEROS Y RUTAS
     if (modoActual === 'numero') {
         const numeroActual = contadorNumero;
 
@@ -238,7 +252,6 @@ async function gestionarPulsacion(e) {
 
         let lineaAsociada = null;
 
-        // VERIFICACIÃ“N ESTRICTA: Solo rutear si submodo es 'ruta' Y tenemos un punto previo vÃ¡lido
         if (submodoNumero === 'ruta' && ultimoPuntoTramo) {
             const coordenadasCalle = await obtenerRutaPorCallesOSRM(ultimoPuntoTramo, latlng);
 
@@ -263,7 +276,6 @@ async function gestionarPulsacion(e) {
             }
         }
 
-        // Actualizar referencia de tramo segÃºn el submodo
         if (submodoNumero === 'ruta') {
             ultimoPuntoTramo = latlng;
         } else {
@@ -313,7 +325,6 @@ function deshacerUltimo() {
                 historialAcciones = historialAcciones.filter(item => item.elemento !== ultimaAccion.elemento.lineaAsociada);
                 historialRehacer.push({ tipo: 'linea', elemento: ultimaAccion.elemento.lineaAsociada });
             }
-            // Recalcular ultimoPuntoTramo con base en el historial restante
             const ultimoMarcadorRuta = historialAcciones.slice().reverse().find(item => item.tipo === 'marcador' && item.submodo === 'ruta');
             ultimoPuntoTramo = ultimoMarcadorRuta ? ultimoMarcadorRuta.elemento.getLatLng() : null;
         }
@@ -365,7 +376,7 @@ function actualizarEstilosGlobales() {
     });
 }
 
-// --- GESTIÃ“N CON GITHUB ---
+// --- GESTIÓN CON GITHUB ---
 
 function obtenerToken() {
     let token = localStorage.getItem('github_token');
@@ -413,7 +424,7 @@ function exportarDatosMapa() {
                 properties: {
                     tipo: "marcador",
                     numero: item.numero,
-                    color: item.color || "#007bff",
+                    color: item.color || "#3388ff",
                     submodo: item.submodo || "ruta"
                 }
             });
@@ -452,15 +463,9 @@ async function guardarEnGithub() {
             archivosDisponibles = dataFiles.filter(f => f.name.endsWith('.json')).map(f => f.name.replace('.json', ''));
         }
 
-        let mensajePrompt = "Elige un nombre de mapa existente para sobrescribir o escribe uno nuevo:
-
-";
+        let mensajePrompt = "Elige un nombre de mapa existente para sobrescribir o escribe uno nuevo:\n\n";
         if (archivosDisponibles.length > 0) {
-            mensajePrompt += "Mapas guardados actualmente:
-- " + archivosDisponibles.join("
-- ") + "
-
-";
+            mensajePrompt += "Mapas guardados actualmente:\n- " + archivosDisponibles.join("\n- ") + "\n\n";
         }
 
         const nombreArchivo = prompt(mensajePrompt);
@@ -497,13 +502,13 @@ async function guardarEnGithub() {
         });
 
         if (res.ok) {
-            alert("Â¡Mapa guardado con Ã©xito en tu repositorio!");
+            alert("¡Mapa guardado con éxito en tu repositorio!");
         } else {
             const errData = await res.json();
             alert(`Error al guardar: ${errData.message}`);
         }
     } catch (e) {
-        alert(`Error de conexiÃ³n: ${e.message}`);
+        alert(`Error de conexión: ${e.message}`);
     }
 }
 
@@ -547,8 +552,8 @@ async function abrirModalCargarGithub() {
             item.innerHTML = `
                 <span style="font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 170px;">${nombreLimpio}</span>
                 <div style="display: flex; gap: 6px;">
-                    <button class="btn btn-primary" style="padding: 4px 10px; font-size: 13px;" onclick="cargarMapaDesdeGithub('${file.name}')">Cargar</button>
-                    <button class="btn btn-danger" style="padding: 4px 10px; font-size: 13px;" onclick="eliminarMapaDeGithub('${file.name}', '${file.sha}')">ðŸ—‘ï¸</button>
+                    <button class="btn btn-blue" style="padding: 4px 10px; font-size: 13px;" onclick="cargarMapaDesdeGithub('${file.name}')">Cargar</button>
+                    <button class="btn btn-red" style="padding: 4px 10px; font-size: 13px;" onclick="eliminarMapaDeGithub('${file.name}', '${file.sha}')">🗑️</button>
                 </div>
             `;
             listaContainer.appendChild(item);
@@ -562,7 +567,7 @@ async function eliminarMapaDeGithub(fileName, sha) {
     const token = obtenerToken();
     if (!token) return;
 
-    if (!confirm(`Â¿Eliminar permanentemente el mapa "${fileName.replace('.json', '')}"?`)) return;
+    if (!confirm(`¿Eliminar permanentemente el mapa "${fileName.replace('.json', '')}"?`)) return;
 
     const path = `${GITHUB_FOLDER}/${fileName}`;
     const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`;
@@ -585,7 +590,7 @@ async function eliminarMapaDeGithub(fileName, sha) {
             alert(`Error al eliminar: ${errData.message}`);
         }
     } catch (e) {
-        alert(`Error de conexiÃ³n: ${e.message}`);
+        alert(`Error de conexión: ${e.message}`);
     }
 }
 
@@ -629,7 +634,7 @@ async function cargarMapaDesdeGithub(nombreArchivo) {
                 const coord = feature.geometry.coordinates;
                 const latlng = [coord[1], coord[0]];
                 const num = feature.properties.numero;
-                const color = feature.properties.color || "#007bff";
+                const color = feature.properties.color || "#3388ff";
                 const sub = feature.properties.submodo || "ruta";
 
                 const numberIcon = L.divIcon({
@@ -711,30 +716,25 @@ async function compartirMapaGithub() {
             return alert("No hay mapas guardados en GitHub para compartir.");
         }
 
-        let mensajePrompt = "Elige el nÃºmero del mapa que quieres compartir:
-
-";
+        let mensajePrompt = "Elige el número del mapa que quieres compartir:\n\n";
         archivosDisponibles.forEach((file, index) => {
-            mensajePrompt += `${index + 1}. ${file.replace('.json', '')}
-`;
+            mensajePrompt += `${index + 1}. ${file.replace('.json', '')}\n`;
         });
-        mensajePrompt += "
-Introduce el nÃºmero correspondiente:";
+        mensajePrompt += "\nIntroduce el número correspondiente:";
 
         const seleccion = prompt(mensajePrompt);
         if (!seleccion) return;
 
         const indice = parseInt(seleccion.trim()) - 1;
         if (isNaN(indice) || indice < 0 || indice >= archivosDisponibles.length) {
-            return alert("SelecciÃ³n no vÃ¡lida.");
+            return alert("Selección no válida.");
         }
 
         const fileName = archivosDisponibles[indice];
         const nombreMapaLimpio = fileName.replace('.json', '');
         const baseUrl = window.location.href.split('?')[0];
         const shareUrl = `${baseUrl}?mapa=${fileName}`;
-        const textoMensaje = `ðŸ—ºï¸ Â¡Mira esta ruta guardada "${nombreMapaLimpio}"!
-${shareUrl}`;
+        const textoMensaje = `🗺️ ¡Mira esta ruta guardada "${nombreMapaLimpio}"!\n${shareUrl}`;
 
         if (navigator.share) {
             try {
