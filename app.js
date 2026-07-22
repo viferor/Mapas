@@ -90,7 +90,6 @@ function promptGuardarNuevo() {
         guardarEnGithub(nombre.trim());
     }
 }
-
 async function abrirModalCargarGithub() {
     const token = obtenerToken();
     if (!token) return;
