@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editor de Mapas y Rutas</title>
-    
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    
-    <!-- Estilo moderno con panel flotante inferior totalmente transparente -->
     <style>
         html, body {
             margin: 0;
@@ -18,7 +15,6 @@
             overflow: hidden;
             font-family: Arial, sans-serif;
         }
-
         #map {
             width: 100%;
             height: 100%;
@@ -27,7 +23,6 @@
             left: 0;
             z-index: 1;
         }
-
         .control-panel {
             position: absolute;
             bottom: 20px;
@@ -36,10 +31,7 @@
             width: 92%;
             max-width: 950px;
             padding: 10px 12px;
-            background: transparent; /* Fondo 100% transparente */
-            backdrop-filter: none;   /* Sin desenfoque de fondo */
-            border: none;            /* Sin bordes */
-            box-shadow: none;        /* Sin sombras de caja para mantenerlo integrado */
+            background: transparent;
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
@@ -47,26 +39,6 @@
             justify-content: center;
             z-index: 1000;
         }
-
-        /* Estilo perfecto y redondo para los números con fondo dinámico */
-        .number-icon {
-            background: #007bff;
-            border: 2px solid white;
-            border-radius: 50%;
-            color: white;
-            font-weight: bold;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .number-icon span {
-            font-size: 13px;
-            line-height: 1;
-        }
-
-        /* Botones con una ligera sombra propia para destacar en total transparencia */
         .btn {
             padding: 6px 12px;
             border: none;
@@ -75,23 +47,23 @@
             font-weight: bold;
             font-size: 13px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            color: white;
         }
-        .btn-primary { background: #007bff; color: white; }
-        .btn-secondary { background: #6c757d; color: white; }
-        .btn-danger { background: #dc3545; color: white; }
-        .btn-success { background: #28a745; color: white; }
-        .btn-info { background: #17a2b8; color: white; }
-        .btn-warning { background: #ffc107; color: black; }
-
-        /* Sombra de texto para legibilidad perfecta sobre cualquier fondo de mapa */
-        .control-panel label {
-            color: #222;
-            font-weight: bold;
-            text-shadow: 0 1px 3px rgba(255, 255, 255, 0.9), 0 0 5px rgba(255, 255, 255, 0.8);
+        .btn-blue { background: #007bff; }
+        .btn-gray { background: #6c757d; }
+        .btn-red { background: #dc3545; }
+        .btn-green { background: #28a745; }
+        .btn-cyan { background: #17a2b8; }
+        .btn-yellow { background: #ffc107; color: black; }
+        
+        .control-group {
             display: flex;
             align-items: center;
-            gap: 4px;
-            font-size: 13px;
+            gap: 5px;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 5px 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
     </style>
 </head>
@@ -100,60 +72,48 @@
     <!-- Contenedor del Mapa -->
     <div id="map"></div>
 
-    <!-- Panel de Control Flotante Inferior Totalmente Transparente -->
-    <div id="control-panel" class="control-panel">
-        <div class="grupo-botones" style="display: flex; gap: 5px; align-items: center;">
-            <button id="btn-number" class="btn btn-primary">Números</button>
-            <!-- Selector de comportamiento para el modo número -->
-            <div id="contenedor-submodo-numero" style="display: flex; align-items: center;">
-                <select id="select-submodo-numero" onchange="cambiarSubmodoNumero(event)" class="btn" style="background: white; color: #333; padding: 6px; cursor: pointer;">
-                    <option value="ruta">Ruta (Callejero)</option>
-                    <option value="aislado">Solo Número (Aislado)</option>
-                </select>
-            </div>
-            <button id="btn-draw" class="btn btn-secondary">Dibujo Libre</button>
-            <button id="btn-erase" class="btn btn-secondary">Borrar</button>
+    <!-- Panel de Control Flotante -->
+    <div class="control-panel">
+        <button id="btn-numeros" class="btn btn-blue">Números</button>
+        
+        <div class="control-group">
+            <select id="route-type-select" class="btn btn-gray" style="padding: 5px;">
+                <option value="callejero">Ruta (Callejero)</option>
+                <option value="linea">Línea recta</option>
+            </select>
         </div>
 
-        <div class="grupo-estilos" style="display: flex; gap: 8px; align-items: center;">
-            <label>Color: <input type="color" id="color" value="#007bff"></label>
-            <label>Grosor: <input type="range" id="grosor" min="2" max="30" value="13" style="width: 70px;"></label>
-            <label>Opacidad: <input type="range" id="opacidad" min="10" max="100" value="35" style="width: 70px;"></label>
+        <button id="btn-dibujo" class="btn btn-gray">Dibujo Libre</button>
+        <button id="btn-borrar" class="btn btn-gray">Borrar</button>
+        
+        <div class="control-group">
+            <label for="color-picker" style="font-size: 12px; font-weight: bold;">Color:</label>
+            <input type="color" id="color-picker" value="#3388ff" style="border: none; width: 25px; height: 25px; cursor: pointer; background: none;">
         </div>
 
-        <div class="grupo-acciones" style="display: flex; gap: 5px;">
-            <button class="btn btn-secondary" onclick="cortarTramoActual()" title="Corta el tramo actual para empezar una ruta independiente">Cortar Tramo</button>
-            <button class="btn btn-secondary" onclick="deshacerUltimo()">Deshacer</button>
-            <button class="btn btn-secondary" onclick="rehacerProximo()">Rehacer</button>
-            <button class="btn btn-danger" onclick="borrarTodo()">Borrar Todo</button>
+        <div class="control-group">
+            <label for="grosor-range" style="font-size: 12px; font-weight: bold;">Grosor:</label>
+            <input type="range" id="grosor-range" min="1" max="10" value="4" style="width: 70px;">
         </div>
 
-        <div class="grupo-github" style="display: flex; gap: 5px;">
-            <button class="btn btn-success" onclick="guardarEnGithub()">Guardar</button>
-            <button class="btn btn-info" onclick="abrirModalCargarGithub()">Cargar</button>
-            <button class="btn btn-warning" onclick="compartirMapaGithub()">Compartir</button>
-            <button class="btn btn-secondary" onclick="cambiarToken()">Token</button>
+        <div class="control-group">
+            <label for="opacidad-range" style="font-size: 12px; font-weight: bold;">Opacidad:</label>
+            <input type="range" id="opacidad-range" min="0.1" max="1" step="0.1" value="1" style="width: 70px;">
         </div>
-    </div>
 
-    <!-- Modal para cargar / eliminar mapas de GitHub -->
-    <div id="modal-load" class="modal" style="display:none; position:fixed; z-index:2000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5);">
-        <div class="modal-content" style="background-color:white; margin: 15% auto; padding: 20px; width: 80%; max-width: 400px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-            <h3 style="margin-top: 0; margin-bottom: 15px;">Mapas Guardados</h3>
-            <div id="lista-mapas" style="max-height: 250px; overflow-y: auto; margin: 15px 0; display: flex; flex-direction: column; gap: 8px;">
-                <!-- Aquí se inyectan los mapas dinámicamente -->
-            </div>
-            <button class="btn btn-secondary" style="width: 100%; margin-top: 10px;" onclick="cerrarModal()">Cerrar</button>
-        </div>
+        <button id="btn-cortar" class="btn btn-gray">Cortar Tramo</button>
+        <button id="btn-deshacer" class="btn btn-gray">Deshacer</button>
+        <button id="btn-rehacer" class="btn btn-gray">Rehacer</button>
+        <button id="btn-borrar-todo" class="btn btn-red">Borrar Todo</button>
+        <button id="btn-guardar" class="btn btn-green">Guardar</button>
+        <button id="btn-cargar" class="btn btn-cyan">Cargar</button>
+        <button id="btn-compartir" class="btn btn-yellow">Compartir</button>
+        <button id="btn-token" class="btn btn-gray">Token</button>
     </div>
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    
-    <!-- Lector GPX (opcional) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-gpx/1.7.0/gpx.min.js"></script>
-
-    <!-- Archivo de lógica principal -->
+    <!-- Script Principal -->
     <script src="app.js"></script>
 </body>
 </html>
