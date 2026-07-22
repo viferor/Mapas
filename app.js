@@ -1,3 +1,4 @@
+
 // Configuración de GitHub
 const GITHUB_USER = "viferor"; 
 const GITHUB_REPO = "Mapas"; 
@@ -21,12 +22,13 @@ document.addEventListener("DOMContentLoaded", function () {
     }).setView([37.8882, -4.7794], 13);
 
     const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' });
-    const topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17, attribution: '&copy; OpenTopoMap' });
+    // Cambiamos el mapa topográfico por CartoDB Positron (mapa claro optimizado para lectura ultra nítida de calles y textos)
+    const cartoClaro = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 20, attribution: '&copy; OpenStreetMap & CARTO' });
     const googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', { maxZoom: 20, subdomains: ['mt0', 'mt1', 'mt2', 'mt3'], attribution: '&copy; Google Maps' });
 
     osm.addTo(map);
 
-    L.control.layers({ "Callejero": osm, "Topográfico": topo, "Híbrido Google": googleHybrid }, null, { position: 'topright' }).addTo(map);
+    L.control.layers({ "Callejero": osm, "Claro / Nombres nítidos": cartoClaro, "Híbrido Google": googleHybrid }, null, { position: 'topright' }).addTo(map);
 
     map.getContainer().style.touchAction = 'auto';
     map.on('click', gestionarPulsacion);
@@ -118,7 +120,6 @@ function obtenerEstilosActuales() {
     };
 }
 
-// Función de aviso flotante temporal (reemplaza al alert estático)
 function mostrarToast(mensaje) {
     const toast = document.getElementById('toast-aviso');
     if (!toast) return;
