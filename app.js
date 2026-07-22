@@ -3,56 +3,32 @@ const GITHUB_USER = "viferor";
 const GITHUB_REPO = "Mapas"; 
 const GITHUB_FOLDER = "mapas"; 
 
-// Variables globales
 let map;
-let modoActual = 'numero'; // 'numero', 'dibujar' (libre) o 'borrar'
-let submodoNumero = 'ruta'; // 'ruta' o 'aislado'
+let modoActual = 'numero'; 
+let submodoNumero = 'ruta'; 
 let contadorNumero = 1;
 
-// Historial para deshacer / rehacer
 let historialAcciones = [];
 let historialRehacer = [];
 
-// Control de tramos independientes
 let ultimoPuntoTramo = null; 
 let trazoLibreActivo = false; 
 
-// Inicialización del mapa y eventos de la interfaz
 document.addEventListener("DOMContentLoaded", function () {
     map = L.map('map', {
         zoomControl: true,
         touchZoom: true
-    }).setView([37.8882, -4.7794], 13); // Centrado en Córdoba
+    }).setView([37.8882, -4.7794], 13);
 
-    // Capas base de mapas
-    const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; OpenStreetMap'
-    });
-
-    const topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-        maxZoom: 17,
-        attribution: '&copy; OpenTopoMap'
-    });
-
-    const googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
-        maxZoom: 20,
-        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-        attribution: '&copy; Google Maps'
-    });
+    const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' });
+    const topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17, attribution: '&copy; OpenTopoMap' });
+    const googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', { maxZoom: 20, subdomains: ['mt0', 'mt1', 'mt2', 'mt3'], attribution: '&copy; Google Maps' });
 
     osm.addTo(map);
 
-    const baseMaps = {
-        "Callejero": osm,
-        "Topográfico": topo,
-        "Híbrido Google": googleHybrid
-    };
-    L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
+    L.control.layers({ "Callejero": osm, "Topográfico": topo, "Híbrido Google": googleHybrid }, null, { position: 'topright' }).addTo(map);
 
-    const mapContainer = map.getContainer();
-    mapContainer.style.touchAction = 'auto';
-
+    map.getContainer().style.touchAction = 'auto';
     map.on('click', gestionarPulsacion);
 
     inicializarInterfaz();
@@ -99,6 +75,7 @@ function inicializarInterfaz() {
     if (btnRehacer) btnRehacer.addEventListener('click', rehacerProximo);
     if (btnBorrarTodo) btnBorrarTodo.addEventListener('click', borrarTodo);
     
+    // Vinculación directa al modal unificado para Guardar, Cargar y Compartir
     if (btnGuardar) btnGuardar.onclick = () => abrirModalGithub('guardar');
     if (btnCargar) btnCargar.onclick = () => abrirModalGithub('cargar');
     if (btnCompartir) btnCompartir.onclick = () => abrirModalGithub('compartir');
@@ -115,7 +92,6 @@ function inicializarInterfaz() {
 
 function setModo(modo) {
     modoActual = modo;
-    
     map.dragging.enable();
     map.touchZoom.enable();
     map.doubleClickZoom.enable();
@@ -128,9 +104,7 @@ function setModo(modo) {
     if (btnDrawEl) btnDrawEl.className = modo === 'dibujar' ? 'btn btn-blue' : 'btn btn-gray';
     if (btnErrEl) btnErrEl.className = modo === 'borrar' ? 'btn btn-red' : 'btn btn-gray';
 
-    if (modo === 'dibujar') {
-        ultimoPuntoTramo = null;
-    }
+    if (modo === 'dibujar') ultimoPuntoTramo = null;
 }
 
 function obtenerEstilosActuales() {
@@ -164,11 +138,9 @@ async function gestionarPulsacion(e) {
     }
     ultimoToqueTiempo = tiempoActual;
 
-    if (modoActual === 'borrar') {
-        return; 
-    }
+    if (modoActual === 'borrar') return; 
 
-    // MODO DIBUJO LIBRE
+    // DIBUJO LIBRE
     if (modoActual === 'dibujar') {
         if (!window.puntosDibujoLibre || !trazoLibreActivo) {
             window.puntosDibujoLibre = [];
@@ -177,15 +149,16 @@ async function gestionarPulsacion(e) {
 
         window.puntosDibujoLibre.push(latlng);
 
+        // Se usa un radio mayor (8px) para facilitar la pulsación en móviles al borrar
         const markerLibre = L.circleMarker(latlng, {
-            radius: 6,
+            radius: 8,
             color: estilos.color,
             fillColor: estilos.color,
             fillOpacity: 1,
-            interactive: true
+            interactive: true,
+            bubblingMouseEvents: false
         }).addTo(map);
 
-        // Corrección de evento para borrado inmediato y preciso
         markerLibre.on('click', function(ev) {
             if (modoActual === 'borrar') {
                 L.DomEvent.stopPropagation(ev);
@@ -200,9 +173,10 @@ async function gestionarPulsacion(e) {
             const pAnt = window.puntosDibujoLibre[window.puntosDibujoLibre.length - 2];
             const lineaLibre = L.polyline([pAnt, latlng], {
                 color: estilos.color,
-                weight: estilos.weight,
+                weight: Math.max(estilos.weight, 6), // Grosor ampliado para facilitar el borrado de líneas libres
                 opacity: estilos.opacity,
-                interactive: true
+                interactive: true,
+                bubblingMouseEvents: false
             }).addTo(map);
 
             lineaLibre.on('click', function(ev) {
@@ -220,7 +194,7 @@ async function gestionarPulsacion(e) {
         return;
     }
 
-    // MODO NÚMEROS Y RUTAS
+    // NÚMEROS Y RUTAS
     if (modoActual === 'numero') {
         const numeroActual = contadorNumero;
 
@@ -231,7 +205,7 @@ async function gestionarPulsacion(e) {
             iconAnchor: [14, 14]
         });
 
-        const marker = L.marker(latlng, { icon: numberIcon, interactive: true }).addTo(map);
+        const marker = L.marker(latlng, { icon: numberIcon, interactive: true, bubblingMouseEvents: false }).addTo(map);
         
         setTimeout(() => {
             const el = marker.getElement();
@@ -261,7 +235,8 @@ async function gestionarPulsacion(e) {
                     weight: estilos.weight,
                     opacity: estilos.opacity,
                     smoothFactor: 1,
-                    interactive: true
+                    interactive: true,
+                    bubblingMouseEvents: false
                 }).addTo(map);
 
                 lineaAsociada.on('click', function(ev) {
@@ -291,26 +266,22 @@ async function gestionarPulsacion(e) {
 
 async function obtenerRutaPorCallesOSRM(origen, destino) {
     const url = `https://router.project-osrm.org/route/v1/foot/${origen.lng},${origen.lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson`;
-
     try {
         const response = await fetch(url);
         if (response.ok) {
             const data = await response.json();
             if (data.code === 'Ok' && data.routes && data.routes.length > 0) {
-                const coordenadasGeoJSON = data.routes[0].geometry.coordinates;
-                return coordenadasGeoJSON.map(coord => [coord[1], coord[0]]);
+                return data.routes[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);
             }
         }
     } catch (e) {
-        console.warn("Error en OSRM principal:", e);
+        console.warn("Error OSRM:", e);
     }
-
     return [origen, destino];
 }
 
 function deshacerUltimo() {
     if (historialAcciones.length === 0) return;
-
     const ultimaAccion = historialAcciones.pop();
     if (ultimaAccion && ultimaAccion.elemento) {
         map.removeLayer(ultimaAccion.elemento);
@@ -318,7 +289,6 @@ function deshacerUltimo() {
 
         if (ultimaAccion.tipo === 'marcador') {
             contadorNumero = Math.max(1, contadorNumero - 1);
-            
             if (ultimaAccion.elemento.lineaAsociada) {
                 map.removeLayer(ultimaAccion.elemento.lineaAsociada);
                 historialAcciones = historialAcciones.filter(item => item.elemento !== ultimaAccion.elemento.lineaAsociada);
@@ -332,12 +302,10 @@ function deshacerUltimo() {
 
 function rehacerProximo() {
     if (historialRehacer.length === 0) return;
-
     const accionRehacer = historialRehacer.pop();
     if (accionRehacer && accionRehacer.elemento) {
         accionRehacer.elemento.addTo(map);
         historialAcciones.push(accionRehacer);
-
         if (accionRehacer.tipo === 'marcador') {
             contadorNumero++;
             if (accionRehacer.submodo === 'ruta') {
@@ -348,12 +316,8 @@ function rehacerProximo() {
 }
 
 function borrarTodo() {
-    historialAcciones.forEach(item => {
-        if (item && item.elemento) map.removeLayer(item.elemento);
-    });
-    historialRehacer.forEach(item => {
-        if (item && item.elemento) map.removeLayer(item.elemento);
-    });
+    historialAcciones.forEach(item => { if (item && item.elemento) map.removeLayer(item.elemento); });
+    historialRehacer.forEach(item => { if (item && item.elemento) map.removeLayer(item.elemento); });
     historialAcciones = [];
     historialRehacer = [];
     ultimoPuntoTramo = null;
@@ -366,24 +330,18 @@ function actualizarEstilosGlobales() {
     const estilos = obtenerEstilosActuales();
     historialAcciones.forEach(item => {
         if ((item.tipo === 'linea' || item.tipo === 'linea-libre') && item.elemento) {
-            item.elemento.setStyle({
-                color: estilos.color,
-                weight: estilos.weight,
-                opacity: estilos.opacity
-            });
+            item.elemento.setStyle({ color: estilos.color, weight: estilos.weight, opacity: estilos.opacity });
         }
     });
 }
 
-// --- GESTIÓN CON GITHUB (MODAL UNIFICADO) ---
+// --- GITHUB ---
 
 function obtenerToken() {
     let token = localStorage.getItem('github_token');
     if (!token) {
         token = prompt("Introduce tu Personal Access Token de GitHub:");
-        if (token) {
-            localStorage.setItem('github_token', token.trim());
-        }
+        if (token) localStorage.setItem('github_token', token.trim());
     }
     return token;
 }
@@ -399,51 +357,32 @@ function cambiarToken() {
 
 function exportarDatosMapa() {
     const elementos = [];
-
     historialAcciones.forEach(item => {
         if (!item || !item.elemento) return;
-        
         if (item.tipo === 'linea') {
             const latlngs = item.elemento.getLatLngs().map(ll => [ll.lng, ll.lat]);
             elementos.push({
                 type: "Feature",
                 geometry: { type: "LineString", coordinates: latlngs },
-                properties: {
-                    tipo: "linea",
-                    color: item.elemento.options.color,
-                    weight: item.elemento.options.weight,
-                    opacity: item.elemento.options.opacity
-                }
+                properties: { tipo: "linea", color: item.elemento.options.color, weight: item.elemento.options.weight, opacity: item.elemento.options.opacity }
             });
         } else if (item.tipo === 'marcador') {
             const ll = item.elemento.getLatLng();
             elementos.push({
                 type: "Feature",
                 geometry: { type: "Point", coordinates: [ll.lng, ll.lat] },
-                properties: {
-                    tipo: "marcador",
-                    numero: item.numero,
-                    color: item.color || "#3388ff",
-                    submodo: item.submodo || "ruta"
-                }
+                properties: { tipo: "marcador", numero: item.numero, color: item.color || "#3388ff", submodo: item.submodo || "ruta" }
             });
         } else if (item.tipo === 'marcador-libre') {
             const ll = item.elemento.getLatLng();
             elementos.push({
                 type: "Feature",
                 geometry: { type: "Point", coordinates: [ll.lng, ll.lat] },
-                properties: {
-                    tipo: "marcador-libre",
-                    color: item.elemento.options.color
-                }
+                properties: { tipo: "marcador-libre", color: item.elemento.options.color }
             });
         }
     });
-
-    return {
-        type: "FeatureCollection",
-        features: elementos
-    };
+    return { type: "FeatureCollection", features: elementos };
 }
 
 async function guardarEnGithub(nombreArchivo) {
@@ -453,36 +392,27 @@ async function guardarEnGithub(nombreArchivo) {
     const path = `${GITHUB_FOLDER}/${nombreArchivo.trim().toLowerCase().replace(/\s+/g, '-')}.json`;
     const contenido = JSON.stringify(exportarDatosMapa(), null, 2);
     const contenidoBase64 = btoa(unescape(encodeURIComponent(contenido)));
-
     const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${path}`;
 
     try {
         let sha = null;
-        const resExist = await fetch(url, {
-            headers: { 'Authorization': `token ${token}` }
-        });
+        const resExist = await fetch(url, { headers: { 'Authorization': `token ${token}` } });
         if (resExist.ok) {
             const dataExist = await resExist.json();
             sha = dataExist.sha;
         }
 
-        const body = {
-            message: `Guardar mapa: ${nombreArchivo}`,
-            content: contenidoBase64
-        };
+        const body = { message: `Guardar mapa: ${nombreArchivo}`, content: contenidoBase64 };
         if (sha) body.sha = sha;
 
         const res = await fetch(url, {
             method: 'PUT',
-            headers: {
-                'Authorization': `token ${token}`,
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
         });
 
         if (res.ok) {
-            alert("¡Mapa guardado con éxito en tu repositorio!");
+            alert("¡Mapa guardado con éxito!");
             cerrarModal();
         } else {
             const errData = await res.json();
@@ -492,7 +422,6 @@ async function guardarEnGithub(nombreArchivo) {
         alert(`Error de conexión: ${e.message}`);
     }
 }
-
 async function abrirModalGithub(accion) {
     const token = obtenerToken();
     if (!token) return;
@@ -513,10 +442,7 @@ async function abrirModalGithub(accion) {
     const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FOLDER}`;
 
     try {
-        const res = await fetch(url, {
-            headers: { 'Authorization': `token ${token}` }
-        });
-        
+        const res = await fetch(url, { headers: { 'Authorization': `token ${token}` } });
         let jsonFiles = [];
         if (res.ok) {
             const archivos = await res.json();
@@ -528,9 +454,7 @@ async function abrirModalGithub(accion) {
         if (accion === 'guardar') {
             const divNuevo = document.createElement('div');
             divNuevo.style.marginBottom = '12px';
-            divNuevo.innerHTML = `
-                <button class="btn btn-blue" style="width: 100%; padding: 8px;" onclick="promptGuardarNuevo()">+ Guardar como mapa nuevo...</button>
-            `;
+            divNuevo.innerHTML = `<button class="btn btn-blue" style="width: 100%; padding: 8px;" onclick="promptGuardarNuevo()">+ Guardar como mapa nuevo...</button>`;
             listaContainer.appendChild(divNuevo);
         }
 
@@ -570,10 +494,7 @@ async function abrirModalGithub(accion) {
                 botonesHtml = `<button class="btn btn-yellow" style="padding: 4px 10px; font-size: 13px; color: black;" onclick="compartirMapaEspecifico('${file.name}')">Compartir</button>`;
             }
 
-            item.innerHTML = `
-                <span style="font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 170px;">${nombreLimpio}</span>
-                ${botonesHtml}
-            `;
+            item.innerHTML = `<span style="font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 170px;">${nombreLimpio}</span>${botonesHtml}`;
             listaContainer.appendChild(item);
         });
     } catch (e) {
@@ -591,7 +512,6 @@ function promptGuardarNuevo() {
 async function eliminarMapaDeGithub(fileName, sha, accionOrigen) {
     const token = obtenerToken();
     if (!token) return;
-
     if (!confirm(`¿Eliminar permanentemente el mapa "${fileName.replace('.json', '')}"?`)) return;
 
     const path = `${GITHUB_FOLDER}/${fileName}`;
@@ -600,10 +520,7 @@ async function eliminarMapaDeGithub(fileName, sha, accionOrigen) {
     try {
         const res = await fetch(url, {
             method: 'DELETE',
-            headers: {
-                'Authorization': `token ${token}`,
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: `Eliminar ${fileName}`, sha: sha })
         });
 
@@ -633,7 +550,6 @@ async function cargarMapaDesdeGithub(nombreArchivo) {
 
         const geojson = await res.json();
         borrarTodo();
-
         const bounds = [];
 
         geojson.features.forEach(feature => {
@@ -643,7 +559,8 @@ async function cargarMapaDesdeGithub(nombreArchivo) {
                     color: feature.properties.color,
                     weight: feature.properties.weight,
                     opacity: feature.properties.opacity,
-                    interactive: true
+                    interactive: true,
+                    bubblingMouseEvents: false
                 }).addTo(map);
 
                 polyline.on('click', function(ev) {
@@ -670,7 +587,7 @@ async function cargarMapaDesdeGithub(nombreArchivo) {
                     iconAnchor: [14, 14]
                 });
 
-                const marker = L.marker(latlng, { icon: numberIcon, interactive: true }).addTo(map);
+                const marker = L.marker(latlng, { icon: numberIcon, interactive: true, bubblingMouseEvents: false }).addTo(map);
                 setTimeout(() => {
                     const el = marker.getElement();
                     if (el) el.style.backgroundColor = color;
@@ -687,20 +604,18 @@ async function cargarMapaDesdeGithub(nombreArchivo) {
                 historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: num, color: color, submodo: sub });
                 bounds.push(latlng);
 
-                if (sub === 'ruta') {
-                    ultimoPuntoTramo = latlng;
-                }
-
+                if (sub === 'ruta') ultimoPuntoTramo = latlng;
                 if (num >= contadorNumero) contadorNumero = num + 1;
             } else if (feature.properties.tipo === 'marcador-libre') {
                 const coord = feature.geometry.coordinates;
                 const latlng = [coord[1], coord[0]];
                 const markerLibre = L.circleMarker(latlng, {
-                    radius: 6,
+                    radius: 8,
                     color: feature.properties.color,
                     fillColor: feature.properties.color,
                     fillOpacity: 1,
-                    interactive: true
+                    interactive: true,
+                    bubblingMouseEvents: false
                 }).addTo(map);
 
                 markerLibre.on('click', function(ev) {
