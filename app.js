@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
         touchZoom: true
     }).setView([37.8882, -4.7794], 13); // Centrado en Córdoba
 
-    // Capas base de mapas (Selector superior derecho)
+    // Capas base de mapas
     const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; OpenStreetMap'
@@ -65,7 +65,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-// Enlazar botones y controles del HTML
 function inicializarInterfaz() {
     const btnNumber = document.getElementById('btn-numeros');
     const btnDraw = document.getElementById('btn-dibujo');
@@ -85,7 +84,6 @@ function inicializarInterfaz() {
     if (grosorInput) grosorInput.addEventListener('input', actualizarEstilosGlobales);
     if (opacidadInput) opacidadInput.addEventListener('input', actualizarEstilosGlobales);
 
-    // Enlazar botones adicionales del panel inferior
     const btnCortar = document.getElementById('btn-cortar');
     const btnDeshacer = document.getElementById('btn-deshacer');
     const btnRehacer = document.getElementById('btn-rehacer');
@@ -101,19 +99,10 @@ function inicializarInterfaz() {
     if (btnRehacer) btnRehacer.addEventListener('click', rehacerProximo);
     if (btnBorrarTodo) btnBorrarTodo.addEventListener('click', borrarTodo);
     
-    // Enlace directo y seguro para Guardar y Cargar
-    if (btnGuardar) {
-        btnGuardar.onclick = function() {
-            abrirModalGuardarGithub();
-        };
-    }
-    if (btnCargar) {
-        btnCargar.onclick = function() {
-            abrirModalCargarGithub();
-        };
-    }
+    if (btnGuardar) btnGuardar.onclick = () => abrirModalGithub('guardar');
+    if (btnCargar) btnCargar.onclick = () => abrirModalGithub('cargar');
+    if (btnCompartir) btnCompartir.onclick = () => abrirModalGithub('compartir');
 
-    if (btnCompartir) btnCompartir.addEventListener('click', compartirMapaGithub);
     if (btnToken) btnToken.addEventListener('click', cambiarToken);
     
     if (selectRutaType) {
@@ -124,7 +113,6 @@ function inicializarInterfaz() {
     }
 }
 
-// Selección de modos
 function setModo(modo) {
     modoActual = modo;
     
@@ -157,7 +145,6 @@ function obtenerEstilosActuales() {
     };
 }
 
-// --- FUNCIÓN PARA CORTAR TRAMO ACTUAL ---
 function cortarTramoActual() {
     ultimoPuntoTramo = null;
     window.puntosDibujoLibre = [];
@@ -167,7 +154,6 @@ function cortarTramoActual() {
 
 let ultimoToqueTiempo = 0;
 
-// --- GESTIÓN DE CLICS / TOQUES ---
 async function gestionarPulsacion(e) {
     const latlng = e.latlng;
     const estilos = obtenerEstilosActuales();
@@ -192,12 +178,14 @@ async function gestionarPulsacion(e) {
         window.puntosDibujoLibre.push(latlng);
 
         const markerLibre = L.circleMarker(latlng, {
-            radius: 5,
+            radius: 6,
             color: estilos.color,
             fillColor: estilos.color,
-            fillOpacity: 1
+            fillOpacity: 1,
+            interactive: true
         }).addTo(map);
 
+        // Corrección de evento para borrado inmediato y preciso
         markerLibre.on('click', function(ev) {
             if (modoActual === 'borrar') {
                 L.DomEvent.stopPropagation(ev);
@@ -213,7 +201,8 @@ async function gestionarPulsacion(e) {
             const lineaLibre = L.polyline([pAnt, latlng], {
                 color: estilos.color,
                 weight: estilos.weight,
-                opacity: estilos.opacity
+                opacity: estilos.opacity,
+                interactive: true
             }).addTo(map);
 
             lineaLibre.on('click', function(ev) {
@@ -242,7 +231,7 @@ async function gestionarPulsacion(e) {
             iconAnchor: [14, 14]
         });
 
-        const marker = L.marker(latlng, { icon: numberIcon }).addTo(map);
+        const marker = L.marker(latlng, { icon: numberIcon, interactive: true }).addTo(map);
         
         setTimeout(() => {
             const el = marker.getElement();
@@ -271,7 +260,8 @@ async function gestionarPulsacion(e) {
                     color: estilos.color,
                     weight: estilos.weight,
                     opacity: estilos.opacity,
-                    smoothFactor: 1
+                    smoothFactor: 1,
+                    interactive: true
                 }).addTo(map);
 
                 lineaAsociada.on('click', function(ev) {
@@ -299,7 +289,6 @@ async function gestionarPulsacion(e) {
     }
 }
 
-// --- MOTOR DE ENRUTAMIENTO POR CALLES ---
 async function obtenerRutaPorCallesOSRM(origen, destino) {
     const url = `https://router.project-osrm.org/route/v1/foot/${origen.lng},${origen.lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson`;
 
@@ -319,7 +308,6 @@ async function obtenerRutaPorCallesOSRM(origen, destino) {
     return [origen, destino];
 }
 
-// Deshacer y Rehacer
 function deshacerUltimo() {
     if (historialAcciones.length === 0) return;
 
@@ -387,7 +375,7 @@ function actualizarEstilosGlobales() {
     });
 }
 
-// --- GESTIÓN CON GITHUB ---
+// --- GESTIÓN CON GITHUB (MODAL UNIFICADO) ---
 
 function obtenerToken() {
     let token = localStorage.getItem('github_token');
@@ -504,19 +492,23 @@ async function guardarEnGithub(nombreArchivo) {
         alert(`Error de conexión: ${e.message}`);
     }
 }
-async function abrirModalCargarGithub() {
+
+async function abrirModalGithub(accion) {
     const token = obtenerToken();
     if (!token) return;
 
     const modal = document.getElementById('modal-load');
     const listaContainer = document.getElementById('lista-mapas');
-    if (!modal || !listaContainer) {
-        alert("Falta el elemento modal-load en el HTML.");
-        return;
-    }
+    const tituloModal = document.getElementById('modal-titulo');
+    
+    if (!modal || !listaContainer) return;
     
     modal.style.display = 'flex';
     listaContainer.innerHTML = 'Cargando mapas...';
+
+    if (accion === 'guardar') tituloModal.innerText = 'Guardar Mapa en GitHub';
+    else if (accion === 'cargar') tituloModal.innerText = 'Cargar Mapa de GitHub';
+    else if (accion === 'compartir') tituloModal.innerText = 'Compartir Mapa de GitHub';
 
     const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FOLDER}`;
 
@@ -524,17 +516,38 @@ async function abrirModalCargarGithub() {
         const res = await fetch(url, {
             headers: { 'Authorization': `token ${token}` }
         });
-        if (!res.ok) throw new Error("No se pudo obtener la lista de mapas.");
-
-        const archivos = await res.json();
-        const jsonFiles = archivos.filter(f => f.name.endsWith('.json'));
-
-        if (jsonFiles.length === 0) {
-            listaContainer.innerHTML = 'No se encontraron mapas guardados.';
-            return;
+        
+        let jsonFiles = [];
+        if (res.ok) {
+            const archivos = await res.json();
+            jsonFiles = archivos.filter(f => f.name.endsWith('.json'));
         }
 
         listaContainer.innerHTML = '';
+
+        if (accion === 'guardar') {
+            const divNuevo = document.createElement('div');
+            divNuevo.style.marginBottom = '12px';
+            divNuevo.innerHTML = `
+                <button class="btn btn-blue" style="width: 100%; padding: 8px;" onclick="promptGuardarNuevo()">+ Guardar como mapa nuevo...</button>
+            `;
+            listaContainer.appendChild(divNuevo);
+        }
+
+        if (jsonFiles.length === 0) {
+            if (accion !== 'guardar') listaContainer.innerHTML = 'No se encontraron mapas guardados.';
+            return;
+        }
+
+        if (accion === 'guardar' && jsonFiles.length > 0) {
+            const titulo = document.createElement('div');
+            titulo.style.fontSize = '12px';
+            titulo.style.color = '#666';
+            titulo.style.marginBottom = '6px';
+            titulo.innerText = 'O sobrescribir existente:';
+            listaContainer.appendChild(titulo);
+        }
+
         jsonFiles.forEach(file => {
             const nombreLimpio = file.name.replace('.json', '');
             const item = document.createElement('div');
@@ -544,21 +557,38 @@ async function abrirModalCargarGithub() {
             item.style.padding = '8px';
             item.style.borderBottom = '1px solid #eee';
 
+            let botonesHtml = '';
+            if (accion === 'guardar') {
+                botonesHtml = `<button class="btn btn-blue" style="padding: 4px 10px; font-size: 13px;" onclick="guardarEnGithub('${nombreLimpio}')">Sobrescribir</button>`;
+            } else if (accion === 'cargar') {
+                botonesHtml = `
+                    <div style="display: flex; gap: 6px;">
+                        <button class="btn btn-blue" style="padding: 4px 10px; font-size: 13px;" onclick="cargarMapaDesdeGithub('${file.name}')">Cargar</button>
+                        <button class="btn btn-red" style="padding: 4px 10px; font-size: 13px;" onclick="eliminarMapaDeGithub('${file.name}', '${file.sha}', '${accion}')">🗑️</button>
+                    </div>`;
+            } else if (accion === 'compartir') {
+                botonesHtml = `<button class="btn btn-yellow" style="padding: 4px 10px; font-size: 13px; color: black;" onclick="compartirMapaEspecifico('${file.name}')">Compartir</button>`;
+            }
+
             item.innerHTML = `
                 <span style="font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 170px;">${nombreLimpio}</span>
-                <div style="display: flex; gap: 6px;">
-                    <button class="btn btn-blue" style="padding: 4px 10px; font-size: 13px;" onclick="cargarMapaDesdeGithub('${file.name}')">Cargar</button>
-                    <button class="btn btn-red" style="padding: 4px 10px; font-size: 13px;" onclick="eliminarMapaDeGithub('${file.name}', '${file.sha}')">🗑️</button>
-                </div>
+                ${botonesHtml}
             `;
             listaContainer.appendChild(item);
         });
     } catch (e) {
-        listaContainer.innerHTML = `Error: ${e.message}`;
+        listaContainer.innerHTML = `Error de conexión: ${e.message}`;
     }
 }
 
-async function eliminarMapaDeGithub(fileName, sha) {
+function promptGuardarNuevo() {
+    const nombre = prompt("Introduce el nombre para el nuevo mapa:");
+    if (nombre && nombre.trim() !== "") {
+        guardarEnGithub(nombre.trim());
+    }
+}
+
+async function eliminarMapaDeGithub(fileName, sha, accionOrigen) {
     const token = obtenerToken();
     if (!token) return;
 
@@ -579,7 +609,7 @@ async function eliminarMapaDeGithub(fileName, sha) {
 
         if (res.ok) {
             alert("Mapa eliminado correctamente.");
-            abrirModalCargarGithub(); 
+            abrirModalGithub(accionOrigen); 
         } else {
             const errData = await res.json();
             alert(`Error al eliminar: ${errData.message}`);
@@ -591,9 +621,7 @@ async function eliminarMapaDeGithub(fileName, sha) {
 
 function cerrarModal() {
     const modal = document.getElementById('modal-load');
-    if (modal) {
-        modal.style.display = 'none';
-    }
+    if (modal) modal.style.display = 'none';
 }
 
 async function cargarMapaDesdeGithub(nombreArchivo) {
@@ -614,7 +642,8 @@ async function cargarMapaDesdeGithub(nombreArchivo) {
                 const polyline = L.polyline(latlngs, {
                     color: feature.properties.color,
                     weight: feature.properties.weight,
-                    opacity: feature.properties.opacity
+                    opacity: feature.properties.opacity,
+                    interactive: true
                 }).addTo(map);
 
                 polyline.on('click', function(ev) {
@@ -641,7 +670,7 @@ async function cargarMapaDesdeGithub(nombreArchivo) {
                     iconAnchor: [14, 14]
                 });
 
-                const marker = L.marker(latlng, { icon: numberIcon }).addTo(map);
+                const marker = L.marker(latlng, { icon: numberIcon, interactive: true }).addTo(map);
                 setTimeout(() => {
                     const el = marker.getElement();
                     if (el) el.style.backgroundColor = color;
@@ -667,10 +696,11 @@ async function cargarMapaDesdeGithub(nombreArchivo) {
                 const coord = feature.geometry.coordinates;
                 const latlng = [coord[1], coord[0]];
                 const markerLibre = L.circleMarker(latlng, {
-                    radius: 5,
+                    radius: 6,
                     color: feature.properties.color,
                     fillColor: feature.properties.color,
-                    fillOpacity: 1
+                    fillOpacity: 1,
+                    interactive: true
                 }).addTo(map);
 
                 markerLibre.on('click', function(ev) {
@@ -693,63 +723,27 @@ async function cargarMapaDesdeGithub(nombreArchivo) {
     }
 }
 
-async function compartirMapaGithub() {
-    const token = obtenerToken();
-    if (!token) return alert("Se requiere un Token de GitHub.");
+async function compartirMapaEspecifico(fileName) {
+    const nombreMapaLimpio = fileName.replace('.json', '');
+    const baseUrl = window.location.href.split('?')[0];
+    const shareUrl = `${baseUrl}?mapa=${fileName}`;
+    const textoMensaje = `🗺️ ¡Mira esta ruta guardada "${nombreMapaLimpio}"!\n${shareUrl}`;
 
-    const urlDir = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FOLDER}`;
-
-    try {
-        let archivosDisponibles = [];
-        const resList = await fetch(urlDir, {
-            headers: { 'Authorization': `token ${token}` }
-        });
-        if (resList.ok) {
-            const dataFiles = await resList.json();
-            archivosDisponibles = dataFiles.filter(f => f.name.endsWith('.json')).map(f => f.name);
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: 'Ruta en Visor de Mapas',
+                text: textoMensaje,
+                url: shareUrl,
+            });
+            cerrarModal();
+            return;
+        } catch (err) {
+            if (err.name === 'AbortError') return;
         }
-
-        if (archivosDisponibles.length === 0) {
-            return alert("No hay mapas guardados en GitHub para compartir.");
-        }
-
-        let mensajePrompt = "Elige el número del mapa que quieres compartir:\n\n";
-        archivosDisponibles.forEach((file, index) => {
-            mensajePrompt += `${index + 1}. ${file.replace('.json', '')}\n`;
-        });
-        mensajePrompt += "\nIntroduce el número correspondiente:";
-
-        const seleccion = prompt(mensajePrompt);
-        if (!seleccion) return;
-
-        const indice = parseInt(seleccion.trim()) - 1;
-        if (isNaN(indice) || indice < 0 || indice >= archivosDisponibles.length) {
-            return alert("Selección no válida.");
-        }
-
-        const fileName = archivosDisponibles[indice];
-        const nombreMapaLimpio = fileName.replace('.json', '');
-        const baseUrl = window.location.href.split('?')[0];
-        const shareUrl = `${baseUrl}?mapa=${fileName}`;
-        const textoMensaje = `🗺️ ¡Mira esta ruta guardada "${nombreMapaLimpio}"!\n${shareUrl}`;
-
-        if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: 'Ruta en Visor de Mapas',
-                    text: textoMensaje,
-                    url: shareUrl,
-                });
-                return;
-            } catch (err) {
-                if (err.name === 'AbortError') return;
-            }
-        }
-
-        const urlWhatsApp = `https://api.whatsapp.com/send?text=${encodeURIComponent(textoMensaje)}`;
-        window.open(urlWhatsApp, '_blank');
-
-    } catch (e) {
-        alert(`Error al compartir el mapa: ${e.message}`);
     }
+
+    const urlWhatsApp = `https://api.whatsapp.com/send?text=${encodeURIComponent(textoMensaje)}`;
+    window.open(urlWhatsApp, '_blank');
+    cerrarModal();
 }
