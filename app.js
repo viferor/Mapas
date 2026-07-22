@@ -422,6 +422,7 @@ async function guardarEnGithub(nombreArchivo) {
         alert(`Error de conexión: ${e.message}`);
     }
 }
+
 async function abrirModalGithub(accion) {
     const token = obtenerToken();
     if (!token) return;
