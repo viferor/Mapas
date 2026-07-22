@@ -75,7 +75,6 @@ function inicializarInterfaz() {
     if (btnRehacer) btnRehacer.addEventListener('click', rehacerProximo);
     if (btnBorrarTodo) btnBorrarTodo.addEventListener('click', borrarTodo);
     
-    // Vinculación directa al modal unificado para Guardar, Cargar y Compartir
     if (btnGuardar) btnGuardar.onclick = () => abrirModalGithub('guardar');
     if (btnCargar) btnCargar.onclick = () => abrirModalGithub('cargar');
     if (btnCompartir) btnCompartir.onclick = () => abrirModalGithub('compartir');
@@ -119,11 +118,23 @@ function obtenerEstilosActuales() {
     };
 }
 
+// Función de aviso flotante temporal (reemplaza al alert estático)
+function mostrarToast(mensaje) {
+    const toast = document.getElementById('toast-aviso');
+    if (!toast) return;
+    toast.innerText = mensaje;
+    toast.style.opacity = '1';
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+    }, 2500);
+}
+
 function cortarTramoActual() {
     ultimoPuntoTramo = null;
     window.puntosDibujoLibre = [];
     trazoLibreActivo = false; 
-    alert("Próximo punto iniciado como un trazado nuevo independiente.");
+    mostrarToast("Próximo punto iniciado como un trazado nuevo independiente.");
 }
 
 let ultimoToqueTiempo = 0;
@@ -140,7 +151,6 @@ async function gestionarPulsacion(e) {
 
     if (modoActual === 'borrar') return; 
 
-    // DIBUJO LIBRE
     if (modoActual === 'dibujar') {
         if (!window.puntosDibujoLibre || !trazoLibreActivo) {
             window.puntosDibujoLibre = [];
@@ -149,7 +159,6 @@ async function gestionarPulsacion(e) {
 
         window.puntosDibujoLibre.push(latlng);
 
-        // Se usa un radio mayor (8px) para facilitar la pulsación en móviles al borrar
         const markerLibre = L.circleMarker(latlng, {
             radius: 8,
             color: estilos.color,
@@ -173,7 +182,7 @@ async function gestionarPulsacion(e) {
             const pAnt = window.puntosDibujoLibre[window.puntosDibujoLibre.length - 2];
             const lineaLibre = L.polyline([pAnt, latlng], {
                 color: estilos.color,
-                weight: Math.max(estilos.weight, 6), // Grosor ampliado para facilitar el borrado de líneas libres
+                weight: Math.max(estilos.weight, 6),
                 opacity: estilos.opacity,
                 interactive: true,
                 bubblingMouseEvents: false
@@ -194,7 +203,6 @@ async function gestionarPulsacion(e) {
         return;
     }
 
-    // NÚMEROS Y RUTAS
     if (modoActual === 'numero') {
         const numeroActual = contadorNumero;
 
@@ -263,7 +271,6 @@ async function gestionarPulsacion(e) {
         contadorNumero++;
     }
 }
-
 async function obtenerRutaPorCallesOSRM(origen, destino) {
     const url = `https://router.project-osrm.org/route/v1/foot/${origen.lng},${origen.lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson`;
     try {
