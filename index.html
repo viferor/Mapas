@@ -124,10 +124,20 @@
         <button id="btn-token" class="btn btn-gray">Token</button>
     </div>
 
+    <!-- Modal para Cargar y Guardar Mapas desde GitHub -->
+    <div id="modal-load" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center;">
+        <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px; max-height:80vh; overflow-y:auto; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            <h3 style="margin-top:0; color:#333;">Gestión de Mapas</h3>
+            <div id="lista-mapas" style="margin: 15px 0; min-height: 50px;">Cargando...</div>
+            <div style="text-align: right;">
+                <button class="btn btn-gray" onclick="cerrarModal()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <!-- Script Principal -->
     <script src="app.js"></script>
 </body>
 </html>
-
