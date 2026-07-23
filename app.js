@@ -1,4 +1,3 @@
-
 const GITHUB_USER = "viferor"; 
 const GITHUB_REPO = "Mapas"; 
 const GITHUB_FOLDER = "mapas"; 
@@ -301,6 +300,26 @@ function manejarArchivoGPX(event) {
         event.target.value = '';
     };
     lector.readAsText(archivo);
+}
+
+function confirmarBorrarTodo() {
+    if (confirm("¿Estás seguro de que quieres borrar todo el mapa? Se perderán todos los puntos y trazos actuales.")) {
+        historialAcciones.forEach(i => {
+            if (i && i.elemento) map.removeLayer(i.elemento);
+        });
+        historialRehacer.forEach(i => {
+            if (i && i.elemento) map.removeLayer(i.elemento);
+        });
+
+        historialAcciones = [];
+        historialRehacer = [];
+        ultimoPuntoTramo = null;
+        contadorNumero = 1;
+        window.puntosDibujoLibre = [];
+        trazoLibreActivo = false;
+
+        mostrarToast("Mapa borrado por completo");
+    }
 }
 
 function deshacerUltimo() {

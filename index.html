@@ -34,7 +34,7 @@
             left: 50%;
             transform: translateX(-50%);
             width: 96%;
-            max-width: 750px;
+            max-width: 780px;
             z-index: 1000;
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(8px);
@@ -46,12 +46,12 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 4px;
+            gap: 3px;
             box-sizing: border-box;
         }
 
         .btn {
-            padding: 8px 10px;
+            padding: 8px 9px;
             border: none;
             border-radius: 20px;
             cursor: pointer;
@@ -129,13 +129,14 @@
 
     <div id="map"></div>
 
-    <!-- Botonera Reactiva -->
+    <!-- Botonera Reactiva con Borrar Todo incluido -->
     <div class="control-panel">
         <button id="btn-ruta" class="btn btn-active-blue" type="button" onclick="setModo('ruta')">📍 Callejero</button>
         <button id="btn-aislado" class="btn" type="button" onclick="setModo('aislado')">📌 Aislados</button>
         <button id="btn-puntos-rectos" class="btn" type="button" onclick="setModo('dibujar_puntos')">✏️ Rectos</button>
         <button id="btn-continuo" class="btn" type="button" onclick="setModo('continuo')">〰️ Alzada</button>
         <button id="btn-borrar" class="btn" type="button" onclick="setModo('borrar')">🗑️</button>
+        <button id="btn-borrar-todo" class="btn btn-active-red" type="button" onclick="confirmarBorrarTodo()" title="Borrar todo el mapa">💥 Todo</button>
         <button id="btn-deshacer" class="btn" type="button" onclick="deshacerUltimo()">↩️</button>
         <button id="btn-rehacer" class="btn" type="button" onclick="rehacerProximo()">🔁</button>
         <button id="btn-cortar" class="btn btn-yellow" type="button" onclick="cortarTramoActual()">✂️</button>
