@@ -3,9 +3,7 @@ const GITHUB_REPO = "Mapas";
 const GITHUB_FOLDER = "mapas"; 
 
 let map;
-let modoActual = 'numero'; 
-let submodoNumero = 'ruta'; // 'ruta' (callejero) o 'aislado'
-let submodoDibujo = 'puntos'; // 'puntos' o 'continuo'
+let modoActual = 'ruta'; // 'ruta', 'aislado', 'dibujar_puntos', 'continuo', 'borrar'
 let contadorNumero = 1;
 
 let historialAcciones = [];
@@ -35,7 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     inicializarInterfaz();
     configurarDibujoTactilTablet();
-    setModo('numero');
+    setModo('ruta');
 
     const urlParams = new URLSearchParams(window.location.search);
     const mapaCompartido = urlParams.get('mapa');
@@ -43,49 +41,22 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function inicializarInterfaz() {
-    const btnNumber = document.getElementById('btn-numeros');
-    const btnDraw = document.getElementById('btn-dibujo');
-    const btnErase = document.getElementById('btn-borrar');
+    const vincularBoton = (id, modo) => {
+        const btn = document.getElementById(id);
+        if (btn) {
+            btn.addEventListener('pointerdown', (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                setModo(modo);
+            });
+        }
+    };
 
-    if (btnNumber) {
-        btnNumber.addEventListener('pointerdown', (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            if (modoActual !== 'numero') {
-                setModo('numero');
-            } else {
-                // Conmuta automáticamente al siguiente submodo
-                submodoNumero = (submodoNumero === 'ruta') ? 'aislado' : 'ruta';
-                if (submodoNumero === 'aislado') ultimoPuntoTramo = null;
-                actualizarTextosBotones();
-                mostrarToast(submodoNumero === 'ruta' ? "Modo: Callejero OSRM" : "Modo: Puntos Aislados");
-            }
-        });
-    }
-    
-    if (btnDraw) {
-        btnDraw.addEventListener('pointerdown', (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            if (modoActual !== 'dibujar') {
-                setModo('dibujar');
-            } else {
-                // Conmuta automáticamente al siguiente submodo de dibujo
-                submodoDibujo = (submodoDibujo === 'puntos') ? 'continuo' : 'puntos';
-                cortarTramoActual();
-                actualizarTextosBotones();
-                mostrarToast(submodoDibujo === 'continuo' ? "Modo: Mano alzada continua" : "Modo: Punto a punto");
-            }
-        });
-    }
-
-    if (btnErase) {
-        btnErase.addEventListener('pointerdown', (e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            setModo('borrar');
-        });
-    }
+    vincularBoton('btn-ruta', 'ruta');
+    vincularBoton('btn-aislado', 'aislado');
+    vincularBoton('btn-puntos-rectos', 'dibujar_puntos');
+    vincularBoton('btn-continuo', 'continuo');
+    vincularBoton('btn-borrar', 'borrar');
 
     document.getElementById('btn-cortar')?.addEventListener('pointerdown', (e) => { e.preventDefault(); cortarTramoActual(); });
     document.getElementById('btn-deshacer')?.addEventListener('pointerdown', (e) => { e.preventDefault(); deshacerUltimo(); });
@@ -94,36 +65,59 @@ function inicializarInterfaz() {
     document.getElementById('btn-guardar').onclick = () => abrirModalGithub('guardar');
     document.getElementById('btn-cargar').onclick = () => abrirModalGithub('cargar');
     document.getElementById('btn-compartir').onclick = () => abrirModalGithub('compartir');
+
+    // Configurar importación de GPX
+    const btnGpx = document.getElementById('btn-gpx');
+    const inputGpx = document.getElementById('input-archivo-gpx');
+    if (btnGpx && inputGpx) {
+        btnGpx.addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            inputGpx.click();
+        });
+        inputGpx.addEventListener('change', (e) => {
+            const archivo = e.target.files[0];
+            if (archivo) importarArchivoGPX(archivo);
+            inputGpx.value = ''; // Resetear selector
+        });
+    }
 }
 
 function setModo(modo) {
     modoActual = modo;
     map.dragging.enable();
-    actualizarTextosBotones();
-    if (modo === 'dibujar') ultimoPuntoTramo = null;
-}
+    actualizarEstilosBotones();
 
-function actualizarTextosBotones() {
-    const btnNum = document.getElementById('btn-numeros');
-    const btnDraw = document.getElementById('btn-dibujo');
-    const btnErr = document.getElementById('btn-borrar');
-
-    if (!btnNum || !btnDraw || !btnErr) return;
-
-    btnNum.className = modoActual === 'numero' ? 'btn btn-blue' : 'btn';
-    btnDraw.className = modoActual === 'dibujar' ? 'btn btn-blue' : 'btn';
-    btnErr.className = modoActual === 'borrar' ? 'btn btn-red' : 'btn';
-
-    if (modoActual === 'numero') {
-        btnNum.innerText = submodoNumero === 'ruta' ? '📍 Callejero' : '📍 Aislados';
-    } else {
-        btnNum.innerText = '📍 Puntos';
+    if (modo !== 'ruta') {
+        ultimoPuntoTramo = null;
     }
 
-    if (modoActual === 'dibujar') {
-        btnDraw.innerText = submodoDibujo === 'continuo' ? '✏️ Mano alzada' : '✏️ Puntos rectos';
-    } else {
-        btnDraw.innerText = '✏️ Dibujar';
+    const mensajes = {
+        'ruta': "Modo: Callejero OSRM",
+        'aislado': "Modo: Puntos Aislados",
+        'dibujar_puntos': "Modo: Punto a punto rectos",
+        'continuo': "Modo: Mano alzada continua",
+        'borrar': "Modo: Borrar elementos"
+    };
+    mostrarToast(mensajes[modo] || "");
+}
+
+function actualizarEstilosBotones() {
+    const ids = {
+        'ruta': 'btn-ruta',
+        'aislado': 'btn-aislado',
+        'dibujar_puntos': 'btn-puntos-rectos',
+        'continuo': 'btn-continuo',
+        'borrar': 'btn-borrar'
+    };
+
+    for (let [m, id] of Object.entries(ids)) {
+        const el = document.getElementById(id);
+        if (el) {
+            el.className = 'btn';
+            if (modoActual === m) {
+                el.classList.add(m === 'borrar' ? 'btn-red' : 'btn-blue');
+            }
+        }
     }
 }
 
@@ -155,7 +149,7 @@ function configurarDibujoTactilTablet() {
     const mapaContenedor = map.getContainer();
 
     mapaContenedor.addEventListener('touchstart', (e) => {
-        if (modoActual !== 'dibujar' || submodoDibujo !== 'continuo') return;
+        if (modoActual !== 'continuo') return;
         if (e.touches.length > 1) { estaDibujandoLibre = false; return; }
 
         e.preventDefault(); 
@@ -213,7 +207,7 @@ function configurarDibujoTactilTablet() {
 let ultimoToqueTiempo = 0;
 
 async function gestionarPulsacion(e) {
-    if (modoActual === 'dibujar' && submodoDibujo === 'continuo') return; 
+    if (modoActual === 'continuo') return; 
 
     const latlng = e.latlng;
     const estilos = obtenerEstilosActuales();
@@ -224,7 +218,7 @@ async function gestionarPulsacion(e) {
 
     if (modoActual === 'borrar') return; 
 
-    if (modoActual === 'dibujar' && submodoDibujo === 'puntos') {
+    if (modoActual === 'dibujar_puntos') {
         if (!window.puntosDibujoLibre || !trazoLibreActivo) {
             window.puntosDibujoLibre = [];
             trazoLibreActivo = true;
@@ -248,7 +242,7 @@ async function gestionarPulsacion(e) {
         return;
     }
 
-    if (modoActual === 'numero') {
+    if (modoActual === 'ruta' || modoActual === 'aislado') {
         const num = contadorNumero;
         const icon = L.divIcon({ className: 'number-icon', html: `<span>${num}</span>`, iconSize: [28, 28], iconAnchor: [14, 14] });
         const marker = L.marker(latlng, { icon: icon, draggable: true, interactive: true }).addTo(map);
@@ -266,7 +260,7 @@ async function gestionarPulsacion(e) {
             }
         });
 
-        if (submodoNumero === 'ruta' && ultimoPuntoTramo) {
+        if (modoActual === 'ruta' && ultimoPuntoTramo) {
             const coords = await obtenerRutaPorCallesOSRM(ultimoPuntoTramo, latlng);
             if (coords && coords.length > 0) {
                 const linea = L.polyline(coords, { color: estilos.color, weight: estilos.weight, interactive: true }).addTo(map);
@@ -281,8 +275,8 @@ async function gestionarPulsacion(e) {
                 historialAcciones.push({ tipo: 'linea', elemento: linea });
             }
         }
-        ultimoPuntoTramo = (submodoNumero === 'ruta') ? latlng : null;
-        historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: num, submodo: submodoNumero });
+        ultimoPuntoTramo = (modoActual === 'ruta') ? latlng : null;
+        historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: num, submodo: modoActual });
         historialRehacer = [];
         contadorNumero++;
     }
@@ -300,6 +294,54 @@ async function obtenerRutaPorCallesOSRM(origen, destino) {
         }
     } catch (e) {}
     return [ [origen.lat, origen.lng], [destino.lat, destino.lng] ];
+}
+
+function importarArchivoGPX(archivo) {
+    const lector = new FileReader();
+    lector.onload = function(e) {
+        try {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(e.target.result, "text/xml");
+            const puntosTrk = xmlDoc.getElementsByTagName("trkpt");
+            const puntosRte = xmlDoc.getElementsByTagName("rtept");
+            
+            let coordenadas = [];
+            
+            const extraerPuntos = (nodos) => {
+                for (let i = 0; i < nodos.length; i++) {
+                    const lat = parseFloat(nodos[i].getAttribute("lat"));
+                    const lon = parseFloat(nodos[i].getAttribute("lon"));
+                    if (!isNaN(lat) && !isNaN(lon)) coordenadas.push([lat, lon]);
+                }
+            };
+
+            extraerPuntos(puntosTrk);
+            if (coordenadas.length === 0) extraerPuntos(puntosRte);
+
+            if (coordenadas.length > 0) {
+                const estilos = obtenerEstilosActuales();
+                const linea = L.polyline(coordenadas, { color: estilos.color, weight: estilos.weight, interactive: true }).addTo(map);
+                
+                linea.on('click', function(ev) {
+                    if (modoActual === 'borrar') {
+                        L.DomEvent.stopPropagation(ev);
+                        map.removeLayer(this);
+                        historialAcciones = historialAcciones.filter(item => item.elemento !== this);
+                    }
+                });
+
+                historialAcciones.push({ tipo: 'linea', elemento: linea });
+                historialRehacer = [];
+                map.fitBounds(linea.getBounds());
+                mostrarToast("¡GPX importado con éxito!");
+            } else {
+                alert("No se han encontrado coordenadas válidas en el archivo GPX.");
+            }
+        } catch (err) {
+            alert("Error al procesar el archivo GPX.");
+        }
+    };
+    lector.readAsText(archivo);
 }
 
 function deshacerUltimo() {
