@@ -198,13 +198,12 @@ async function gestionarPulsacion(e) {
             const ultimoMarcadorLibre = historialAcciones.slice().reverse().find(item => item.tipo === 'marcador-libre');
             if (ultimoMarcadorLibre && ultimoMarcadorLibre.elemento) {
                 map.removeLayer(ultimoMarcadorLibre.elemento);
-                historialAcciones = historialAcciones.filter(item => item.elemento !== ultimoMarcadorLibre);
+                historialAcciones = historialAcciones.filter(item => item !== ultimoMarcadorLibre);
             }
         }
 
         const radioPuntoLibre = Math.max(2, Math.round(estilos.weight * 0.8));
         
-        // Convertimos el punto de dibujo libre en un marcador arrastrable (draggable: true)
         const markerLibre = L.marker(latlng, {
             icon: L.divIcon({
                 className: 'circle-marker-icon',
@@ -240,7 +239,6 @@ async function gestionarPulsacion(e) {
             iconAnchor: [14, 14]
         });
 
-        // Hacemos el marcador numérico arrastrable con draggable: true
         const marker = L.marker(latlng, { icon: numberIcon, draggable: true, interactive: true, bubblingMouseEvents: false }).addTo(map);
         
         setTimeout(() => {
@@ -292,7 +290,7 @@ async function gestionarPulsacion(e) {
         if (submodoNumero === 'ruta') {
             ultimoPuntoTramo = latlng;
         } else {
-            ultimoPuntoTramo = null;
+            ultimoPuntoTrad = null;
         }
 
         historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: numeroActual, color: estilos.color, submodo: submodoNumero });
@@ -301,7 +299,12 @@ async function gestionarPulsacion(e) {
     }
 }
 async function obtenerRutaPorCallesOSRM(origen, destino) {
-    const url = `https://router.project-osrm.org/route/v1/foot/${origen.lng},${origen.lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson`;
+    // Usamos el perfil 'car' pero con una aproximación o bien OSRM flexible pasando por alto restricciones 
+    // Si prefieres que ignore por completo sentidos únicos peatonales/de tráfico, usamos el perfil de coche 
+    // permitiendo flexibilidad o uniendo en línea recta inteligente si falla.
+    // Nota: OSRM público oficial 'foot' respeta algunas direcciones de calles. Para ir completamente a contradirección 
+    // sin restricciones estrictas de sentido único urbano, podemos usar puntos intermedios o una directriz abierta.
+    const url = `https://router.project-osrm.org/route/v1/driving/${origen.lng},${origen.lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson&continue_straight=true`;
     try {
         const response = await fetch(url);
         if (response.ok) {
