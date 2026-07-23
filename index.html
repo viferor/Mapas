@@ -23,17 +23,20 @@
             z-index: 1;
         }
 
-        /* Panel de control flotante */
+        /* Panel de control inferior, transparente y flotante */
         .control-panel {
             position: absolute;
-            top: 10px;
-            left: 10px;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             z-index: 1000;
-            background: white;
-            padding: 12px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            max-width: 260px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(5px);
+            padding: 10px 14px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 400px;
             display: flex;
             flex-direction: column;
             gap: 8px;
@@ -49,7 +52,7 @@
         .btn {
             padding: 8px 12px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
             font-size: 13px;
@@ -58,7 +61,7 @@
 
         .btn-blue { background-color: #3388ff; color: white; }
         .btn-red { background-color: #ff4d4d; color: white; }
-        .btn-gray { background-color: #e0e0e0; color: #333; }
+        .btn-gray { background-color: rgba(224, 224, 224, 0.8); color: #333; }
         .btn-yellow { background-color: #ffcc00; color: #333; }
         .btn:hover { opacity: 0.9; }
 
@@ -81,7 +84,7 @@
         /* Toast flotante de avisos */
         #toast-aviso {
             position: absolute;
-            bottom: 20px;
+            bottom: 120px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 2000;
@@ -121,10 +124,8 @@
     <!-- Mapa -->
     <div id="map"></div>
 
-    <!-- Panel de Controles Flotante -->
+    <!-- Panel de Controles Flotante Inferior Transparente -->
     <div class="control-panel">
-        <div style="font-weight: bold; font-size: 15px; margin-bottom: 2px;">Panel de Control</div>
-        
         <!-- Botones de Modo -->
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
             <button id="btn-numeros" class="btn btn-blue">Puntos / Ruta</button>
@@ -133,7 +134,7 @@
 
         <!-- Selector de Submodo para Dibujar (Aparece automáticamente al pulsar Dibujar) -->
         <div id="draw-submode-container" style="display: none;">
-            <select id="draw-type-select" style="width: 100%; padding: 6px; border-radius: 4px; font-size: 12px; background: white; border: 1px solid #ccc;">
+            <select id="draw-type-select" style="width: 100%; padding: 6px; border-radius: 4px; font-size: 12px; background: rgba(255,255,255,0.9); border: 1px solid #ccc;">
                 <option value="puntos">Punto a punto (rectas)</option>
                 <option value="continuo">Mano alzada continua</option>
             </select>
@@ -141,52 +142,28 @@
 
         <!-- Selector de Submodo para Números / Callejero -->
         <div class="control-group">
-            <label for="route-type-select">Modo de Puntos:</label>
-            <select id="route-type-select" style="padding: 4px; border-radius: 4px; border: 1px solid #ccc;">
+            <select id="route-type-select" style="padding: 4px; border-radius: 4px; border: 1px solid #ccc; background: rgba(255,255,255,0.9);">
                 <option value="callejero">Por Callejero (OSRM)</option>
                 <option value="aislado">Puntos Aislados (Rectas)</option>
             </select>
         </div>
 
-        <button id="btn-borrar" class="btn btn-gray">Modo Borrar Elementos</button>
-        
-        <hr style="border: 0; border-top: 1px solid #eee; margin: 4px 0;">
-
-        <!-- Estilos de Línea / Marcador -->
-        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
-            <label for="color-picker">Color:</label>
-            <input type="color" id="color-picker" value="#3388ff" style="border: none; width: 30px; height: 25px; cursor: pointer; background: none;">
+        <!-- Acciones principales y guardado compactas -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;">
+            <button id="btn-borrar" class="btn btn-gray" style="font-size: 12px;">Borrar el.</button>
+            <button id="btn-deshacer" class="btn btn-gray" style="font-size: 12px;">↩️ Deshacer</button>
+            <button id="btn-rehacer" class="btn btn-gray" style="font-size: 12px;">🔁 Rehacer</button>
         </div>
 
-        <div class="control-group">
-            <label for="grosor-range">Grosor (<span id="grosor-val">4</span>px):</label>
-            <input type="range" id="grosor-range" min="1" max="20" value="4" oninput="document.getElementById('grosor-val').innerText=this.value">
-        </div>
-
-        <div class="control-group">
-            <label for="opacidad-range">Opacidad:</label>
-            <input type="range" id="opacidad-range" min="0.1" max="1" step="0.1" value="1">
-        </div>
-
-        <hr style="border: 0; border-top: 1px solid #eee; margin: 4px 0;">
-
-        <!-- Acciones generales -->
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-            <button id="btn-deshacer" class="btn btn-gray">↩️ Deshacer</button>
-            <button id="btn-rehacer" class="btn btn-gray">🔁 Rehacer</button>
+            <button id="btn-cortar" class="btn btn-yellow" style="color: black; font-size: 12px;">✂️ Cortar Tramo</button>
+            <button id="btn-borrar-todo" class="btn btn-red" style="font-size: 12px;">🗑️ Borrar Todo</button>
         </div>
-        
-        <button id="btn-cortar" class="btn btn-yellow" style="color: black;">✂️ Cortar Tramo / Nuevo Trazo</button>
-        <button id="btn-borrar-todo" class="btn btn-red">🗑️ Borrar Todo</button>
 
-        <hr style="border: 0; border-top: 1px solid #eee; margin: 4px 0;">
-
-        <!-- GitHub y Guardar -->
-        <div style="display: grid; grid-template-columns: 1fr; gap: 6px;">
-            <button id="btn-guardar" class="btn btn-blue">💾 Guardar en GitHub</button>
-            <button id="btn-cargar" class="btn btn-gray">📂 Cargar Mapa</button>
-            <button id="btn-compartir" class="btn btn-blue" style="background-color: #28a745;">🔗 Compartir Mapa</button>
-            <button id="btn-token" class="btn btn-gray" style="font-size: 11px; padding: 4px;">⚙️ Configurar Token GitHub</button>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px;">
+            <button id="btn-guardar" class="btn btn-blue" style="font-size: 11px; padding: 6px;">💾 Guardar</button>
+            <button id="btn-cargar" class="btn btn-gray" style="font-size: 11px; padding: 6px;">📂 Cargar</button>
+            <button id="btn-compartir" class="btn btn-blue" style="background-color: #28a745; font-size: 11px; padding: 6px;">🔗 Compartir</button>
         </div>
     </div>
 
