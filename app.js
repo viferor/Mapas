@@ -366,7 +366,7 @@ function rehacerProximo() {
 function obtenerToken() {
     let token = localStorage.getItem('github_token');
     if (!token) {
-        token = prompt("Token GitHub:");
+        token = prompt("Introduce tu Token de GitHub:");
         if (token) localStorage.setItem('github_token', token.trim());
     }
     return token;
@@ -429,7 +429,7 @@ async function abrirModalGithub(accion) {
         const archivos = res.ok ? await res.json() : [];
         const jsonFiles = archivos.filter(f => f.name.endsWith('.json'));
 
-        lista.innerHTML = accion === 'guardar' ? `<button class="btn btn-blue" style="width: 100%; margin-bottom:10px; border-radius:6px;" onclick="promptGuardarNuevo()">+ Nuevo...</button>` : '';
+        lista.innerHTML = accion === 'guardar' ? `<button class="btn btn-blue" style="width: 100%; margin-bottom:10px; border-radius:6px;" onclick="promptGuardارNuevo()">+ Nuevo...</button>` : '';
 
         if (jsonFiles.length === 0 && accion !== 'guardar') {
             lista.innerHTML = 'No hay mapas guardados.';
