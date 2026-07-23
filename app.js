@@ -73,7 +73,15 @@ function inicializarInterfaz() {
     if (btnCortar) btnCortar.addEventListener('click', cortarTramoActual);
     if (btnDeshacer) btnDeshacer.addEventListener('click', deshacerUltimo);
     if (btnRehacer) btnRehacer.addEventListener('click', rehacerProximo);
-    if (btnBorrarTodo) btnBorrarTodo.addEventListener('click', borrarTodo);
+    
+    // Añadimos confirmación de seguridad para evitar borrados accidentales por error táctil
+    if (btnBorrarTodo) {
+        btnBorrarTodo.addEventListener('click', () => {
+            if (confirm("¿Estás seguro de que quieres borrar todo el mapa? Esta acción eliminará los elementos actuales.")) {
+                borrarTodo();
+            }
+        });
+    }
     
     if (btnGuardar) btnGuardar.onclick = () => abrirModalGithub('guardar');
     if (btnCargar) btnCargar.onclick = () => abrirModalGithub('cargar');
@@ -136,7 +144,6 @@ function cortarTramoActual() {
     mostrarToast("Próximo punto iniciado como un trazado nuevo independiente.");
 }
 
-// Función auxiliar para recalcular el contador de números basándose en los marcadores que quedan vivos
 function recalcularContadorNumeros() {
     const marcadoresRestantes = historialAcciones.filter(item => item.tipo === 'marcador');
     if (marcadoresRestantes.length === 0) {
