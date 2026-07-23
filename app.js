@@ -136,6 +136,17 @@ function cortarTramoActual() {
     mostrarToast("Próximo punto iniciado como un trazado nuevo independiente.");
 }
 
+// Función auxiliar para recalcular el contador de números basándose en los marcadores que quedan vivos
+function recalcularContadorNumeros() {
+    const marcadoresRestantes = historialAcciones.filter(item => item.tipo === 'marcador');
+    if (marcadoresRestantes.length === 0) {
+        contadorNumero = 1;
+    } else {
+        const maxNum = Math.max(...marcadoresRestantes.map(m => m.numero));
+        contadorNumero = maxNum + 1;
+    }
+}
+
 let ultimoToqueTiempo = 0;
 
 async function gestionarPulsacion(e) {
@@ -159,7 +170,6 @@ async function gestionarPulsacion(e) {
         window.puntosDibujoLibre.push(latlng);
 
         if (window.puntosDibujoLibre.length > 1) {
-            // Si ya hay más de un punto, creamos la línea y eliminamos el punto anterior para dejar el trazado limpio
             const pAnt = window.puntosDibujoLibre[window.puntosDibujoLibre.length - 2];
             const lineaLibre = L.polyline([pAnt, latlng], {
                 color: estilos.color,
@@ -179,7 +189,6 @@ async function gestionarPulsacion(e) {
 
             historialAcciones.push({ tipo: 'linea', elemento: lineaLibre });
 
-            // Removemos el marcador anterior del historial y del mapa para que no queden puntos intermedios
             const ultimoMarcadorLibre = historialAcciones.slice().reverse().find(item => item.tipo === 'marcador-libre');
             if (ultimoMarcadorLibre && ultimoMarcadorLibre.elemento) {
                 map.removeLayer(ultimoMarcadorLibre.elemento);
@@ -236,6 +245,7 @@ async function gestionarPulsacion(e) {
                     map.removeLayer(marker.lineaAsociada);
                     historialAcciones = historialAcciones.filter(item => item.elemento !== marker.lineaAsociada);
                 }
+                recalcularContadorNumeros();
             }
         });
 
@@ -302,12 +312,12 @@ function deshacerUltimo() {
         historialRehacer.push(ultimaAccion);
 
         if (ultimaAccion.tipo === 'marcador') {
-            contadorNumero = Math.max(1, contadorNumero - 1);
             if (ultimaAccion.elemento.lineaAsociada) {
                 map.removeLayer(ultimaAccion.elemento.lineaAsociada);
                 historialAcciones = historialAcciones.filter(item => item.elemento !== ultimaAccion.elemento.lineaAsociada);
                 historialRehacer.push({ tipo: 'linea', elemento: ultimaAccion.elemento.lineaAsociada });
             }
+            recalcularContadorNumeros();
             const ultimoMarcadorRuta = historialAcciones.slice().reverse().find(item => item.tipo === 'marcador' && item.submodo === 'ruta');
             ultimoPuntoTramo = ultimoMarcadorRuta ? ultimoMarcadorRuta.elemento.getLatLng() : null;
         }
@@ -321,7 +331,7 @@ function rehacerProximo() {
         accionRehacer.elemento.addTo(map);
         historialAcciones.push(accionRehacer);
         if (accionRehacer.tipo === 'marcador') {
-            contadorNumero++;
+            recalcularContadorNumeros();
             if (accionRehacer.submodo === 'ruta') {
                 ultimoPuntoTramo = accionRehacer.elemento.getLatLng();
             }
@@ -619,6 +629,7 @@ async function cargarMapaDesdeGithub(nombreArchivo) {
                         L.DomEvent.stopPropagation(ev);
                         map.removeLayer(marker);
                         historialAcciones = historialAcciones.filter(item => item.elemento !== marker);
+                        recalcularContadorNumeros();
                     }
                 });
 
@@ -626,7 +637,7 @@ async function cargarMapaDesdeGithub(nombreArchivo) {
                 bounds.push(latlng);
 
                 if (sub === 'ruta') ultimoPuntoTramo = latlng;
-                if (num >= contadorNumero) contadorNumero = num + 1;
+                recalcularContadorNumeros();
             } else if (feature.properties.tipo === 'marcador-libre') {
                 const coord = feature.geometry.coordinates;
                 const latlng = [coord[1], coord[0]];
