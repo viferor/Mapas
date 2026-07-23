@@ -15,6 +15,7 @@
             height: 100%;
             width: 100%;
             font-family: sans-serif;
+            overflow: hidden;
         }
 
         #map {
@@ -23,20 +24,20 @@
             z-index: 1;
         }
 
-        /* Panel de control inferior, transparente y flotante */
+        /* Panel de control inferior: Ocupa todo el ancho, flotante y transparente */
         .control-panel {
             position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+            bottom: 0;
+            left: 0;
+            width: 100%;
             z-index: 1000;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(5px);
-            padding: 10px 14px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            width: 90%;
-            max-width: 400px;
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding: 10px 12px 18px 12px;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+            border-top: 1px solid rgba(255, 255, 255, 0.4);
+            box-sizing: border-box;
             display: flex;
             flex-direction: column;
             gap: 8px;
@@ -50,7 +51,7 @@
         }
 
         .btn {
-            padding: 8px 12px;
+            padding: 9px 10px;
             border: none;
             border-radius: 6px;
             cursor: pointer;
@@ -61,7 +62,7 @@
 
         .btn-blue { background-color: #3388ff; color: white; }
         .btn-red { background-color: #ff4d4d; color: white; }
-        .btn-gray { background-color: rgba(224, 224, 224, 0.8); color: #333; }
+        .btn-gray { background-color: rgba(224, 224, 224, 0.85); color: #333; }
         .btn-yellow { background-color: #ffcc00; color: #333; }
         .btn:hover { opacity: 0.9; }
 
@@ -81,10 +82,10 @@
             background: transparent;
         }
 
-        /* Toast flotante de avisos */
+        /* Toast flotante de avisos (situado justo encima de la botonera) */
         #toast-aviso {
             position: absolute;
-            bottom: 120px;
+            bottom: 155px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 2000;
@@ -96,6 +97,7 @@
             opacity: 0;
             transition: opacity 0.3s ease;
             pointer-events: none;
+            white-space: nowrap;
         }
 
         /* Modal para GitHub */
@@ -124,7 +126,7 @@
     <!-- Mapa -->
     <div id="map"></div>
 
-    <!-- Panel de Controles Flotante Inferior Transparente -->
+    <!-- Panel de Controles Flotante Inferior Ancho Total -->
     <div class="control-panel">
         <!-- Botones de Modo -->
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
@@ -142,7 +144,7 @@
 
         <!-- Selector de Submodo para Números / Callejero -->
         <div class="control-group">
-            <select id="route-type-select" style="padding: 4px; border-radius: 4px; border: 1px solid #ccc; background: rgba(255,255,255,0.9);">
+            <select id="route-type-select" style="padding: 5px; border-radius: 4px; border: 1px solid #ccc; background: rgba(255,255,255,0.9);">
                 <option value="callejero">Por Callejero (OSRM)</option>
                 <option value="aislado">Puntos Aislados (Rectas)</option>
             </select>
@@ -161,9 +163,9 @@
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px;">
-            <button id="btn-guardar" class="btn btn-blue" style="font-size: 11px; padding: 6px;">💾 Guardar</button>
-            <button id="btn-cargar" class="btn btn-gray" style="font-size: 11px; padding: 6px;">📂 Cargar</button>
-            <button id="btn-compartir" class="btn btn-blue" style="background-color: #28a745; font-size: 11px; padding: 6px;">🔗 Compartir</button>
+            <button id="btn-guardar" class="btn btn-blue" style="font-size: 11px; padding: 7px;">💾 Guardar</button>
+            <button id="btn-cargar" class="btn btn-gray" style="font-size: 11px; padding: 7px;">📂 Cargar</button>
+            <button id="btn-compartir" class="btn btn-blue" style="background-color: #28a745; font-size: 11px; padding: 7px;">🔗 Compartir</button>
         </div>
     </div>
 

@@ -6,7 +6,7 @@ const GITHUB_FOLDER = "mapas";
 let map;
 let modoActual = 'numero'; 
 let submodoNumero = 'ruta'; 
-let submodoDibujo = 'puntos'; // NUEVO: 'puntos' (punto a punto) o 'continuo' (mano alzada)
+let submodoDibujo = 'puntos'; // 'puntos' (punto a punto) o 'continuo' (mano alzada fluida)
 let contadorNumero = 1;
 
 let historialAcciones = [];
@@ -14,6 +14,10 @@ let historialRehacer = [];
 
 let ultimoPuntoTramo = null; 
 let trazoLibreActivo = false; 
+
+// Variables globales para el dibujo a mano alzada continua
+let estaDibujandoLibre = false;
+let ultimaPosicionLibre = null;
 
 document.addEventListener("DOMContentLoaded", function () {
     map = L.map('map', {
@@ -33,6 +37,7 @@ document.addEventListener("DOMContentLoaded", function () {
     map.on('click', gestionarPulsacion);
 
     inicializarInterfaz();
+    configurarDibujoContinuo();
     setModo('numero');
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -96,7 +101,6 @@ function inicializarInterfaz() {
         });
     }
 
-    // NUEVO: Selector de submodo de dibujo (puntos vs continuo) si existe en el HTML
     const selectDibujoType = document.getElementById('draw-type-select');
     if (selectDibujoType) {
         selectDibujoType.addEventListener('change', (e) => {
@@ -115,7 +119,8 @@ function setModo(modo) {
     const btnNumEl = document.getElementById('btn-numeros');
     const btnDrawEl = document.getElementById('btn-dibujo');
     const btnErrEl = document.getElementById('btn-borrar');
-    const contenedorDrawSub = document.getElementById('draw-submode-container'); // Opcional para mostrar/ocultar selector
+    const contenedorDrawSub = document.getElementById('draw-submode-container');
+    const selectRutaContainer = document.getElementById('route-type-select')?.parentElement;
     
     if (btnNumEl) btnNumEl.className = modo === 'numero' ? 'btn btn-blue' : 'btn btn-gray';
     if (btnDrawEl) btnDrawEl.className = modo === 'dibujar' ? 'btn btn-blue' : 'btn btn-gray';
@@ -123,6 +128,9 @@ function setModo(modo) {
 
     if (contenedorDrawSub) {
         contenedorDrawSub.style.display = (modo === 'dibujar') ? 'block' : 'none';
+    }
+    if (selectRutaContainer) {
+        selectRutaContainer.style.display = (modo === 'numero') ? 'block' : 'none';
     }
 
     if (modo === 'dibujar') ultimoPuntoTramo = null;
@@ -168,9 +176,68 @@ function recalcularContadorNumeros() {
     }
 }
 
+// Lógica de dibujo continuo (tipo rotulador con arrastre)
+function configurarDibujoContinuo() {
+    const mapaContenedor = map.getContainer();
+
+    mapaContenedor.addEventListener('pointerdown', (e) => {
+        if (modoActual !== 'dibujar' || submodoDibujo !== 'continuo') return;
+        
+        map.dragging.disable();
+        estaDibujandoLibre = true;
+        
+        const rect = mapaContenedor.getBoundingClientRect();
+        const puntoContainer = L.point(e.clientX - rect.left, e.clientY - rect.top);
+        ultimaPosicionLibre = map.containerPointToLatLng(puntoContainer);
+    });
+
+    mapaContenedor.addEventListener('pointermove', (e) => {
+        if (!estaDibujandoLibre || modoActual !== 'dibujar' || submodoDibujo !== 'continuo') return;
+
+        const rect = mapaContenedor.getBoundingClientRect();
+        const puntoContainer = L.point(e.clientX - rect.left, e.clientY - rect.top);
+        const latlng = map.containerPointToLatLng(puntoContainer);
+        const estilos = obtenerEstilosActuales();
+
+        if (ultimaPosicionLibre && ultimaPosicionLibre.distanceTo(latlng) > 2) {
+            const lineaContinuo = L.polyline([ultimaPosicionLibre, latlng], {
+                color: estilos.color,
+                weight: estilos.weight,
+                opacity: estilos.opacity,
+                interactive: true,
+                bubblingMouseEvents: false
+            }).addTo(map);
+
+            lineaContinuo.on('click', function(ev) {
+                if (modoActual === 'borrar') {
+                    L.DomEvent.stopPropagation(ev);
+                    map.removeLayer(lineaContinuo);
+                    historialAcciones = historialAcciones.filter(item => item.elemento !== lineaContinuo);
+                }
+            });
+
+            historialAcciones.push({ tipo: 'linea', elemento: lineaContinuo });
+            ultimaPosicionLibre = latlng;
+        }
+    });
+
+    const finalizarTrazoLibre = () => {
+        if (estaDibujandoLibre) {
+            estaDibujandoLibre = false;
+            map.dragging.enable();
+            historialRehacer = [];
+        }
+    };
+
+    mapaContenedor.addEventListener('pointerup', finalizarTrazoLibre);
+    mapaContenedor.addEventListener('pointercancel', finalizarTrazoLibre);
+}
+
 let ultimoToqueTiempo = 0;
 
 async function gestionarPulsacion(e) {
+    if (modoActual === 'dibujar' && submodoDibujo === 'continuo') return; 
+
     const latlng = e.latlng;
     const estilos = obtenerEstilosActuales();
 
@@ -182,7 +249,7 @@ async function gestionarPulsacion(e) {
 
     if (modoActual === 'borrar') return; 
 
-    if (modoActual === 'dibujar') {
+    if (modoActual === 'dibujar' && submodoDibujo === 'puntos') {
         if (!window.puntosDibujoLibre || !trazoLibreActivo) {
             window.puntosDibujoLibre = [];
             trazoLibreActivo = true;
@@ -190,61 +257,28 @@ async function gestionarPulsacion(e) {
 
         window.puntosDibujoLibre.push(latlng);
 
-        // Si estamos en modo 'puntos' (punto a punto) o 'continuo' (mano alzada)
-        if (submodoDibujo === 'puntos') {
-            // Dibujo de punto a punto recto
-            if (window.puntosDibujoLibre.length > 1) {
-                const pAnt = window.puntosDibujoLibre[window.puntosDibujoLibre.length - 2];
-                const lineaPuntoPunto = L.polyline([pAnt, latlng], {
-                    color: estilos.color,
-                    weight: estilos.weight,
-                    opacity: estilos.opacity,
-                    interactive: true,
-                    bubblingMouseEvents: false
-                }).addTo(map);
+        if (window.puntosDibujoLibre.length > 1) {
+            const pAnt = window.puntosDibujoLibre[window.puntosDibujoLibre.length - 2];
+            const lineaPuntoPunto = L.polyline([pAnt, latlng], {
+                color: estilos.color,
+                weight: estilos.weight,
+                opacity: estilos.opacity,
+                interactive: true,
+                bubblingMouseEvents: false
+            }).addTo(map);
 
-                lineaPuntoPunto.on('click', function(ev) {
-                    if (modoActual === 'borrar') {
-                        L.DomEvent.stopPropagation(ev);
-                        map.removeLayer(lineaPuntoPunto);
-                        historialAcciones = historialAcciones.filter(item => item.elemento !== lineaPuntoPunto);
-                    }
-                });
-
-                historialAcciones.push({ tipo: 'linea', elemento: lineaPuntoPunto });
-            }
-        } else {
-            // Comportamiento continuo / mano alzada anterior
-            if (window.puntosDibujoLibre.length > 1) {
-                const pAnt = window.puntosDibujoLibre[window.puntosDibujoLibre.length - 2];
-                const lineaLibre = L.polyline([pAnt, latlng], {
-                    color: estilos.color,
-                    weight: estilos.weight,
-                    opacity: estilos.opacity,
-                    interactive: true,
-                    bubblingMouseEvents: false
-                }).addTo(map);
-
-                lineaLibre.on('click', function(ev) {
-                    if (modoActual === 'borrar') {
-                        L.DomEvent.stopPropagation(ev);
-                        map.removeLayer(lineaLibre);
-                        historialAcciones = historialAcciones.filter(item => item.elemento !== lineaLibre);
-                    }
-                });
-
-                historialAcciones.push({ tipo: 'linea', elemento: lineaLibre });
-
-                const ultimoMarcadorLibre = historialAcciones.slice().reverse().find(item => item.tipo === 'marcador-libre');
-                if (ultimoMarcadorLibre && ultimoMarcadorLibre.elemento) {
-                    map.removeLayer(ultimoMarcadorLibre.elemento);
-                    historialAcciones = historialAcciones.filter(item => item !== ultimoMarcadorLibre);
+            lineaPuntoPunto.on('click', function(ev) {
+                if (modoActual === 'borrar') {
+                    L.DomEvent.stopPropagation(ev);
+                    map.removeLayer(lineaPuntoPunto);
+                    historialAcciones = historialAcciones.filter(item => item.elemento !== lineaPuntoPunto);
                 }
-            }
+            });
+
+            historialAcciones.push({ tipo: 'linea', elemento: lineaPuntoPunto });
         }
 
         const radioPuntoLibre = Math.max(2, Math.round(estilos.weight * 0.8));
-        
         const markerLibre = L.marker(latlng, {
             icon: L.divIcon({
                 className: 'circle-marker-icon',
@@ -763,3 +797,4 @@ async function compartirMapaEspecifico(fileName) {
     window.open(urlWhatsApp, '_blank');
     cerrarModal();
 }
+
