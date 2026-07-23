@@ -299,23 +299,46 @@ async function gestionarPulsacion(e) {
     }
 }
 async function obtenerRutaPorCallesOSRM(origen, destino) {
-    // Usamos el perfil 'foot' añadiendo radios amplios para ser más permisivos con los puntos seleccionados
-    const url = `https://router.project-osrm.org/route/v1/foot/${origen.lng},${origen.lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson&radios=50;50`;
+    const url = 'https://api.openrouteservice.org/v2/directions/foot-walking/geojson';
+    const apiKey = '5b3ce3597851110001cf6248a3d3421e42204c32ae99cfdf2b374941';
+
+    const bodyData = {
+        coordinates: [
+            [origen.lng, origen.lat],
+            [destino.lng, destino.lat]
+        ],
+        options: {
+            ignore_restrictions: true
+        }
+    };
+
     try {
-        const response = await fetch(url);
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': apiKey,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8'
+            },
+            body: JSON.stringify(bodyData)
+        });
+
         if (response.ok) {
             const data = await response.json();
-            if (data.code === 'Ok' && data.routes && data.routes.length > 0) {
-                return data.routes[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);
+            if (data.features && data.features.length > 0) {
+                return data.features[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);
             }
         }
     } catch (e) {
-        console.warn("Aviso de enrutamiento:", e);
+        console.warn("Aviso de enrutamiento con ORS:", e);
     }
     
-    // Línea recta de respaldo por si falla la red o el servicio por completo
+    // Respaldo de seguridad curvado por si falla la conexión
+    const latMid = (origen.lat + destino.lat) / 2;
+    const lngMid = (origen.lng + destino.lng) / 2;
     return [
         [origen.lat, origen.lng],
+        [latMid, lngMid],
         [destino.lat, destino.lng]
     ];
 }
