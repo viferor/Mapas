@@ -4,21 +4,6 @@
     {
       "type": "Feature",
       "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -4.785156179399227,
-          37.88953412359264
-        ]
-      },
-      "properties": {
-        "tipo": "marcador",
-        "numero": 1,
-        "color": "#ff0000"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
         "type": "LineString",
         "coordinates": [
           [
@@ -77,24 +62,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -4.780995454987281,
-          37.891399897273935
-        ]
-      },
-      "properties": {
-        "tipo": "marcador",
-        "numero": 2,
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -130,24 +100,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -4.780351925983236,
-          37.89156920822094
-        ]
-      },
-      "properties": {
-        "tipo": "marcador",
-        "numero": 3,
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -161,7 +116,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -175,7 +132,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -195,9 +154,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -211,7 +170,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -231,9 +192,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -247,7 +208,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -267,9 +230,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -283,7 +246,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -303,9 +268,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -319,7 +284,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -339,9 +306,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -355,7 +322,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -375,9 +344,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -391,7 +360,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -411,9 +382,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -427,7 +398,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -447,9 +420,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -463,7 +436,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -483,9 +458,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -499,7 +474,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -519,9 +496,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -535,7 +512,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -549,7 +528,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -569,9 +550,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -585,7 +566,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -599,7 +582,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -619,9 +604,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -635,7 +620,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -649,7 +636,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -669,9 +658,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -685,7 +674,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -699,7 +690,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -719,9 +712,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -735,7 +728,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -749,7 +744,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -769,9 +766,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -785,7 +782,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -805,9 +804,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -821,7 +820,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -841,9 +842,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -857,7 +858,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -877,9 +880,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -893,7 +896,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -907,7 +912,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -927,9 +934,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -943,7 +950,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -963,9 +972,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -979,7 +988,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -993,7 +1004,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -1007,7 +1020,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -1027,9 +1042,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -1043,7 +1058,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -1063,9 +1080,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -1079,7 +1096,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -1099,9 +1118,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -1115,7 +1134,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -1135,9 +1156,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -1151,7 +1172,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -1171,9 +1194,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -1187,7 +1210,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -1207,9 +1232,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -1223,7 +1248,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -1243,9 +1270,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -1259,7 +1286,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -1279,9 +1308,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -1295,7 +1324,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -1309,7 +1340,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -1329,9 +1362,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -1345,7 +1378,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -1359,7 +1394,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -1379,9 +1416,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -1395,7 +1432,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -1409,7 +1448,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -1429,9 +1470,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -1445,7 +1486,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -1465,9 +1508,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -1481,7 +1524,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -1501,9 +1546,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -1517,7 +1562,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -1537,9 +1584,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -1553,7 +1600,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -1573,9 +1622,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -1589,7 +1638,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -1609,9 +1660,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -1625,7 +1676,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -1645,9 +1698,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
       }
     },
     {
@@ -1661,7 +1714,9 @@
       },
       "properties": {
         "tipo": "marcador-libre",
-        "color": "#ff0000"
+        "color": "#3388ff",
+        "radius": 4,
+        "opacity": 0.3
       }
     },
     {
@@ -1681,9 +1736,553 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#ff0000",
-        "weight": 13,
-        "opacity": 0.45
+        "color": "#3388ff",
+        "weight": 5,
+        "opacity": 0.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.785130948563326,
+          37.88957541823229
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 1,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.781350059371338,
+          37.891261900819785
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 2,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.780845961651511,
+          37.890741266242365
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 3,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.780347226673375,
+          37.89157512635273
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 4,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.779457011551137,
+          37.88940368410705
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 5,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7794999134847425,
+          37.88983543795858
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 6,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.781183090401607,
+          37.88926072612596
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 7,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.780735301469633,
+          37.888615205813394
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 8,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7815370313538335,
+          37.8897453917556
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 9,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.780914953316592,
+          37.890098835858105
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 10,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.781784814798176,
+          37.89009978310889
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 11,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.782313044855671,
+          37.89081936465153
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 12,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.781814309877535,
+          37.890025708139085
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 13,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7827403782699465,
+          37.88965777142532
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 14,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.782866402699898,
+          37.89054243775879
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 15,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.783032647692609,
+          37.89047471248221
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 16,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.78261234172588,
+          37.88767230335147
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 17,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.782421964395518,
+          37.88771674976293
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 18,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.782593572129921,
+          37.88866916641819
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 19,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7825174390009195,
+          37.88876853142328
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 20,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.781297415264104,
+          37.88923203578002
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 21,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.782664914397675,
+          37.888842607657935
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 22,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.782761443748288,
+          37.88956643437158
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 23,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.782873138761566,
+          37.889343532179325
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 24,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7838503043988725,
+          37.889135559433996
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 25,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.784553015501339,
+          37.88976841918434
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 26,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7849061384914275,
+          37.8888846505132
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 27,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.784817653253392,
+          37.888520618222614
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 28,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.783412614927905,
+          37.88868570285648
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 29,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.783793445525881,
+          37.889073600400515
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 30,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.783166004746948,
+          37.8886820549731
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 31,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.782760966040754,
+          37.88873914794598
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 32,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.783125632476382,
+          37.88833490187685
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 33,
+        "color": "#3388ff",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.784730394853226,
+          37.8879670717493
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 34,
+        "color": "#3388ff",
+        "submodo": "aislado"
       }
     }
   ]
