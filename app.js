@@ -48,8 +48,9 @@ function inicializarInterfaz() {
     const btnErase = document.getElementById('btn-borrar');
 
     if (btnNumber) {
-        btnNumber.addEventListener('click', (e) => {
+        btnNumber.addEventListener('pointerdown', (e) => {
             e.stopPropagation();
+            e.preventDefault();
             if (modoActual !== 'numero') {
                 setModo('numero');
                 cerrarMenusFlotantes();
@@ -60,8 +61,9 @@ function inicializarInterfaz() {
     }
     
     if (btnDraw) {
-        btnDraw.addEventListener('click', (e) => {
+        btnDraw.addEventListener('pointerdown', (e) => {
             e.stopPropagation();
+            e.preventDefault();
             if (modoActual !== 'dibujar') {
                 setModo('dibujar');
                 cerrarMenusFlotantes();
@@ -72,18 +74,23 @@ function inicializarInterfaz() {
     }
 
     if (btnErase) {
-        btnErase.addEventListener('click', (e) => {
+        btnErase.addEventListener('pointerdown', (e) => {
             e.stopPropagation();
+            e.preventDefault();
             cerrarMenusFlotantes();
             setModo('borrar');
         });
     }
 
-    document.addEventListener('click', () => cerrarMenusFlotantes());
+    document.addEventListener('pointerdown', (e) => {
+        if (!e.target.closest('.control-panel') && !e.target.closest('.submode-menu')) {
+            cerrarMenusFlotantes();
+        }
+    });
 
-    document.getElementById('btn-cortar')?.addEventListener('click', cortarTramoActual);
-    document.getElementById('btn-deshacer')?.addEventListener('click', deshacerUltimo);
-    document.getElementById('btn-rehacer')?.addEventListener('click', rehacerProximo);
+    document.getElementById('btn-cortar')?.addEventListener('pointerdown', (e) => { e.preventDefault(); cortarTramoActual(); });
+    document.getElementById('btn-deshacer')?.addEventListener('pointerdown', (e) => { e.preventDefault(); deshacerUltimo(); });
+    document.getElementById('btn-rehacer')?.addEventListener('pointerdown', (e) => { e.preventDefault(); rehacerProximo(); });
     
     document.getElementById('btn-guardar').onclick = () => abrirModalGithub('guardar');
     document.getElementById('btn-cargar').onclick = () => abrirModalGithub('cargar');
@@ -100,9 +107,9 @@ function cerrarMenusFlotantes() {
 function toggleMenu(id) {
     const menu = document.getElementById(id);
     if (!menu) return;
-    const visible = menu.style.display === 'flex';
+    const esVisible = menu.style.display === 'flex';
     cerrarMenusFlotantes();
-    menu.style.display = visible ? 'none' : 'flex';
+    menu.style.display = esVisible ? 'none' : 'flex';
 }
 
 function cambiarSubmodoNumero(sub) {
