@@ -6,6 +6,7 @@ const GITHUB_FOLDER = "mapas";
 let map;
 let modoActual = 'numero'; 
 let submodoNumero = 'ruta'; 
+let submodoDibujo = 'puntos'; // NUEVO: 'puntos' (punto a punto) o 'continuo' (mano alzada)
 let contadorNumero = 1;
 
 let historialAcciones = [];
@@ -94,6 +95,15 @@ function inicializarInterfaz() {
             if (submodoNumero === 'aislado') ultimoPuntoTramo = null;
         });
     }
+
+    // NUEVO: Selector de submodo de dibujo (puntos vs continuo) si existe en el HTML
+    const selectDibujoType = document.getElementById('draw-type-select');
+    if (selectDibujoType) {
+        selectDibujoType.addEventListener('change', (e) => {
+            submodoDibujo = e.target.value;
+            cortarTramoActual();
+        });
+    }
 }
 
 function setModo(modo) {
@@ -105,10 +115,15 @@ function setModo(modo) {
     const btnNumEl = document.getElementById('btn-numeros');
     const btnDrawEl = document.getElementById('btn-dibujo');
     const btnErrEl = document.getElementById('btn-borrar');
+    const contenedorDrawSub = document.getElementById('draw-submode-container'); // Opcional para mostrar/ocultar selector
     
     if (btnNumEl) btnNumEl.className = modo === 'numero' ? 'btn btn-blue' : 'btn btn-gray';
     if (btnDrawEl) btnDrawEl.className = modo === 'dibujar' ? 'btn btn-blue' : 'btn btn-gray';
     if (btnErrEl) btnErrEl.className = modo === 'borrar' ? 'btn btn-red' : 'btn btn-gray';
+
+    if (contenedorDrawSub) {
+        contenedorDrawSub.style.display = (modo === 'dibujar') ? 'block' : 'none';
+    }
 
     if (modo === 'dibujar') ultimoPuntoTramo = null;
 }
@@ -140,7 +155,7 @@ function cortarTramoActual() {
     ultimoPuntoTramo = null;
     window.puntosDibujoLibre = [];
     trazoLibreActivo = false; 
-    mostrarToast("Próximo punto iniciado como un trazado nuevo independiente.");
+    mostrarToast("Próximo segmento iniciado de forma independiente.");
 }
 
 function recalcularContadorNumeros() {
@@ -175,30 +190,56 @@ async function gestionarPulsacion(e) {
 
         window.puntosDibujoLibre.push(latlng);
 
-        if (window.puntosDibujoLibre.length > 1) {
-            const pAnt = window.puntosDibujoLibre[window.puntosDibujoLibre.length - 2];
-            const lineaLibre = L.polyline([pAnt, latlng], {
-                color: estilos.color,
-                weight: estilos.weight,
-                opacity: estilos.opacity,
-                interactive: true,
-                bubblingMouseEvents: false
-            }).addTo(map);
+        // Si estamos en modo 'puntos' (punto a punto) o 'continuo' (mano alzada)
+        if (submodoDibujo === 'puntos') {
+            // Dibujo de punto a punto recto
+            if (window.puntosDibujoLibre.length > 1) {
+                const pAnt = window.puntosDibujoLibre[window.puntosDibujoLibre.length - 2];
+                const lineaPuntoPunto = L.polyline([pAnt, latlng], {
+                    color: estilos.color,
+                    weight: estilos.weight,
+                    opacity: estilos.opacity,
+                    interactive: true,
+                    bubblingMouseEvents: false
+                }).addTo(map);
 
-            lineaLibre.on('click', function(ev) {
-                if (modoActual === 'borrar') {
-                    L.DomEvent.stopPropagation(ev);
-                    map.removeLayer(lineaLibre);
-                    historialAcciones = historialAcciones.filter(item => item.elemento !== lineaLibre);
+                lineaPuntoPunto.on('click', function(ev) {
+                    if (modoActual === 'borrar') {
+                        L.DomEvent.stopPropagation(ev);
+                        map.removeLayer(lineaPuntoPunto);
+                        historialAcciones = historialAcciones.filter(item => item.elemento !== lineaPuntoPunto);
+                    }
+                });
+
+                historialAcciones.push({ tipo: 'linea', elemento: lineaPuntoPunto });
+            }
+        } else {
+            // Comportamiento continuo / mano alzada anterior
+            if (window.puntosDibujoLibre.length > 1) {
+                const pAnt = window.puntosDibujoLibre[window.puntosDibujoLibre.length - 2];
+                const lineaLibre = L.polyline([pAnt, latlng], {
+                    color: estilos.color,
+                    weight: estilos.weight,
+                    opacity: estilos.opacity,
+                    interactive: true,
+                    bubblingMouseEvents: false
+                }).addTo(map);
+
+                lineaLibre.on('click', function(ev) {
+                    if (modoActual === 'borrar') {
+                        L.DomEvent.stopPropagation(ev);
+                        map.removeLayer(lineaLibre);
+                        historialAcciones = historialAcciones.filter(item => item.elemento !== lineaLibre);
+                    }
+                });
+
+                historialAcciones.push({ tipo: 'linea', elemento: lineaLibre });
+
+                const ultimoMarcadorLibre = historialAcciones.slice().reverse().find(item => item.tipo === 'marcador-libre');
+                if (ultimoMarcadorLibre && ultimoMarcadorLibre.elemento) {
+                    map.removeLayer(ultimoMarcadorLibre.elemento);
+                    historialAcciones = historialAcciones.filter(item => item !== ultimoMarcadorLibre);
                 }
-            });
-
-            historialAcciones.push({ tipo: 'linea', elemento: lineaLibre });
-
-            const ultimoMarcadorLibre = historialAcciones.slice().reverse().find(item => item.tipo === 'marcador-libre');
-            if (ultimoMarcadorLibre && ultimoMarcadorLibre.elemento) {
-                map.removeLayer(ultimoMarcadorLibre.elemento);
-                historialAcciones = historialAcciones.filter(item => item !== ultimoMarcadorLibre);
             }
         }
 
