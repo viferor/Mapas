@@ -4,7 +4,7 @@ const GITHUB_FOLDER = "mapas";
 
 let map;
 let modoActual = 'numero'; 
-let submodoNumero = 'ruta'; 
+let submodoNumero = 'ruta'; // 'ruta' (callejero) o 'aislado'
 let submodoDibujo = 'puntos'; // 'puntos' o 'continuo'
 let contadorNumero = 1;
 
@@ -47,23 +47,41 @@ function inicializarInterfaz() {
     const btnDraw = document.getElementById('btn-dibujo');
     const btnErase = document.getElementById('btn-borrar');
 
-    if (btnNumber) btnNumber.addEventListener('click', () => setModo('numero'));
+    // Botón Puntos: Si ya está activo, despliega el menú flotante de selección
+    if (btnNumber) {
+        btnNumber.addEventListener('click', (e) => {
+            e.stopPropagation();
+            cerrarMenusFlotantes();
+            if (modoActual !== 'numero') {
+                setModo('numero');
+            } else {
+                toggleMenu('menu-puntos');
+            }
+        });
+    }
     
-    // Botón Dibujar interactivo: un toque cambia de modo, o alterna submodo si ya está activo
+    // Botón Dibujar: Si ya está activo, despliega el menú flotante de selección
     if (btnDraw) {
-        btnDraw.addEventListener('click', () => {
+        btnDraw.addEventListener('click', (e) => {
+            e.stopPropagation();
+            cerrarMenusFlotantes();
             if (modoActual !== 'dibujar') {
                 setModo('dibujar');
             } else {
-                // Alternar submodo integrado dentro del botón
-                submodoDibujo = (submodoDibujo === 'puntos') ? 'continuo' : 'puntos';
-                actualizarTextoBotonDibujar();
-                mostrarToast(submodoDibujo === 'continuo' ? "Modo: Mano alzada continua" : "Modo: Punto a punto");
+                toggleMenu('menu-dibujo');
             }
         });
     }
 
-    if (btnErase) btnErase.addEventListener('click', () => setModo('borrar'));
+    if (btnErase) {
+        btnErase.addEventListener('click', (e) => {
+            e.stopPropagation();
+            cerrarMenusFlotantes();
+            setModo('borrar');
+        });
+    }
+
+    document.addEventListener('click', () => cerrarMenusFlotantes());
 
     document.getElementById('btn-cortar')?.addEventListener('click', cortarTramoActual);
     document.getElementById('btn-deshacer')?.addEventListener('click', deshacerUltimo);
@@ -74,10 +92,43 @@ function inicializarInterfaz() {
     document.getElementById('btn-compartir').onclick = () => abrirModalGithub('compartir');
 }
 
+function cerrarMenusFlotantes() {
+    document.getElementById('menu-puntos').style.display = 'none';
+    document.getElementById('menu-dibujo').style.display = 'none';
+}
+
+function toggleMenu(id) {
+    const menu = document.getElementById(id);
+    const visible = menu.style.display === 'flex';
+    cerrarMenusFlotantes();
+    menu.style.display = visible ? 'none' : 'flex';
+}
+
+function cambiarSubmodoNumero(sub) {
+    submodoNumero = sub;
+    if (sub === 'aislado') ultimoPuntoTramo = null;
+    cerrarMenusFlotantes();
+    actualizarTextosBotones();
+    mostrarToast(sub === 'ruta' ? "Modo: Callejero OSRM" : "Modo: Puntos Aislados");
+}
+
+function cambiarSubmodoDibujo(sub) {
+    submodoDibujo = sub;
+    cortarTramoActual();
+    cerrarMenusFlotantes();
+    actualizarTextosBotones();
+    mostrarToast(sub === 'continuo' ? "Modo: Mano alzada continua" : "Modo: Punto a punto");
+}
+
 function setModo(modo) {
     modoActual = modo;
     map.dragging.enable();
-    
+    cerrarMenusFlotantes();
+    actualizarTextosBotones();
+    if (modo === 'dibujar') ultimoPuntoTramo = null;
+}
+
+function actualizarTextosBotones() {
     const btnNum = document.getElementById('btn-numeros');
     const btnDraw = document.getElementById('btn-dibujo');
     const btnErr = document.getElementById('btn-borrar');
@@ -86,18 +137,24 @@ function setModo(modo) {
     btnDraw.className = modo === 'dibujar' ? 'btn btn-blue' : 'btn';
     btnErr.className = modo === 'borrar' ? 'btn btn-red' : 'btn';
 
-    actualizarTextoBotonDibujar();
-    if (modo === 'dibujar') ultimoPuntoTramo = null;
-}
+    // Textos dinámicos según el submodo escogido
+    if (modoActual === 'numero') {
+        btnNum.innerText = submodoNumero === 'ruta' ? '📍 Callejero' : '📍 Aislados';
+    } else {
+        btnNum.innerText = '📍 Puntos';
+    }
 
-function actualizarTextoBotonDibujar() {
-    const btnDraw = document.getElementById('btn-dibujo');
-    if (!btnDraw) return;
     if (modoActual === 'dibujar') {
-        btnDraw.innerText = submodoDibujo === 'continuo' ? '✏️ Trazo libre' : '✏️ Puntos rectos';
+        btnDraw.innerText = submodoDibujo === 'continuo' ? '✏️ Mano alzada' : '✏️ Puntos rectos';
     } else {
         btnDraw.innerText = '✏️ Dibujar';
     }
+
+    // Actualizar clases activas en los menús flotantes
+    document.getElementById('sub-callejero').className = submodoNumero === 'ruta' ? 'active' : '';
+    document.getElementById('sub-aislado').className = submodoNumero === 'aislado' ? 'active' : '';
+    document.getElementById('sub-rectos').className = submodoDibujo === 'puntos' ? 'active' : '';
+    document.getElementById('sub-continuo').className = submodoDibujo === 'continuo' ? 'active' : '';
 }
 
 function obtenerEstilosActuales() {
@@ -239,7 +296,6 @@ async function gestionarPulsacion(e) {
             }
         });
 
-        // Por defecto puntos numerados usa trazado automático por callejero o recto según interese
         if (submodoNumero === 'ruta' && ultimoPuntoTramo) {
             const coords = await obtenerRutaPorCallesOSRM(ultimoPuntoTramo, latlng);
             if (coords && coords.length > 0) {
