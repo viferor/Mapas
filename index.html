@@ -70,42 +70,6 @@
         .btn-yellow { background-color: #ffcc00; color: #333; }
         .btn:active { opacity: 0.7; transform: scale(0.96); }
 
-        /* Menú desplegable flotante contextual justo encima de la botonera */
-        .submode-menu {
-            position: absolute;
-            bottom: 55px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 2000;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(6px);
-            padding: 6px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            display: none;
-            gap: 4px;
-            flex-direction: column;
-            border: 1px solid rgba(255,255,255,0.8);
-        }
-
-        .submode-menu button {
-            background: #fff;
-            border: 1px solid #ddd;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: left;
-            touch-action: manipulation;
-        }
-
-        .submode-menu button.active {
-            background: #3388ff;
-            color: white;
-            border-color: #3388ff;
-        }
-
         /* Iconos Leaflet */
         .number-icon {
             background: #3388ff;
@@ -161,21 +125,10 @@
 
     <div id="map"></div>
 
-    <!-- Menús contextuales flotantes para elegir submodos -->
-    <div id="menu-puntos" class="submode-menu">
-        <button id="sub-callejero" type="button" onclick="cambiarSubmodoNumero('ruta')">📍 Por Callejero (OSRM)</button>
-        <button id="sub-aislado" type="button" onclick="cambiarSubmodoNumero('aislado')">📍 Puntos Aislados (Rectas)</button>
-    </div>
-
-    <div id="menu-dibujo" class="submode-menu">
-        <button id="sub-rectos" type="button" onclick="cambiarSubmodoDibujo('puntos')">✏️ Punto a punto (Rectas)</button>
-        <button id="sub-continuo" type="button" onclick="cambiarSubmodoDibujo('continuo')">✏️ Mano alzada continua</button>
-    </div>
-
     <!-- Botonera Minimalista en una sola línea flotante -->
     <div class="control-panel">
-        <button id="btn-numeros" class="btn" type="button">📍 Puntos</button>
-        <button id="btn-dibujo" class="btn" type="button">✏️ Dibujar</button>
+        <button id="btn-numeros" class="btn" type="button">📍 Callejero</button>
+        <button id="btn-dibujo" class="btn" type="button">✏️ Puntos rectos</button>
         <button id="btn-borrar" class="btn" type="button">🗑️ Borrar</button>
         <button id="btn-deshacer" class="btn" type="button">↩️</button>
         <button id="btn-rehacer" class="btn" type="button">🔁</button>

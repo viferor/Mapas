@@ -53,9 +53,12 @@ function inicializarInterfaz() {
             e.preventDefault();
             if (modoActual !== 'numero') {
                 setModo('numero');
-                cerrarMenusFlotantes();
             } else {
-                toggleMenu('menu-puntos');
+                // Conmuta automáticamente al siguiente submodo
+                submodoNumero = (submodoNumero === 'ruta') ? 'aislado' : 'ruta';
+                if (submodoNumero === 'aislado') ultimoPuntoTramo = null;
+                actualizarTextosBotones();
+                mostrarToast(submodoNumero === 'ruta' ? "Modo: Callejero OSRM" : "Modo: Puntos Aislados");
             }
         });
     }
@@ -66,9 +69,12 @@ function inicializarInterfaz() {
             e.preventDefault();
             if (modoActual !== 'dibujar') {
                 setModo('dibujar');
-                cerrarMenusFlotantes();
             } else {
-                toggleMenu('menu-dibujo');
+                // Conmuta automáticamente al siguiente submodo de dibujo
+                submodoDibujo = (submodoDibujo === 'puntos') ? 'continuo' : 'puntos';
+                cortarTramoActual();
+                actualizarTextosBotones();
+                mostrarToast(submodoDibujo === 'continuo' ? "Modo: Mano alzada continua" : "Modo: Punto a punto");
             }
         });
     }
@@ -77,16 +83,9 @@ function inicializarInterfaz() {
         btnErase.addEventListener('pointerdown', (e) => {
             e.stopPropagation();
             e.preventDefault();
-            cerrarMenusFlotantes();
             setModo('borrar');
         });
     }
-
-    document.addEventListener('pointerdown', (e) => {
-        if (!e.target.closest('.control-panel') && !e.target.closest('.submode-menu')) {
-            cerrarMenusFlotantes();
-        }
-    });
 
     document.getElementById('btn-cortar')?.addEventListener('pointerdown', (e) => { e.preventDefault(); cortarTramoActual(); });
     document.getElementById('btn-deshacer')?.addEventListener('pointerdown', (e) => { e.preventDefault(); deshacerUltimo(); });
@@ -97,41 +96,9 @@ function inicializarInterfaz() {
     document.getElementById('btn-compartir').onclick = () => abrirModalGithub('compartir');
 }
 
-function cerrarMenusFlotantes() {
-    const mPuntos = document.getElementById('menu-puntos');
-    const mDibujo = document.getElementById('menu-dibujo');
-    if (mPuntos) mPuntos.style.display = 'none';
-    if (mDibujo) mDibujo.style.display = 'none';
-}
-
-function toggleMenu(id) {
-    const menu = document.getElementById(id);
-    if (!menu) return;
-    const esVisible = menu.style.display === 'flex';
-    cerrarMenusFlotantes();
-    menu.style.display = esVisible ? 'none' : 'flex';
-}
-
-function cambiarSubmodoNumero(sub) {
-    submodoNumero = sub;
-    if (sub === 'aislado') ultimoPuntoTramo = null;
-    cerrarMenusFlotantes();
-    actualizarTextosBotones();
-    mostrarToast(sub === 'ruta' ? "Modo: Callejero OSRM" : "Modo: Puntos Aislados");
-}
-
-function cambiarSubmodoDibujo(sub) {
-    submodoDibujo = sub;
-    cortarTramoActual();
-    cerrarMenusFlotantes();
-    actualizarTextosBotones();
-    mostrarToast(sub === 'continuo' ? "Modo: Mano alzada continua" : "Modo: Punto a punto");
-}
-
 function setModo(modo) {
     modoActual = modo;
     map.dragging.enable();
-    cerrarMenusFlotantes();
     actualizarTextosBotones();
     if (modo === 'dibujar') ultimoPuntoTramo = null;
 }
@@ -158,16 +125,6 @@ function actualizarTextosBotones() {
     } else {
         btnDraw.innerText = '✏️ Dibujar';
     }
-
-    const subCallejero = document.getElementById('sub-callejero');
-    const subAislado = document.getElementById('sub-aislado');
-    const subRectos = document.getElementById('sub-rectos');
-    const subContinuo = document.getElementById('sub-continuo');
-
-    if (subCallejero) subCallejero.className = submodoNumero === 'ruta' ? 'active' : '';
-    if (subAislado) subAislado.className = submodoNumero === 'aislado' ? 'active' : '';
-    if (subRectos) subRectos.className = submodoDibujo === 'puntos' ? 'active' : '';
-    if (subContinuo) subContinuo.className = submodoDibujo === 'continuo' ? 'active' : '';
 }
 
 function obtenerEstilosActuales() {
