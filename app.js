@@ -1,4 +1,3 @@
-
 // Configuración de GitHub
 const GITHUB_USER = "viferor"; 
 const GITHUB_REPO = "Mapas"; 
@@ -22,7 +21,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }).setView([37.8882, -4.7794], 13);
 
     const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' });
-    // Cambiamos el mapa topográfico por CartoDB Positron (mapa claro optimizado para lectura ultra nítida de calles y textos)
     const cartoClaro = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 20, attribution: '&copy; OpenStreetMap & CARTO' });
     const googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', { maxZoom: 20, subdomains: ['mt0', 'mt1', 'mt2', 'mt3'], attribution: '&copy; Google Maps' });
 
@@ -160,11 +158,14 @@ async function gestionarPulsacion(e) {
 
         window.puntosDibujoLibre.push(latlng);
 
+        // El radio del punto libre ahora se ajusta proporcionalmente al grosor (mínimo 2, con un tamaño base más pequeño)
+        const radioPuntoLibre = Math.max(2, Math.round(estilos.weight * 0.8));
+
         const markerLibre = L.circleMarker(latlng, {
-            radius: 8,
+            radius: radioPuntoLibre,
             color: estilos.color,
             fillColor: estilos.color,
-            fillOpacity: 1,
+            fillOpacity: estilos.opacity,
             interactive: true,
             bubblingMouseEvents: false
         }).addTo(map);
@@ -183,7 +184,7 @@ async function gestionarPulsacion(e) {
             const pAnt = window.puntosDibujoLibre[window.puntosDibujoLibre.length - 2];
             const lineaLibre = L.polyline([pAnt, latlng], {
                 color: estilos.color,
-                weight: Math.max(estilos.weight, 6),
+                weight: estilos.weight,
                 opacity: estilos.opacity,
                 interactive: true,
                 bubblingMouseEvents: false
@@ -336,9 +337,15 @@ function borrarTodo() {
 
 function actualizarEstilosGlobales() {
     const estilos = obtenerEstilosActuales();
+    const nuevoRadioLibre = Math.max(2, Math.round(estilos.weight * 0.8));
+
     historialAcciones.forEach(item => {
-        if ((item.tipo === 'linea' || item.tipo === 'linea-libre') && item.elemento) {
+        if (!item || !item.elemento) return;
+        if (item.tipo === 'linea') {
             item.elemento.setStyle({ color: estilos.color, weight: estilos.weight, opacity: estilos.opacity });
+        } else if (item.tipo === 'marcador-libre') {
+            item.elemento.setStyle({ color: estilos.color, fillColor: estilos.color, fillOpacity: estilos.opacity });
+            item.elemento.setRadius(nuevoRadioLibre);
         }
     });
 }
@@ -386,7 +393,7 @@ function exportarDatosMapa() {
             elementos.push({
                 type: "Feature",
                 geometry: { type: "Point", coordinates: [ll.lng, ll.lat] },
-                properties: { tipo: "marcador-libre", color: item.elemento.options.color }
+                properties: { tipo: "marcador-libre", color: item.elemento.options.color, radius: item.elemento.options.radius, opacity: item.elemento.options.fillOpacity }
             });
         }
     });
@@ -619,10 +626,10 @@ async function cargarMapaDesdeGithub(nombreArchivo) {
                 const coord = feature.geometry.coordinates;
                 const latlng = [coord[1], coord[0]];
                 const markerLibre = L.circleMarker(latlng, {
-                    radius: 8,
+                    radius: feature.properties.radius || 4,
                     color: feature.properties.color,
                     fillColor: feature.properties.color,
-                    fillOpacity: 1,
+                    fillOpacity: feature.properties.opacity !== undefined ? feature.properties.opacity : 1,
                     interactive: true,
                     bubblingMouseEvents: false
                 }).addTo(map);
