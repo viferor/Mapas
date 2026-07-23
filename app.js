@@ -1,4 +1,3 @@
-// Configuración de GitHub
 const GITHUB_USER = "viferor"; 
 const GITHUB_REPO = "Mapas"; 
 const GITHUB_FOLDER = "mapas"; 
@@ -6,7 +5,7 @@ const GITHUB_FOLDER = "mapas";
 let map;
 let modoActual = 'numero'; 
 let submodoNumero = 'ruta'; 
-let submodoDibujo = 'puntos'; 
+let submodoDibujo = 'puntos'; // 'puntos' o 'continuo'
 let contadorNumero = 1;
 
 let historialAcciones = [];
@@ -15,15 +14,14 @@ let historialRehacer = [];
 let ultimoPuntoTramo = null; 
 let trazoLibreActivo = false; 
 
-// Variables para trazado táctil en tablet
 let estaDibujandoLibre = false;
 let polilineaContinuaActual = null;
 
 document.addEventListener("DOMContentLoaded", function () {
     map = L.map('map', {
-        zoomControl: false, // Desactivado para tablet, usaremos gestos
+        zoomControl: false,
         touchZoom: true,
-        tap: false // Previene dobles eventos táctiles en Leaflet
+        tap: false 
     }).setView([37.8882, -4.7794], 13);
 
     const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' });
@@ -31,7 +29,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', { maxZoom: 20, subdomains: ['mt0', 'mt1', 'mt2', 'mt3'], attribution: '&copy; Google Maps' });
 
     osm.addTo(map);
-
     L.control.layers({ "Callejero": osm, "Claro": cartoClaro, "Google": googleHybrid }, null, { position: 'topright' }).addTo(map);
 
     map.on('click', gestionarPulsacion);
@@ -42,9 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const urlParams = new URLSearchParams(window.location.search);
     const mapaCompartido = urlParams.get('mapa');
-    if (mapaCompartido) {
-        cargarMapaDesdeGithub(mapaCompartido);
-    }
+    if (mapaCompartido) cargarMapaDesdeGithub(mapaCompartido);
 });
 
 function inicializarInterfaz() {
@@ -53,44 +48,56 @@ function inicializarInterfaz() {
     const btnErase = document.getElementById('btn-borrar');
 
     if (btnNumber) btnNumber.addEventListener('click', () => setModo('numero'));
-    if (btnDraw) btnDraw.addEventListener('click', () => setModo('dibujar'));
+    
+    // Botón Dibujar interactivo: un toque cambia de modo, o alterna submodo si ya está activo
+    if (btnDraw) {
+        btnDraw.addEventListener('click', () => {
+            if (modoActual !== 'dibujar') {
+                setModo('dibujar');
+            } else {
+                // Alternar submodo integrado dentro del botón
+                submodoDibujo = (submodoDibujo === 'puntos') ? 'continuo' : 'puntos';
+                actualizarTextoBotonDibujar();
+                mostrarToast(submodoDibujo === 'continuo' ? "Modo: Mano alzada continua" : "Modo: Punto a punto");
+            }
+        });
+    }
+
     if (btnErase) btnErase.addEventListener('click', () => setModo('borrar'));
 
     document.getElementById('btn-cortar')?.addEventListener('click', cortarTramoActual);
     document.getElementById('btn-deshacer')?.addEventListener('click', deshacerUltimo);
     document.getElementById('btn-rehacer')?.addEventListener('click', rehacerProximo);
     
-    document.getElementById('btn-borrar-todo')?.addEventListener('click', () => {
-        if (confirm("¿Borrar todo el mapa?")) borrarTodo();
-    });
-    
     document.getElementById('btn-guardar').onclick = () => abrirModalGithub('guardar');
     document.getElementById('btn-cargar').onclick = () => abrirModalGithub('cargar');
     document.getElementById('btn-compartir').onclick = () => abrirModalGithub('compartir');
-
-    document.getElementById('route-type-select')?.addEventListener('change', (e) => {
-        submodoNumero = (e.target.value === 'callejero') ? 'ruta' : 'aislado';
-        if (submodoNumero === 'aislado') ultimoPuntoTramo = null;
-    });
-
-    document.getElementById('draw-type-select')?.addEventListener('change', (e) => {
-        submodoDibujo = e.target.value;
-        cortarTramoActual();
-    });
 }
 
 function setModo(modo) {
     modoActual = modo;
     map.dragging.enable();
     
-    document.getElementById('btn-numeros').className = modo === 'numero' ? 'btn btn-blue' : 'btn btn-gray';
-    document.getElementById('btn-dibujo').className = modo === 'dibujar' ? 'btn btn-blue' : 'btn btn-gray';
-    document.getElementById('btn-borrar').className = modo === 'borrar' ? 'btn btn-red' : 'btn btn-gray';
+    const btnNum = document.getElementById('btn-numeros');
+    const btnDraw = document.getElementById('btn-dibujo');
+    const btnErr = document.getElementById('btn-borrar');
 
-    document.getElementById('draw-submode-container').style.display = (modo === 'dibujar') ? 'block' : 'none';
-    document.getElementById('route-type-select').parentElement.style.display = (modo === 'numero') ? 'block' : 'none';
+    btnNum.className = modo === 'numero' ? 'btn btn-blue' : 'btn';
+    btnDraw.className = modo === 'dibujar' ? 'btn btn-blue' : 'btn';
+    btnErr.className = modo === 'borrar' ? 'btn btn-red' : 'btn';
 
+    actualizarTextoBotonDibujar();
     if (modo === 'dibujar') ultimoPuntoTramo = null;
+}
+
+function actualizarTextoBotonDibujar() {
+    const btnDraw = document.getElementById('btn-dibujo');
+    if (!btnDraw) return;
+    if (modoActual === 'dibujar') {
+        btnDraw.innerText = submodoDibujo === 'continuo' ? '✏️ Trazo libre' : '✏️ Puntos rectos';
+    } else {
+        btnDraw.innerText = '✏️ Dibujar';
+    }
 }
 
 function obtenerEstilosActuales() {
@@ -117,35 +124,27 @@ function recalcularContadorNumeros() {
     contadorNumero = marcadoresRestantes.length === 0 ? 1 : Math.max(...marcadoresRestantes.map(m => m.numero)) + 1;
 }
 
-// Lógica EXCLUSIVA para TABLET (Touch Events puros). Permite deshacer el trazo entero.
 function configurarDibujoTactilTablet() {
     const mapaContenedor = map.getContainer();
 
     mapaContenedor.addEventListener('touchstart', (e) => {
         if (modoActual !== 'dibujar' || submodoDibujo !== 'continuo') return;
-        
-        // Si hay más de un dedo (zoom, rotar, etc), ignorar el dibujo
-        if (e.touches.length > 1) {
-            estaDibujandoLibre = false;
-            return; 
-        }
+        if (e.touches.length > 1) { estaDibujandoLibre = false; return; }
 
-        e.preventDefault(); // Evita interacciones nativas de la tablet
+        e.preventDefault(); 
         map.dragging.disable();
         estaDibujandoLibre = true;
 
         const touch = e.touches[0];
         const rect = mapaContenedor.getBoundingClientRect();
         const latlng = map.containerPointToLatLng(L.point(touch.clientX - rect.left, touch.clientY - rect.top));
-        
         const estilos = obtenerEstilosActuales();
         
-        // Creamos una única línea vacía y le iremos añadiendo puntos
         polilineaContinuaActual = L.polyline([latlng], {
             color: estilos.color,
             weight: estilos.weight,
             opacity: estilos.opacity,
-            smoothFactor: 1, // Suaviza un poco el trazo
+            smoothFactor: 1,
             interactive: true,
             bubblingMouseEvents: false
         }).addTo(map);
@@ -158,10 +157,8 @@ function configurarDibujoTactilTablet() {
             }
         });
 
-        // Guardamos todo el trazo como una sola acción en el historial
         historialAcciones.push({ tipo: 'linea', elemento: polilineaContinuaActual });
         historialRehacer = [];
-        
     }, { passive: false });
 
     mapaContenedor.addEventListener('touchmove', (e) => {
@@ -169,12 +166,9 @@ function configurarDibujoTactilTablet() {
         if (e.touches.length > 1) return;
 
         e.preventDefault(); 
-        
         const touch = e.touches[0];
         const rect = mapaContenedor.getBoundingClientRect();
         const latlng = map.containerPointToLatLng(L.point(touch.clientX - rect.left, touch.clientY - rect.top));
-        
-        // Añadimos el punto al vuelo a la línea existente
         polilineaContinuaActual.addLatLng(latlng);
     }, { passive: false });
 
@@ -192,7 +186,6 @@ function configurarDibujoTactilTablet() {
 let ultimoToqueTiempo = 0;
 
 async function gestionarPulsacion(e) {
-    // Si estamos en dibujo continuo, la lógica táctil se encarga, ignoramos el clic de Leaflet.
     if (modoActual === 'dibujar' && submodoDibujo === 'continuo') return; 
 
     const latlng = e.latlng;
@@ -246,6 +239,7 @@ async function gestionarPulsacion(e) {
             }
         });
 
+        // Por defecto puntos numerados usa trazado automático por callejero o recto según interese
         if (submodoNumero === 'ruta' && ultimoPuntoTramo) {
             const coords = await obtenerRutaPorCallesOSRM(ultimoPuntoTramo, latlng);
             if (coords && coords.length > 0) {
@@ -279,7 +273,7 @@ async function obtenerRutaPorCallesOSRM(origen, destino) {
             }
         }
     } catch (e) {}
-    return [ [origen.lat, origen.lng], [destino.lat, destino.lng] ]; // Recta si falla
+    return [ [origen.lat, origen.lng], [destino.lat, destino.lng] ];
 }
 
 function deshacerUltimo() {
@@ -313,16 +307,6 @@ function rehacerProximo() {
             if (accion.submodo === 'ruta') ultimoPuntoTramo = accion.elemento.getLatLng();
         }
     }
-}
-
-function borrarTodo() {
-    historialAcciones.forEach(i => map.removeLayer(i.elemento));
-    historialRehacer.forEach(i => map.removeLayer(i.elemento));
-    historialAcciones = [];
-    historialRehacer = [];
-    ultimoPuntoTramo = null;
-    contadorNumero = 1;
-    window.puntosDibujoLibre = [];
 }
 
 function obtenerToken() {
@@ -391,22 +375,22 @@ async function abrirModalGithub(accion) {
         const archivos = res.ok ? await res.json() : [];
         const jsonFiles = archivos.filter(f => f.name.endsWith('.json'));
 
-        lista.innerHTML = accion === 'guardar' ? `<button class="btn btn-blue" style="width: 100%; margin-bottom:10px;" onclick="promptGuardarNuevo()">+ Nuevo...</button>` : '';
+        lista.innerHTML = accion === 'guardar' ? `<button class="btn btn-blue" style="width: 100%; margin-bottom:10px; border-radius:6px;" onclick="promptGuardarNuevo()">+ Nuevo...</button>` : '';
 
         jsonFiles.forEach(file => {
             const n = file.name.replace('.json', '');
             const item = document.createElement('div');
-            item.style.cssText = 'display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid #ccc; padding-bottom:4px;';
+            item.style.cssText = 'display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid #ccc; padding-bottom:4px;';
             
             let btn = '';
-            if (accion === 'guardar') btn = `<button class="btn btn-blue" onclick="guardarEnGithub('${n}')">Sobrescribir</button>`;
-            else if (accion === 'cargar') btn = `<button class="btn btn-gray" onclick="cargarMapaDesdeGithub('${file.name}')">Cargar</button>`;
-            else if (accion === 'compartir') btn = `<button class="btn btn-yellow" onclick="compartirMapaEspecifico('${file.name}')">Link</button>`;
+            if (accion === 'guardar') btn = `<button class="btn btn-blue" style="border-radius:6px;" onclick="guardarEnGithub('${n}')">Sobrescribir</button>`;
+            else if (accion === 'cargar') btn = `<button class="btn" style="border-radius:6px; background:#ddd;" onclick="cargarMapaDesdeGithub('${file.name}')">Cargar</button>`;
+            else if (accion === 'compartir') btn = `<button class="btn btn-yellow" style="border-radius:6px;" onclick="compartirMapaEspecifico('${file.name}')">Link</button>`;
 
             item.innerHTML = `<span>${n}</span> ${btn}`;
             lista.appendChild(item);
         });
-    } catch (e) { lista.innerHTML = "Error"; }
+    } catch (e) { lista.innerHTML = "Error de conexión"; }
 }
 
 function promptGuardarNuevo() {
@@ -421,7 +405,14 @@ async function cargarMapaDesdeGithub(fileName) {
     try {
         const res = await fetch(url);
         const geojson = await res.json();
-        borrarTodo();
+        
+        historialAcciones.forEach(i => map.removeLayer(i.elemento));
+        historialRehacer.forEach(i => map.removeLayer(i.elemento));
+        historialAcciones = [];
+        historialRehacer = [];
+        ultimoPuntoTramo = null;
+        contadorNumero = 1;
+
         geojson.features.forEach(f => {
             if (f.properties.tipo === 'linea') {
                 const ll = f.geometry.coordinates.map(c => [c[1], c[0]]);
@@ -435,6 +426,7 @@ async function cargarMapaDesdeGithub(fileName) {
                 historialAcciones.push({ tipo: 'marcador', elemento: m, numero: f.properties.numero });
             }
         });
+        recalcularContadorNumeros();
         cerrarModal();
     } catch (e) { alert("Error al cargar"); }
 }
