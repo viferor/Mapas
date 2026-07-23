@@ -47,26 +47,24 @@ function inicializarInterfaz() {
     const btnDraw = document.getElementById('btn-dibujo');
     const btnErase = document.getElementById('btn-borrar');
 
-    // Botón Puntos: Si ya está activo, despliega el menú flotante de selección
     if (btnNumber) {
         btnNumber.addEventListener('click', (e) => {
             e.stopPropagation();
-            cerrarMenusFlotantes();
             if (modoActual !== 'numero') {
                 setModo('numero');
+                cerrarMenusFlotantes();
             } else {
                 toggleMenu('menu-puntos');
             }
         });
     }
     
-    // Botón Dibujar: Si ya está activo, despliega el menú flotante de selección
     if (btnDraw) {
         btnDraw.addEventListener('click', (e) => {
             e.stopPropagation();
-            cerrarMenusFlotantes();
             if (modoActual !== 'dibujar') {
                 setModo('dibujar');
+                cerrarMenusFlotantes();
             } else {
                 toggleMenu('menu-dibujo');
             }
@@ -93,12 +91,15 @@ function inicializarInterfaz() {
 }
 
 function cerrarMenusFlotantes() {
-    document.getElementById('menu-puntos').style.display = 'none';
-    document.getElementById('menu-dibujo').style.display = 'none';
+    const mPuntos = document.getElementById('menu-puntos');
+    const mDibujo = document.getElementById('menu-dibujo');
+    if (mPuntos) mPuntos.style.display = 'none';
+    if (mDibujo) mDibujo.style.display = 'none';
 }
 
 function toggleMenu(id) {
     const menu = document.getElementById(id);
+    if (!menu) return;
     const visible = menu.style.display === 'flex';
     cerrarMenusFlotantes();
     menu.style.display = visible ? 'none' : 'flex';
@@ -133,11 +134,12 @@ function actualizarTextosBotones() {
     const btnDraw = document.getElementById('btn-dibujo');
     const btnErr = document.getElementById('btn-borrar');
 
-    btnNum.className = modo === 'numero' ? 'btn btn-blue' : 'btn';
-    btnDraw.className = modo === 'dibujar' ? 'btn btn-blue' : 'btn';
-    btnErr.className = modo === 'borrar' ? 'btn btn-red' : 'btn';
+    if (!btnNum || !btnDraw || !btnErr) return;
 
-    // Textos dinámicos según el submodo escogido
+    btnNum.className = modoActual === 'numero' ? 'btn btn-blue' : 'btn';
+    btnDraw.className = modoActual === 'dibujar' ? 'btn btn-blue' : 'btn';
+    btnErr.className = modoActual === 'borrar' ? 'btn btn-red' : 'btn';
+
     if (modoActual === 'numero') {
         btnNum.innerText = submodoNumero === 'ruta' ? '📍 Callejero' : '📍 Aislados';
     } else {
@@ -150,11 +152,15 @@ function actualizarTextosBotones() {
         btnDraw.innerText = '✏️ Dibujar';
     }
 
-    // Actualizar clases activas en los menús flotantes
-    document.getElementById('sub-callejero').className = submodoNumero === 'ruta' ? 'active' : '';
-    document.getElementById('sub-aislado').className = submodoNumero === 'aislado' ? 'active' : '';
-    document.getElementById('sub-rectos').className = submodoDibujo === 'puntos' ? 'active' : '';
-    document.getElementById('sub-continuo').className = submodoDibujo === 'continuo' ? 'active' : '';
+    const subCallejero = document.getElementById('sub-callejero');
+    const subAislado = document.getElementById('sub-aislado');
+    const subRectos = document.getElementById('sub-rectos');
+    const subContinuo = document.getElementById('sub-continuo');
+
+    if (subCallejero) subCallejero.className = submodoNumero === 'ruta' ? 'active' : '';
+    if (subAislado) subAislado.className = submodoNumero === 'aislado' ? 'active' : '';
+    if (subRectos) subRectos.className = submodoDibujo === 'puntos' ? 'active' : '';
+    if (subContinuo) subContinuo.className = submodoDibujo === 'continuo' ? 'active' : '';
 }
 
 function obtenerEstilosActuales() {
