@@ -290,7 +290,7 @@ async function gestionarPulsacion(e) {
         if (submodoNumero === 'ruta') {
             ultimoPuntoTramo = latlng;
         } else {
-            ultimoPuntoTrad = null;
+            ultimoPuntoTramo = null;
         }
 
         historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: numeroActual, color: estilos.color, submodo: submodoNumero });
@@ -299,12 +299,7 @@ async function gestionarPulsacion(e) {
     }
 }
 async function obtenerRutaPorCallesOSRM(origen, destino) {
-    // Usamos el perfil 'car' pero con una aproximación o bien OSRM flexible pasando por alto restricciones 
-    // Si prefieres que ignore por completo sentidos únicos peatonales/de tráfico, usamos el perfil de coche 
-    // permitiendo flexibilidad o uniendo en línea recta inteligente si falla.
-    // Nota: OSRM público oficial 'foot' respeta algunas direcciones de calles. Para ir completamente a contradirección 
-    // sin restricciones estrictas de sentido único urbano, podemos usar puntos intermedios o una directriz abierta.
-    const url = `https://router.project-osrm.org/route/v1/driving/${origen.lng},${origen.lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson&continue_straight=true`;
+    const url = `https://router.project-osrm.org/route/v1/foot/${origen.lng},${origen.lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson`;
     try {
         const response = await fetch(url);
         if (response.ok) {
@@ -314,9 +309,14 @@ async function obtenerRutaPorCallesOSRM(origen, destino) {
             }
         }
     } catch (e) {
-        console.warn("Error OSRM:", e);
+        console.warn("Aviso de enrutamiento:", e);
     }
-    return [origen, destino];
+    
+    // Ruta directa flexible de respaldo si OSRM bloquea la dirección o falla
+    return [
+        [origen.lat, origen.lng],
+        [destino.lat, destino.lng]
+    ];
 }
 
 function deshacerUltimo() {
