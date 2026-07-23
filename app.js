@@ -299,9 +299,8 @@ async function gestionarPulsacion(e) {
     }
 }
 async function obtenerRutaPorCallesOSRM(origen, destino) {
-    // Usamos el perfil 'bike' para mantener la geometría real y las curvas de las calles
-    // evitando las restricciones estrictas de dirección única del perfil peatonal.
-    const url = `https://router.project-osrm.org/route/v1/bike/${origen.lng},${origen.lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson`;
+    // Usamos el perfil 'foot' añadiendo radios amplios para ser más permisivos con los puntos seleccionados
+    const url = `https://router.project-osrm.org/route/v1/foot/${origen.lng},${origen.lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson&radios=50;50`;
     try {
         const response = await fetch(url);
         if (response.ok) {
@@ -314,7 +313,7 @@ async function obtenerRutaPorCallesOSRM(origen, destino) {
         console.warn("Aviso de enrutamiento:", e);
     }
     
-    // Línea recta de respaldo por si falla la red o el servicio
+    // Línea recta de respaldo por si falla la red o el servicio por completo
     return [
         [origen.lat, origen.lng],
         [destino.lat, destino.lng]
