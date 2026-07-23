@@ -299,43 +299,22 @@ async function gestionarPulsacion(e) {
     }
 }
 async function obtenerRutaPorCallesOSRM(origen, destino) {
-    const url = 'https://api.openrouteservice.org/v2/directions/foot-walking/geojson';
-    const apiKey = '5b3ce3597851110001cf6248a3d3421e42204c32ae99cfdf2b374941';
-
-    const bodyData = {
-        coordinates: [
-            [origen.lng, origen.lat],
-            [destino.lng, destino.lat]
-        ],
-        options: {
-            ignore_restrictions: true
-        }
-    };
-
+    const url = `https://routing.openstreetmap.de/routed-bike/route/v1/bike/${origen.lng},${origen.lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson`;
+    
     try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Authorization': apiKey,
-                'Content-Type': 'application/json',
-                'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8'
-            },
-            body: JSON.stringify(bodyData)
-        });
-
+        const response = await fetch(url);
         if (response.ok) {
             const data = await response.json();
-            if (data.features && data.features.length > 0) {
-                return data.features[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);
+            if (data.code === 'Ok' && data.routes && data.routes.length > 0) {
+                return data.routes[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);
             }
         }
     } catch (e) {
-        console.warn("Aviso de enrutamiento con ORS:", e);
+        console.warn("Aviso de enrutamiento alternativo:", e);
     }
     
-    // Respaldo de seguridad curvado por si falla la conexión
-    const latMid = (origen.lat + destino.lat) / 2;
-    const lngMid = (origen.lng + destino.lng) / 2;
+    const latMid = (origen.lat + destino.lat) / 2 + 0.0001;
+    const lngMid = (origen.lng + destino.lng) / 2 + 0.0001;
     return [
         [origen.lat, origen.lng],
         [latMid, lngMid],
