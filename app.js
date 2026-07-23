@@ -158,29 +158,8 @@ async function gestionarPulsacion(e) {
 
         window.puntosDibujoLibre.push(latlng);
 
-        // El radio del punto libre ahora se ajusta proporcionalmente al grosor (mínimo 2, con un tamaño base más pequeño)
-        const radioPuntoLibre = Math.max(2, Math.round(estilos.weight * 0.8));
-
-        const markerLibre = L.circleMarker(latlng, {
-            radius: radioPuntoLibre,
-            color: estilos.color,
-            fillColor: estilos.color,
-            fillOpacity: estilos.opacity,
-            interactive: true,
-            bubblingMouseEvents: false
-        }).addTo(map);
-
-        markerLibre.on('click', function(ev) {
-            if (modoActual === 'borrar') {
-                L.DomEvent.stopPropagation(ev);
-                map.removeLayer(markerLibre);
-                historialAcciones = historialAcciones.filter(item => item.elemento !== markerLibre);
-            }
-        });
-
-        historialAcciones.push({ tipo: 'marcador-libre', elemento: markerLibre });
-
         if (window.puntosDibujoLibre.length > 1) {
+            // Si ya hay más de un punto, creamos la línea y eliminamos el punto anterior para dejar el trazado limpio
             const pAnt = window.puntosDibujoLibre[window.puntosDibujoLibre.length - 2];
             const lineaLibre = L.polyline([pAnt, latlng], {
                 color: estilos.color,
@@ -199,8 +178,34 @@ async function gestionarPulsacion(e) {
             });
 
             historialAcciones.push({ tipo: 'linea', elemento: lineaLibre });
+
+            // Removemos el marcador anterior del historial y del mapa para que no queden puntos intermedios
+            const ultimoMarcadorLibre = historialAcciones.slice().reverse().find(item => item.tipo === 'marcador-libre');
+            if (ultimoMarcadorLibre && ultimoMarcadorLibre.elemento) {
+                map.removeLayer(ultimoMarcadorLibre.elemento);
+                historialAcciones = historialAcciones.filter(item => item !== ultimoMarcadorLibre);
+            }
         }
 
+        const radioPuntoLibre = Math.max(2, Math.round(estilos.weight * 0.8));
+        const markerLibre = L.circleMarker(latlng, {
+            radius: radioPuntoLibre,
+            color: estilos.color,
+            fillColor: estilos.color,
+            fillOpacity: estilos.opacity,
+            interactive: true,
+            bubblingMouseEvents: false
+        }).addTo(map);
+
+        markerLibre.on('click', function(ev) {
+            if (modoActual === 'borrar') {
+                L.DomEvent.stopPropagation(ev);
+                map.removeLayer(markerLibre);
+                historialAcciones = historialAcciones.filter(item => item.elemento !== markerLibre);
+            }
+        });
+
+        historialAcciones.push({ tipo: 'marcador-libre', elemento: markerLibre });
         historialRehacer = [];
         return;
     }
