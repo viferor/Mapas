@@ -52,7 +52,6 @@ function inicializarInterfaz() {
             e.stopPropagation();
             if (modoActual !== 'numero') {
                 setModo('numero');
-                cerrarMenusFlotantes();
             } else {
                 toggleMenu('menu-puntos');
             }
@@ -64,7 +63,6 @@ function inicializarInterfaz() {
             e.stopPropagation();
             if (modoActual !== 'dibujar') {
                 setModo('dibujar');
-                cerrarMenusFlotantes();
             } else {
                 toggleMenu('menu-dibujo');
             }
