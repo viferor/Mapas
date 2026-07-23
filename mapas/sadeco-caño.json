@@ -2690,13 +2690,15 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.782985142795833,
-          37.88553631205246
+          -4.7800937576218265,
+          37.88881788335348
         ]
       },
       "properties": {
-        "tipo": "marcador-libre",
-        "color": "#3388ff"
+        "tipo": "marcador",
+        "numero": 1,
+        "color": "#ff0000",
+        "submodo": "aislado"
       }
     },
     {
@@ -2704,35 +2706,463 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.782454231367512,
-          37.88562732398239
+          -4.780318992773236,
+          37.88737020809277
         ]
       },
       "properties": {
-        "tipo": "marcador-libre",
-        "color": "#3388ff"
+        "tipo": "marcador",
+        "numero": 2,
+        "color": "#ff0000",
+        "submodo": "aislado"
       }
     },
     {
       "type": "Feature",
       "geometry": {
-        "type": "LineString",
+        "type": "Point",
         "coordinates": [
-          [
-            -4.782985142795833,
-            37.88553631205246
-          ],
-          [
-            -4.782454231367512,
-            37.88562732398239
-          ]
+          -4.779739606657851,
+          37.8868406607032
         ]
       },
       "properties": {
-        "tipo": "linea",
+        "tipo": "marcador",
+        "numero": 3,
         "color": "#ff0000",
-        "weight": 5,
-        "opacity": 1
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.779900488908873,
+          37.88608294252775
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 4,
+        "color": "#ff0000",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.779677789052357,
+          37.886728170102984
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 5,
+        "color": "#ff0000",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.778887309107416,
+          37.88664576875233
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 6,
+        "color": "#ff0000",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7786138092806905,
+          37.88550283588103
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 7,
+        "color": "#ff0000",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.778801505240205,
+          37.88634945452615
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 8,
+        "color": "#ff0000",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.777446573957974,
+          37.88703079633232
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 9,
+        "color": "#ff0000",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.776870036478796,
+          37.88636403846689
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 10,
+        "color": "#ff0000",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.776835969779974,
+          37.88540915260146
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 11,
+        "color": "#ff0000",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.776779535372687,
+          37.887375543459406
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 12,
+        "color": "#ff0000",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.777369436959725,
+          37.8881205494336
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 13,
+        "color": "#ff0000",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.778190384947714,
+          37.88815017359167
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 14,
+        "color": "#ff0000",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.778437071065927,
+          37.88732050770454
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 15,
+        "color": "#ff0000",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.778195747689424,
+          37.889081420084494
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 16,
+        "color": "#ff0000",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.778603316058639,
+          37.888450713519745
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 17,
+        "color": "#ff0000",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.77936482538008,
+          37.889195708615354
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 18,
+        "color": "#ff0000",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.778319090748531,
+          37.88783270050438
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 19,
+        "color": "#ff0000",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.779466717472383,
+          37.88775227377161
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 20,
+        "color": "#ff0000",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.779654507306346,
+          37.8869437748144
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 21,
+        "color": "#ff0000",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.780619800812395,
+          37.886948007849
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 22,
+        "color": "#ff0000",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.782492223168378,
+          37.88593879788357
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 23,
+        "color": "#ff0000",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7832215560396145,
+          37.8859811287964
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 24,
+        "color": "#ff0000",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.78356477150842,
+          37.886967432176064
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 25,
+        "color": "#ff0000",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.784149310353768,
+          37.8866287887281
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 26,
+        "color": "#ff0000",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.783763192951337,
+          37.88593879788357
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 27,
+        "color": "#ff0000",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.783248369748108,
+          37.88578640639595
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 28,
+        "color": "#ff0000",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.783398526515729,
+          37.88542659190989
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 29,
+        "color": "#ff0000",
+        "submodo": "aislado"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7839508889108515,
+          37.88531229752873
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 30,
+        "color": "#ff0000",
+        "submodo": "aislado"
       }
     }
   ]
