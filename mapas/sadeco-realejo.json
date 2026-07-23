@@ -1,0 +1,4291 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.779087727978736,
+          37.884486155098976
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.779117223058094,
+          37.88415808322793
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.778792777185226,
+          37.883927373746516
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.778792777185226,
+            37.883927373746516
+          ],
+          [
+            -4.778283316723689,
+            37.88378767774592
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.778283316723689,
+          37.88378767774592
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.778283316723689,
+            37.88378767774592
+          ],
+          [
+            -4.778184106002251,
+            37.88401627106347
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.778184106002251,
+          37.88401627106347
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.778269909869442,
+          37.88379191096194
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.778269909869442,
+            37.88379191096194
+          ],
+          [
+            -4.778095620764193,
+            37.883751695399816
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.778095620764193,
+          37.883751695399816
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.778095620764193,
+            37.883751695399816
+          ],
+          [
+            -4.777575434819255,
+            37.884149616837696
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.777575434819255,
+          37.884149616837696
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.777575434819255,
+            37.884149616837696
+          ],
+          [
+            -4.777596885786058,
+            37.88456446881342
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.777596885786058,
+          37.88456446881342
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.777958870850822,
+          37.8845560024699
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.777958870850822,
+            37.8845560024699
+          ],
+          [
+            -4.77794814536742,
+            37.88428931215172
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.77794814536742,
+          37.88428931215172
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.77794814536742,
+            37.88428931215172
+          ],
+          [
+            -4.77810366487673,
+            37.884302011712585
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.77810366487673,
+          37.884302011712585
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.77810366487673,
+            37.884302011712585
+          ],
+          [
+            -4.777575434819255,
+            37.88427449599464
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.777575434819255,
+          37.88427449599464
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.777575434819255,
+            37.88427449599464
+          ],
+          [
+            -4.777570072077564,
+            37.884147500240005
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.777570072077564,
+          37.884147500240005
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.777570072077564,
+            37.884147500240005
+          ],
+          [
+            -4.777062910783764,
+            37.88421527360885
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.777062910783764,
+          37.88421527360885
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.777062910783764,
+            37.88421527360885
+          ],
+          [
+            -4.776961018691459,
+            37.884611075957444
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.776961018691459,
+          37.884611075957444
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.777057524573446,
+          37.88420471003295
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.777057524573446,
+            37.88420471003295
+          ],
+          [
+            -4.777049480460889,
+            37.884088297155905
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.777049480460889,
+          37.884088297155905
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.777049480460889,
+            37.884088297155905
+          ],
+          [
+            -4.7766365493499645,
+            37.88404808175564
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7766365493499645,
+          37.88404808175564
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.776574877820421,
+            37.88404173195357
+          ],
+          [
+            -4.7765802405621125,
+            37.88404384855432
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7765802405621125,
+          37.88404384855432
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.7765802405621125,
+            37.88404384855432
+          ],
+          [
+            -4.7760439663920815,
+            37.88433805546596
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7760439663920815,
+          37.88433805546596
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.7760439663920815,
+            37.88433805546596
+          ],
+          [
+            -4.775950118412334,
+            37.884543364628826
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.775950118412334,
+          37.884543364628826
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.777591018469186,
+          37.88353796989061
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.777591018469186,
+            37.88353796989061
+          ],
+          [
+            -4.777406003880516,
+            37.88415601895135
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.777406003880516,
+          37.88415601895135
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.776121974664103,
+          37.885490088235976
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.776121974664103,
+            37.885490088235976
+          ],
+          [
+            -4.7762131412730255,
+            37.88554300219565
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7762131412730255,
+          37.88554300219565
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.7762131412730255,
+            37.88554300219565
+          ],
+          [
+            -4.776269450060878,
+            37.88588588373266
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.776269450060878,
+          37.88588588373266
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.776269450060878,
+            37.88588588373266
+          ],
+          [
+            -4.776319904521867,
+            37.88618194875076
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.776319904521867,
+          37.88618194875076
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.776319904521867,
+            37.88618194875076
+          ],
+          [
+            -4.776244085013316,
+            37.88675365396283
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.776244085013316,
+          37.88675365396283
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.776244085013316,
+            37.88675365396283
+          ],
+          [
+            -4.776229860115117,
+            37.88742660432013
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.776229860115117,
+          37.88742660432013
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.776229860115117,
+            37.88742660432013
+          ],
+          [
+            -4.7762685225729316,
+            37.88784178035634
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7762685225729316,
+          37.88784178035634
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.7762685225729316,
+            37.88784178035634
+          ],
+          [
+            -4.776700963504434,
+            37.88781851935609
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.776700963504434,
+          37.88781851935609
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.776700963504434,
+            37.88781851935609
+          ],
+          [
+            -4.776840394788654,
+            37.887915877933814
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.776840394788654,
+          37.887915877933814
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.776840394788654,
+            37.887915877933814
+          ],
+          [
+            -4.776698282133589,
+            37.88781428637154
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.776698282133589,
+          37.88781428637154
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.776698282133589,
+            37.88781428637154
+          ],
+          [
+            -4.776816262451006,
+            37.88775502456214
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.776816262451006,
+          37.88775502456214
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.776269262797573,
+            37.88786508217021
+          ],
+          [
+            -4.776277306910108,
+            37.88785238322383
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.776277306910108,
+          37.88785238322383
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.776277306910108,
+            37.88785238322383
+          ],
+          [
+            -4.77624781183077,
+            37.88851907494799
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.77624781183077,
+          37.88851907494799
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.77624781183077,
+            37.88851907494799
+          ],
+          [
+            -4.77654812536599,
+            37.88855717143559
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.77654812536599,
+          37.88855717143559
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.77654812536599,
+            37.88855717143559
+          ],
+          [
+            -4.776526674399187,
+            37.888603733782595
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.776526674399187,
+          37.888603733782595
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.776526674399187,
+            37.888603733782595
+          ],
+          [
+            -4.776430145048574,
+            37.8886333643517
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.776430145048574,
+          37.8886333643517
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.776430145048574,
+            37.8886333643517
+          ],
+          [
+            -4.77639796859837,
+            37.888709557188974
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.77639796859837,
+          37.888709557188974
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.77639796859837,
+            37.888709557188974
+          ],
+          [
+            -4.776365792148166,
+            37.88874977004351
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.776365792148166,
+          37.88874977004351
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.776365792148166,
+            37.88874977004351
+          ],
+          [
+            -4.77625317457246,
+            37.88875188650896
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.77625317457246,
+          37.88875188650896
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.77625317457246,
+            37.88875188650896
+          ],
+          [
+            -4.776242449089059,
+            37.88852754083583
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.776242449089059,
+          37.88852754083583
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.776101916722276,
+          37.88550403349276
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.776101916722276,
+            37.88550403349276
+          ],
+          [
+            -4.7756782601279495,
+            37.88571992216832
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7756782601279495,
+          37.88571992216832
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.7756782601279495,
+            37.88571992216832
+          ],
+          [
+            -4.774932839031621,
+            37.885901945461825
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.774932839031621,
+          37.885901945461825
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.774932839031621,
+            37.885901945461825
+          ],
+          [
+            -4.773351378893995,
+            37.88618851665475
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.773351378893995,
+          37.88618851665475
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.771983410388164,
+          37.8864806407385
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.771983410388164,
+            37.8864806407385
+          ],
+          [
+            -4.771897636440999,
+            37.886522305156156
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.771897636440999,
+          37.886522305156156
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.772921797526698,
+          37.886220490493336
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.772921797526698,
+            37.886220490493336
+          ],
+          [
+            -4.7728668294242675,
+            37.886009894646016
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7728668294242675,
+          37.886009894646016
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.7728668294242675,
+            37.886009894646016
+          ],
+          [
+            -4.772767618702829,
+            37.885973913385726
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.772767618702829,
+          37.885973913385726
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.772767618702829,
+            37.885973913385726
+          ],
+          [
+            -4.772771640759098,
+            37.885841629189414
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.772771640759098,
+          37.885841629189414
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.772771640759098,
+            37.885841629189414
+          ],
+          [
+            -4.772492778190681,
+            37.88580988094694
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.772492778190681,
+          37.88580988094694
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.772492778190681,
+            37.88580988094694
+          ],
+          [
+            -4.772421116750019,
+            37.885863239297265
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.772421116750019,
+          37.885863239297265
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.772421116750019,
+            37.885863239297265
+          ],
+          [
+            -4.772207947767433,
+            37.885847365182386
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.772207947767433,
+          37.885847365182386
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.773619236031985,
+          37.886108048626596
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.773619236031985,
+            37.886108048626596
+          ],
+          [
+            -4.773597785065183,
+            37.88598105603404
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.773597785065183,
+          37.88598105603404
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.773597785065183,
+            37.88598105603404
+          ],
+          [
+            -4.773308197013365,
+            37.88604455235771
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.773308197013365,
+          37.88604455235771
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.773308197013365,
+            37.88604455235771
+          ],
+          [
+            -4.773313559755075,
+            37.886137680200015
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.773313559755075,
+          37.886137680200015
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.773313559755075,
+            37.886137680200015
+          ],
+          [
+            -4.773581696840091,
+            37.88612074787383
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.773581696840091,
+          37.88612074787383
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.773716098869297,
+          37.88414552501265
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.773716098869297,
+            37.88414552501265
+          ],
+          [
+            -4.773510973999266,
+            37.883966672282
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.773510973999266,
+          37.883966672282
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.773510973999266,
+            37.883966672282
+          ],
+          [
+            -4.773427851502902,
+            37.88379099402904
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.773427851502902,
+          37.88379099402904
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.773427851502902,
+            37.88379099402904
+          ],
+          [
+            -4.7734425990425695,
+            37.88367352219235
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7734425990425695,
+          37.88367352219235
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.7734425990425695,
+            37.88367352219235
+          ],
+          [
+            -4.7733903123110055,
+            37.88367458049803
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7733903123110055,
+          37.88367458049803
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.7733903123110055,
+            37.88367458049803
+          ],
+          [
+            -4.7733755647713165,
+            37.88375606998905
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7733755647713165,
+          37.88375606998905
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.7733755647713165,
+            37.88375606998905
+          ],
+          [
+            -4.773426510817479,
+            37.883796285548804
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.773426510817479,
+          37.883796285548804
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.773371542715048,
+          37.88376771133756
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.773371542715048,
+            37.88376771133756
+          ],
+          [
+            -4.77308195466323,
+            37.88372643745729
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.77308195466323,
+          37.88372643745729
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.773393457749815,
+          37.883663730810134
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.773393457749815,
+            37.883663730810134
+          ],
+          [
+            -4.773446586910387,
+            37.88317141536088
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.773446586910387,
+          37.88317141536088
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.773429157999852,
+          37.88342117678052
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.773429157999852,
+            37.88342117678052
+          ],
+          [
+            -4.773797190554424,
+            37.883479553142834
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.773797190554424,
+          37.883479553142834
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.773797190554424,
+            37.883479553142834
+          ],
+          [
+            -4.773881961761758,
+            37.88348282491471
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.773881961761758,
+          37.88348282491471
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.773881961761758,
+            37.88348282491471
+          ],
+          [
+            -4.773873917649201,
+            37.883690253072814
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.773873917649201,
+          37.883690253072814
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.773873917649201,
+            37.883690253072814
+          ],
+          [
+            -4.775056402194103,
+            37.88380031675617
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.775056402194103,
+          37.88380031675617
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.775056402194103,
+            37.88380031675617
+          ],
+          [
+            -4.775042995339857,
+            37.88340239343088
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.775042995339857,
+          37.88340239343088
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.775042995339857,
+            37.88340239343088
+          ],
+          [
+            -4.7738765990200465,
+            37.883343128070806
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7738765990200465,
+          37.883343128070806
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.7738765990200465,
+            37.883343128070806
+          ],
+          [
+            -4.773873917649201,
+            37.88347435844684
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.773873917649201,
+          37.88347435844684
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.774670345977708,
+          37.88336428284182
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.774670345977708,
+            37.88336428284182
+          ],
+          [
+            -4.774675708719419,
+            37.882964240528736
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.774675708719419,
+          37.882964240528736
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.774675708719419,
+            37.882964240528736
+          ],
+          [
+            -4.774722431130679,
+            37.882832859901214
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.774722431130679,
+          37.882832859901214
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.774722431130679,
+            37.882832859901214
+          ],
+          [
+            -4.774784102660222,
+            37.88261696276171
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.774784102660222,
+          37.88261696276171
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7754197672035845,
+          37.883008051043525
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.7754197672035845,
+            37.883008051043525
+          ],
+          [
+            -4.775225367816937,
+            37.88301122598918
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.775225367816937,
+          37.88301122598918
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.775225367816937,
+            37.88301122598918
+          ],
+          [
+            -4.775028287059462,
+            37.883016517564975
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.775028287059462,
+          37.883016517564975
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.775028287059462,
+            37.883016517564975
+          ],
+          [
+            -4.7747762381995384,
+            37.88301863419518
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7747762381995384,
+          37.88301863419518
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.7747762381995384,
+            37.88301863419518
+          ],
+          [
+            -4.774679708848946,
+            37.88301334261954
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.774679708848946,
+          37.88301334261954
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.776113118368406,
+          37.88335994010727
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.776113118368406,
+            37.88335994010727
+          ],
+          [
+            -4.775576844198375,
+            37.88327421693236
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.775576844198375,
+          37.88327421693236
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.775576844198375,
+            37.88327421693236
+          ],
+          [
+            -4.7753313642401345,
+            37.883230820607444
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7753313642401345,
+          37.883230820607444
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.7753313642401345,
+            37.883230820607444
+          ],
+          [
+            -4.775084678121922,
+            37.88323611216746
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.775084678121922,
+          37.88323611216746
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.775084678121922,
+            37.88323611216746
+          ],
+          [
+            -4.774662190808349,
+            37.88325198147446
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.774662190808349,
+          37.88325198147446
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.774657051437539,
+          37.882932481690176
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.774657051437539,
+            37.882932481690176
+          ],
+          [
+            -4.77424680169748,
+            37.88292401515908
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.77424680169748,
+          37.88292401515908
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.77424680169748,
+            37.88292401515908
+          ],
+          [
+            -4.774273615405973,
+            37.88275256769461
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.774273615405973,
+          37.88275256769461
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.774273615405973,
+            37.88275256769461
+          ],
+          [
+            -4.7743084732270225,
+            37.88264461908625
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7743084732270225,
+          37.88264461908625
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.7743084732270225,
+            37.88264461908625
+          ],
+          [
+            -4.774710678854547,
+            37.882763150882965
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.774710678854547,
+          37.882763150882965
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.774710678854547,
+            37.882763150882965
+          ],
+          [
+            -4.77466777692094,
+            37.8829176652601
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.77466777692094,
+          37.8829176652601
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.775496320513636,
+          37.88432097962338
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.775496320513636,
+            37.88432097962338
+          ],
+          [
+            -4.775367614712838,
+            37.88413895242197
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.775367614712838,
+          37.88413895242197
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.775367614712838,
+            37.88413895242197
+          ],
+          [
+            -4.775238908912022,
+            37.883931525527714
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.775238908912022,
+          37.883931525527714
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.775238908912022,
+            37.883931525527714
+          ],
+          [
+            -4.7752013697201265,
+            37.88380241257403
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.772932594702292,
+          37.88342770304948
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.780192824914156,
+          37.886454915284006
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.780192824914156,
+            37.886454915284006
+          ],
+          [
+            -4.780163329834798,
+            37.886260194136405
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.780163329834798,
+          37.886260194136405
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.780163329834798,
+            37.886260194136405
+          ],
+          [
+            -4.78014992298055,
+            37.88616071682969
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.78014992298055,
+          37.88616071682969
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.780133834755439,
+          37.88615436720979
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.780133834755439,
+            37.88615436720979
+          ],
+          [
+            -4.780117746530347,
+            37.8860612393886
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.780117746530347,
+          37.8860612393886
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.780117746530347,
+            37.8860612393886
+          ],
+          [
+            -4.780283991523059,
+            37.8860125588897
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.780283991523059,
+          37.8860125588897
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.780098976934389,
+          37.886063355931284
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.780098976934389,
+            37.886063355931284
+          ],
+          [
+            -4.77968872719433,
+            37.886046423588
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.77968872719433,
+          37.886046423588
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.779742354611317,
+          37.885794554521716
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.77931869801701,
+          37.885731057982476
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.77931869801701,
+            37.885731057982476
+          ],
+          [
+            -4.779267751970849,
+            37.88581572002262
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.779267751970849,
+          37.88581572002262
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.779267751970849,
+            37.88581572002262
+          ],
+          [
+            -4.779152453024299,
+            37.88590884815436
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.779152453024299,
+          37.88590884815436
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.779152453024299,
+            37.88590884815436
+          ],
+          [
+            -4.779246301004045,
+            37.8861120363966
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.779246301004045,
+          37.8861120363966
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.779246301004045,
+            37.8861120363966
+          ],
+          [
+            -4.7793267421295464,
+            37.886105686772495
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7793267421295464,
+          37.886105686772495
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.7793267421295464,
+            37.886105686772495
+          ],
+          [
+            -4.779307972533609,
+            37.886239028763256
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.779307972533609,
+          37.886239028763256
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.779484943009702,
+          37.88624114530085
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.779484943009702,
+            37.88624114530085
+          ],
+          [
+            -4.7794903057514135,
+            37.88609087098085
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7794903057514135,
+          37.88609087098085
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.7794903057514135,
+            37.88609087098085
+          ],
+          [
+            -4.779678001710928,
+            37.886035840871465
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.779678001710928,
+          37.886035840871465
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.779729019001081,
+          37.8857839651857
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.779729019001081,
+            37.8857839651857
+          ],
+          [
+            -4.779664666100672,
+            37.886029484657534
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.779664666100672,
+          37.886029484657534
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.779664666100672,
+            37.886029484657534
+          ],
+          [
+            -4.779726337630235,
+            37.88577973208416
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.779726337630235,
+          37.88577973208416
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.779726337630235,
+            37.88577973208416
+          ],
+          [
+            -4.779299999665044,
+            37.885733167951386
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.779299999665044,
+          37.885733167951386
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.779299999665044,
+            37.885733167951386
+          ],
+          [
+            -4.779257097731458,
+            37.885648505816334
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.779257097731458,
+          37.885648505816334
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.779257097731458,
+            37.885648505816334
+          ],
+          [
+            -4.779246372248057,
+            37.885544794568254
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.779246372248057,
+          37.885544794568254
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.779246372248057,
+            37.885544794568254
+          ],
+          [
+            -4.779275867327396,
+            37.88534160476083
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.779275867327396,
+          37.88534160476083
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7794769701411575,
+          37.88623478910468
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.7794769701411575,
+            37.88623478910468
+          ],
+          [
+            -4.779294636923353,
+            37.88624537179262
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.779294636923353,
+          37.88624537179262
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.779106740642459,
+          37.88412428765347
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.779106740642459,
+            37.88412428765347
+          ],
+          [
+            -4.778766206544499,
+            37.88393379355085
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.778766206544499,
+          37.88393379355085
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.773329991270324,
+          37.886174332685634
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.773329991270324,
+            37.886174332685634
+          ],
+          [
+            -4.772909016046843,
+            37.88622724615359
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.772909016046843,
+          37.88622724615359
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.772909016046843,
+            37.88622724615359
+          ],
+          [
+            -4.772364697764276,
+            37.886362704458335
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.772364697764276,
+          37.886362704458335
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.772364697764276,
+            37.886362704458335
+          ],
+          [
+            -4.77201075681205,
+            37.88647699720912
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 5,
+        "opacity": 0.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.77201075681205,
+          37.88647699720912
+        ]
+      },
+      "properties": {
+        "tipo": "marcador-libre",
+        "htmlIcon": "<div style=\"width: 8px; height: 8px; background-color: #ff0000; opacity: 0.4; border-radius: 50%; border: 1px solid white;\"></div>"
+      }
+    }
+  ]
+}
