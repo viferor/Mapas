@@ -74,7 +74,6 @@ function inicializarInterfaz() {
     if (btnDeshacer) btnDeshacer.addEventListener('click', deshacerUltimo);
     if (btnRehacer) btnRehacer.addEventListener('click', rehacerProximo);
     
-    // Añadimos confirmación de seguridad para evitar borrados accidentales por error táctil
     if (btnBorrarTodo) {
         btnBorrarTodo.addEventListener('click', () => {
             if (confirm("¿Estás seguro de que quieres borrar todo el mapa? Esta acción eliminará los elementos actuales.")) {
@@ -199,16 +198,21 @@ async function gestionarPulsacion(e) {
             const ultimoMarcadorLibre = historialAcciones.slice().reverse().find(item => item.tipo === 'marcador-libre');
             if (ultimoMarcadorLibre && ultimoMarcadorLibre.elemento) {
                 map.removeLayer(ultimoMarcadorLibre.elemento);
-                historialAcciones = historialAcciones.filter(item => item !== ultimoMarcadorLibre);
+                historialAcciones = historialAcciones.filter(item => item.elemento !== ultimoMarcadorLibre);
             }
         }
 
         const radioPuntoLibre = Math.max(2, Math.round(estilos.weight * 0.8));
-        const markerLibre = L.circleMarker(latlng, {
-            radius: radioPuntoLibre,
-            color: estilos.color,
-            fillColor: estilos.color,
-            fillOpacity: estilos.opacity,
+        
+        // Convertimos el punto de dibujo libre en un marcador arrastrable (draggable: true)
+        const markerLibre = L.marker(latlng, {
+            icon: L.divIcon({
+                className: 'circle-marker-icon',
+                html: `<div style="width: ${radioPuntoLibre*2}px; height: ${radioPuntoLibre*2}px; background-color: ${estilos.color}; opacity: ${estilos.opacity}; border-radius: 50%; border: 1px solid white;"></div>`,
+                iconSize: [radioPuntoLibre*2, radioPuntoLibre*2],
+                iconAnchor: [radioPuntoLibre, radioPuntoLibre]
+            }),
+            draggable: true,
             interactive: true,
             bubblingMouseEvents: false
         }).addTo(map);
@@ -236,7 +240,8 @@ async function gestionarPulsacion(e) {
             iconAnchor: [14, 14]
         });
 
-        const marker = L.marker(latlng, { icon: numberIcon, interactive: true, bubblingMouseEvents: false }).addTo(map);
+        // Hacemos el marcador numérico arrastrable con draggable: true
+        const marker = L.marker(latlng, { icon: numberIcon, draggable: true, interactive: true, bubblingMouseEvents: false }).addTo(map);
         
         setTimeout(() => {
             const el = marker.getElement();
@@ -366,8 +371,12 @@ function actualizarEstilosGlobales() {
         if (item.tipo === 'linea') {
             item.elemento.setStyle({ color: estilos.color, weight: estilos.weight, opacity: estilos.opacity });
         } else if (item.tipo === 'marcador-libre') {
-            item.elemento.setStyle({ color: estilos.color, fillColor: estilos.color, fillOpacity: estilos.opacity });
-            item.elemento.setRadius(nuevoRadioLibre);
+            item.elemento.setIcon(L.divIcon({
+                className: 'circle-marker-icon',
+                html: `<div style="width: ${nuevoRadioLibre*2}px; height: ${nuevoRadioLibre*2}px; background-color: ${estilos.color}; opacity: ${estilos.opacity}; border-radius: 50%; border: 1px solid white;"></div>`,
+                iconSize: [nuevoRadioLibre*2, nuevoRadioLibre*2],
+                iconAnchor: [nuevoRadioLibre, nuevoRadioLibre]
+            }));
         }
     });
 }
@@ -412,10 +421,11 @@ function exportarDatosMapa() {
             });
         } else if (item.tipo === 'marcador-libre') {
             const ll = item.elemento.getLatLng();
+            const iconHtml = item.elemento.options.icon.options.html || "";
             elementos.push({
                 type: "Feature",
                 geometry: { type: "Point", coordinates: [ll.lng, ll.lat] },
-                properties: { tipo: "marcador-libre", color: item.elemento.options.color, radius: item.elemento.options.radius, opacity: item.elemento.options.fillOpacity }
+                properties: { tipo: "marcador-libre", htmlIcon: iconHtml }
             });
         }
     });
@@ -625,7 +635,7 @@ async function cargarMapaDesdeGithub(nombreArchivo) {
                     iconAnchor: [14, 14]
                 });
 
-                const marker = L.marker(latlng, { icon: numberIcon, interactive: true, bubblingMouseEvents: false }).addTo(map);
+                const marker = L.marker(latlng, { icon: numberIcon, draggable: true, interactive: true, bubblingMouseEvents: false }).addTo(map);
                 setTimeout(() => {
                     const el = marker.getElement();
                     if (el) el.style.backgroundColor = color;
@@ -648,11 +658,16 @@ async function cargarMapaDesdeGithub(nombreArchivo) {
             } else if (feature.properties.tipo === 'marcador-libre') {
                 const coord = feature.geometry.coordinates;
                 const latlng = [coord[1], coord[0]];
-                const markerLibre = L.circleMarker(latlng, {
-                    radius: feature.properties.radius || 4,
-                    color: feature.properties.color,
-                    fillColor: feature.properties.color,
-                    fillOpacity: feature.properties.opacity !== undefined ? feature.properties.opacity : 1,
+                const htmlIconStr = feature.properties.htmlIcon || `<div style="width: 8px; height: 8px; background-color: #3388ff; border-radius: 50%; border: 1px solid white;"></div>`;
+
+                const markerLibre = L.marker(latlng, {
+                    icon: L.divIcon({
+                        className: 'circle-marker-icon',
+                        html: htmlIconStr,
+                        iconSize: [12, 12],
+                        iconAnchor: [6, 6]
+                    }),
+                    draggable: true,
                     interactive: true,
                     bubblingMouseEvents: false
                 }).addTo(map);
