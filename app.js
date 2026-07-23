@@ -499,4 +499,3 @@ async function compartirMapaEspecifico(fileName) {
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(link)}`, '_blank');
     cerrarModal();
 }
-
