@@ -236,6 +236,7 @@ async function gestionarPulsacion(e) {
         contadorNumero++;
     }
 }
+
 async function obtenerRutaPorCallesOSRM(origen, destino) {
     const url = `https://routing.openstreetmap.de/routed-bike/route/v1/bike/${origen.lng},${origen.lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson`;
     try {
@@ -249,7 +250,6 @@ async function obtenerRutaPorCallesOSRM(origen, destino) {
     } catch (e) {}
     return [ [origen.lat, origen.lng], [destino.lat, destino.lng] ];
 }
-
 function manejarArchivoGPX(event) {
     const archivo = event.target.files[0];
     if (!archivo) return;
@@ -275,6 +275,7 @@ function manejarArchivoGPX(event) {
             if (coordenadas.length === 0) extraerPuntos(puntosRte);
 
             if (coordenadas.length > 0) {
+                let grupoCapas = L.featureGroup();
                 const estilos = obtenerEstilosActuales();
                 const linea = L.polyline(coordenadas, { color: estilos.color, weight: estilos.weight, interactive: true }).addTo(map);
                 
@@ -288,8 +289,10 @@ function manejarArchivoGPX(event) {
                 });
 
                 historialAcciones.push({ tipo: 'linea', elemento: linea });
+                grupoCapas.addLayer(linea);
                 historialRehacer = [];
-                map.fitBounds(linea.getBounds());
+                
+                enfocarMapaEnGrupo(grupoCapas, map);
                 mostrarToast("¡GPX importado con éxito!");
             } else {
                 alert("No se han encontrado coordenadas válidas en el archivo GPX.");
@@ -429,7 +432,7 @@ async function abrirModalGithub(accion) {
         const archivos = res.ok ? await res.json() : [];
         const jsonFiles = archivos.filter(f => f.name.endsWith('.json'));
 
-        lista.innerHTML = accion === 'guardar' ? `<button class="btn btn-blue" style="width: 100%; margin-bottom:10px; border-radius:6px;" onclick="promptGuardارNuevo()">+ Nuevo...</button>` : '';
+        lista.innerHTML = accion === 'guardar' ? `<button class="btn btn-blue" style="width: 100%; margin-bottom:10px; border-radius:6px;" onclick="promptGuardarNuevo()">+ Nuevo...</button>` : '';
 
         if (jsonFiles.length === 0 && accion !== 'guardar') {
             lista.innerHTML = 'No hay mapas guardados.';
@@ -472,20 +475,7 @@ async function cargarMapaDesdeGithub(fileName) {
         ultimoPuntoTramo = null;
         contadorNumero = 1;
 
-        geojson.features.forEach(f => {
-            if (f.properties.tipo === 'linea') {
-                const ll = f.geometry.coordinates.map(c => [c[1], c[0]]);
-                const l = L.polyline(ll, { color: f.properties.color, interactive: true }).addTo(map);
-                l.on('click', ev => { if(modoActual==='borrar'){ L.DomEvent.stopPropagation(ev); map.removeLayer(l); historialAcciones = historialAcciones.filter(item => item.elemento !== l); mostrarToast("Línea borrada"); }});
-                historialAcciones.push({ tipo: 'linea', elemento: l });
-            } else if (f.properties.tipo === 'marcador') {
-                const latlng = [f.geometry.coordinates[1], f.geometry.coordinates[0]];
-                const m = L.marker(latlng, { icon: L.divIcon({ className: 'number-icon', html: `<span>${f.properties.numero}</span>`, iconSize: [28,28], iconAnchor:[14,14] }), interactive: true }).addTo(map);
-                m.on('click', ev => { if(modoActual==='borrar'){ L.DomEvent.stopPropagation(ev); map.removeLayer(m); historialAcciones = historialAcciones.filter(item => item.elemento !== m); recalcularContadorNumeros(); mostrarToast("Punto borrado"); }});
-                historialAcciones.push({ tipo: 'marcador', elemento: m, numero: f.properties.numero });
-            }
-        });
-        recalcularContadorNumeros();
+        procesarYAnadirGeoJSON(geojson, map);
         cerrarModal();
         mostrarToast("¡Mapa cargado!");
     } catch (e) { alert("Error al cargar el mapa"); }
@@ -499,3 +489,60 @@ async function compartirMapaEspecifico(fileName) {
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(link)}`, '_blank');
     cerrarModal();
 }
+
+function procesarYAnadirGeoJSON(geojson, mapInstance) {
+    let grupoCapas = L.featureGroup();
+
+    geojson.features.forEach(f => {
+        if (f.properties.tipo === 'linea') {
+            const ll = f.geometry.coordinates.map(c => [c[1], c[0]]);
+            const l = L.polyline(ll, { color: f.properties.color || '#3388ff', weight: 4, interactive: true }).addTo(mapInstance);
+            
+            l.on('click', ev => { 
+                if (modoActual === 'borrar') { 
+                    L.DomEvent.stopPropagation(ev); 
+                    mapInstance.removeLayer(l); 
+                    historialAcciones = historialAcciones.filter(item => item.elemento !== l); 
+                    mostrarToast("Línea borrada"); 
+                } 
+            });
+            
+            historialAcciones.push({ tipo: 'linea', elemento: l });
+            grupoCapas.addLayer(l);
+
+        } else if (f.properties.tipo === 'marcador') {
+            const latlng = [f.geometry.coordinates[1], f.geometry.coordinates[0]];
+            const m = L.marker(latlng, { 
+                icon: L.divIcon({ className: 'number-icon', html: `<span>${f.properties.numero}</span>`, iconSize: [28,28], iconAnchor:[14,14] }), 
+                interactive: true 
+            }).addTo(mapInstance);
+            
+            m.on('click', ev => { 
+                if (modoActual === 'borrar') { 
+                    L.DomEvent.stopPropagation(ev); 
+                    mapInstance.removeLayer(m); 
+                    historialAcciones = historialAcciones.filter(item => item.elemento !== m); 
+                    recalcularContadorNumeros(); 
+                    mostrarToast("Punto borrado"); 
+                } 
+            });
+            
+            historialAcciones.push({ tipo: 'marcador', elemento: m, numero: f.properties.numero });
+            grupoCapas.addLayer(m);
+        }
+    });
+
+    recalcularContadorNumeros();
+    enfocarMapaEnGrupo(grupoCapas, mapInstance);
+}
+
+function enfocarMapaEnGrupo(grupoCapas, mapInstance) {
+    if (grupoCapas.getLayers().length > 0) {
+        let limites = grupoCapas.getBounds();
+        mapInstance.fitBounds(limites, {
+            padding: [50, 50],
+            maxZoom: 16
+        });
+    }
+}
+
