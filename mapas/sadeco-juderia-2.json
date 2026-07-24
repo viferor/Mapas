@@ -12,9 +12,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 1,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 1
       }
     },
     {
@@ -78,9 +76,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -94,9 +90,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 2,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 2
       }
     },
     {
@@ -140,9 +134,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -156,9 +148,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 3,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 3
       }
     },
     {
@@ -206,9 +196,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -222,9 +210,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 4,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 4
       }
     },
     {
@@ -296,9 +282,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -312,9 +296,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 5,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 5
       }
     },
     {
@@ -358,9 +340,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -374,9 +354,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 6,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 6
       }
     },
     {
@@ -416,9 +394,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -432,9 +408,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 7,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 7
       }
     },
     {
@@ -482,9 +456,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -498,9 +470,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 8,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 8
       }
     },
     {
@@ -536,9 +506,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -552,9 +520,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 9,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 9
       }
     },
     {
@@ -586,9 +552,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -602,9 +566,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 10,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 10
       }
     },
     {
@@ -618,9 +580,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 11,
-        "color": "#3388ff",
-        "submodo": "aislado"
+        "numero": 11
       }
     },
     {
@@ -640,9 +600,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -656,9 +614,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 12,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 12
       }
     },
     {
@@ -678,9 +634,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -700,9 +654,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -716,9 +668,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 13,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 13
       }
     },
     {
@@ -750,9 +700,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -766,9 +714,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 14,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 14
       }
     },
     {
@@ -812,9 +758,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -828,9 +772,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 15,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 15
       }
     },
     {
@@ -870,9 +812,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -886,9 +826,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 16,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 16
       }
     },
     {
@@ -956,9 +894,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -972,9 +908,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 17,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 17
       }
     },
     {
@@ -1002,9 +936,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -1018,9 +950,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 18,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 18
       }
     },
     {
@@ -1044,9 +974,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -1060,9 +988,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 19,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 19
       }
     },
     {
@@ -1082,23 +1008,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -4.781775747315312,
-          37.87821146859042
-        ]
-      },
-      "properties": {
-        "tipo": "marcador-libre",
-        "htmlIcon": "<div style=\"width: 6px; height: 6px; background-color: #3388ff; opacity: 1; border-radius: 50%; border: 1px solid white;\"></div>"
+        "color": "#3388ff"
       }
     },
     {
@@ -1138,9 +1048,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -1154,9 +1062,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 20,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 20
       }
     },
     {
@@ -1204,9 +1110,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -1220,9 +1124,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 21,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 21
       }
     },
     {
@@ -1250,9 +1152,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -1266,9 +1166,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 22,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 22
       }
     },
     {
@@ -1282,9 +1180,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 23,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 23
       }
     },
     {
@@ -1320,9 +1216,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -1336,9 +1230,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 24,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 24
       }
     },
     {
@@ -1462,9 +1354,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -1478,9 +1368,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 25,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 25
       }
     },
     {
@@ -1588,9 +1476,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -1604,9 +1490,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 26,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 26
       }
     },
     {
@@ -1674,9 +1558,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -1690,9 +1572,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 27,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 27
       }
     },
     {
@@ -1724,9 +1604,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -1740,9 +1618,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 28,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 28
       }
     },
     {
@@ -1806,9 +1682,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -1822,9 +1696,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 29,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 29
       }
     },
     {
@@ -1876,9 +1748,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -1892,9 +1762,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 30,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 30
       }
     },
     {
@@ -1982,9 +1850,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -1998,9 +1864,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 31,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 31
       }
     },
     {
@@ -2028,9 +1892,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -2044,9 +1906,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 32,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 32
       }
     },
     {
@@ -2066,9 +1926,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -2082,9 +1940,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 33,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 33
       }
     },
     {
@@ -2140,9 +1996,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -2156,9 +2010,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 34,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 34
       }
     },
     {
@@ -2234,9 +2086,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -2250,9 +2100,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 35,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 35
       }
     },
     {
@@ -2300,9 +2148,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -2316,9 +2162,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 36,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 36
       }
     },
     {
@@ -2346,9 +2190,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -2362,9 +2204,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 37,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 37
       }
     },
     {
@@ -2384,9 +2224,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -2400,9 +2238,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 38,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 38
       }
     },
     {
@@ -2434,9 +2270,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -2450,9 +2284,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 39,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 39
       }
     },
     {
@@ -2476,9 +2308,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -2492,9 +2322,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 40,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 40
       }
     },
     {
@@ -2530,9 +2358,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -2546,9 +2372,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 41,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 41
       }
     },
     {
@@ -2572,9 +2396,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -2588,9 +2410,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 42,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 42
       }
     },
     {
@@ -2630,9 +2450,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -2646,9 +2464,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 43,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 43
       }
     },
     {
@@ -2704,9 +2520,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -2720,9 +2534,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 44,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 44
       }
     },
     {
@@ -2770,9 +2582,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -2786,9 +2596,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 45,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 45
       }
     },
     {
@@ -2892,9 +2700,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -2908,9 +2714,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 46,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 46
       }
     },
     {
@@ -2946,9 +2750,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -2962,9 +2764,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 47,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 47
       }
     },
     {
@@ -3036,9 +2836,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -3052,9 +2850,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 48,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 48
       }
     },
     {
@@ -3086,9 +2882,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -3102,9 +2896,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 49,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 49
       }
     },
     {
@@ -3136,9 +2928,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -3152,9 +2942,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 50,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 50
       }
     },
     {
@@ -3198,9 +2986,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -3214,9 +3000,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 51,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 51
       }
     },
     {
@@ -3248,9 +3032,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -3264,9 +3046,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 52,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 52
       }
     },
     {
@@ -3286,9 +3066,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -3302,9 +3080,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 53,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 53
       }
     },
     {
@@ -3348,9 +3124,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -3364,9 +3138,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 54,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 54
       }
     },
     {
@@ -3426,9 +3198,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -3442,9 +3212,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 55,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 55
       }
     },
     {
@@ -3484,9 +3252,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -3500,9 +3266,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 56,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 56
       }
     },
     {
@@ -3538,9 +3302,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -3554,9 +3316,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 57,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 57
       }
     },
     {
@@ -3604,9 +3364,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -3620,9 +3378,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 58,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 58
       }
     },
     {
@@ -3642,9 +3398,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -3658,9 +3412,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 59,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 59
       }
     },
     {
@@ -3684,9 +3436,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -3700,9 +3450,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 60,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 60
       }
     },
     {
@@ -3726,9 +3474,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -3742,9 +3488,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 61,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 61
       }
     },
     {
@@ -3824,9 +3568,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -3840,9 +3582,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 62,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 62
       }
     },
     {
@@ -3934,9 +3674,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -3950,9 +3688,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 63,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 63
       }
     },
     {
@@ -4008,9 +3744,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -4024,9 +3758,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 64,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 64
       }
     },
     {
@@ -4066,9 +3798,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -4082,9 +3812,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 65,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 65
       }
     },
     {
@@ -4116,9 +3844,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -4132,9 +3858,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 66,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 66
       }
     },
     {
@@ -4186,9 +3910,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -4202,9 +3924,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 67,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 67
       }
     },
     {
@@ -4236,9 +3956,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -4252,9 +3970,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 68,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 68
       }
     },
     {
@@ -4302,9 +4018,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -4318,9 +4032,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 69,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 69
       }
     },
     {
@@ -4352,9 +4064,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -4368,9 +4078,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 70,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 70
       }
     },
     {
@@ -4406,9 +4114,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -4422,9 +4128,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 71,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 71
       }
     },
     {
@@ -4452,9 +4156,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -4468,9 +4170,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 72,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 72
       }
     },
     {
@@ -4484,9 +4184,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 73,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 73
       }
     },
     {
@@ -4582,9 +4280,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -4598,9 +4294,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 74,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 74
       }
     },
     {
@@ -4656,9 +4350,7 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#3388ff"
       }
     },
     {
@@ -4672,9 +4364,1863 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 75,
-        "color": "#3388ff",
-        "submodo": "ruta"
+        "numero": 75
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.782368187170506,
+            37.879205999471445
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.782673128788702,
+            37.87927737547458
+          ],
+          [
+            -4.7826626554206095,
+            37.87928124657667
+          ],
+          [
+            -4.78266229820747,
+            37.87928140803277
+          ],
+          [
+            -4.782660765481524,
+            37.879282093623516
+          ],
+          [
+            -4.782657801897586,
+            37.879283384141566
+          ],
+          [
+            -4.782655502849594,
+            37.87928443244318
+          ],
+          [
+            -4.782653459269568,
+            37.87928531967636
+          ],
+          [
+            -4.782651569371411,
+            37.879286287249876
+          ],
+          [
+            -4.7826496789411985,
+            37.879287215024696
+          ],
+          [
+            -4.7826478394245,
+            37.87928794083407
+          ],
+          [
+            -4.7826460003580005,
+            37.879288464968695
+          ],
+          [
+            -4.782644314523169,
+            37.879289029677295
+          ],
+          [
+            -4.782642730433509,
+            37.87928943292982
+          ],
+          [
+            -4.78264109596239,
+            37.87928967472628
+          ],
+          [
+            -4.782639869617924,
+            37.87928967472628
+          ],
+          [
+            -4.782638387805491,
+            37.87928971491264
+          ],
+          [
+            -4.782637059674927,
+            37.87928967472628
+          ],
+          [
+            -4.78263573154436,
+            37.87928963457226
+          ],
+          [
+            -4.782634352009154,
+            37.87928947311618
+          ],
+          [
+            -4.782633023387462,
+            37.87928935220177
+          ],
+          [
+            -4.782631235275404,
+            37.87928915059168
+          ],
+          [
+            -4.7826291916544506,
+            37.879288948949245
+          ],
+          [
+            -4.782627352587952,
+            37.879288706765145
+          ],
+          [
+            -4.7826256153894064,
+            37.87928850512271
+          ],
+          [
+            -4.782623878641062,
+            37.879288344086596
+          ],
+          [
+            -4.782622243678816,
+            37.87928830351262
+          ],
+          [
+            -4.782620710993798,
+            37.87928822317221
+          ],
+          [
+            -4.7826192805860055,
+            37.87928806171614
+          ],
+          [
+            -4.782617901050799,
+            37.87928773919163
+          ],
+          [
+            -4.782616572920233,
+            37.879287537549224
+          ],
+          [
+            -4.782615346575767,
+            37.879287335939104
+          ],
+          [
+            -4.782614120190374,
+            37.879287215024696
+          ],
+          [
+            -4.7826129966142625,
+            37.879287053568625
+          ],
+          [
+            -4.782612025737763,
+            37.879286892112546
+          ],
+          [
+            -4.782610850716083,
+            37.879286690502425
+          ],
+          [
+            -4.782609726689771,
+            37.87928648886002
+          ],
+          [
+            -4.782608500345305,
+            37.87928624706354
+          ],
+          [
+            -4.782607172214739,
+            37.8792860454534
+          ],
+          [
+            -4.782605894915833,
+            37.87928572292889
+          ],
+          [
+            -4.782604566826195,
+            37.879285440558434
+          ],
+          [
+            -4.782603187331916,
+            37.879285118033906
+          ],
+          [
+            -4.7826013991789305,
+            37.879284835695756
+          ],
+          [
+            -4.782599304194265,
+            37.87928447259723
+          ],
+          [
+            -4.7825972606142395,
+            37.87928402919063
+          ],
+          [
+            -4.782595217034214,
+            37.879283585751715
+          ],
+          [
+            -4.782593327095129,
+            37.87928318249913
+          ],
+          [
+            -4.782591538942143,
+            37.8792826177905
+          ],
+          [
+            -4.7825898526161845,
+            37.879282012895466
+          ],
+          [
+            -4.782588218145065,
+            37.87928140803277
+          ],
+          [
+            -4.782586685460047,
+            37.87928084332409
+          ],
+          [
+            -4.782585152734101,
+            37.879280279003055
+          ],
+          [
+            -4.782583926389635,
+            37.8792798351765
+          ],
+          [
+            -4.782582138236649,
+            37.87927935158351
+          ],
+          [
+            -4.78258060555163,
+            37.87927886760286
+          ],
+          [
+            -4.782579277421065,
+            37.87927846435028
+          ],
+          [
+            -4.782578101990112,
+            37.879278020523664
+          ],
+          [
+            -4.782576824732132,
+            37.87927753693068
+          ],
+          [
+            -4.782575598878793,
+            37.87927701240834
+          ],
+          [
+            -4.782574474811555,
+            37.879276568969374
+          ],
+          [
+            -4.782573299789875,
+            37.87927616571677
+          ],
+          [
+            -4.782572278040789,
+            37.87927576246416
+          ],
+          [
+            -4.782571358528003,
+            37.87927523832946
+          ],
+          [
+            -4.782570234460764,
+            37.87927479450283
+          ],
+          [
+            -4.782568804052972,
+            37.87927435106386
+          ],
+          [
+            -4.782567373154053,
+            37.879273947811235
+          ],
+          [
+            -4.782565278660514,
+            37.87927293969585
+          ],
+          [
+            -4.782563745975495,
+            37.879271689751604
+          ],
+          [
+            -4.782562673231042,
+            37.87927068163617
+          ],
+          [
+            -4.782561753268055,
+            37.87926991528496
+          ],
+          [
+            -4.782560986905083,
+            37.8792693505762
+          ],
+          [
+            -4.782560169669524,
+            37.87926874568109
+          ],
+          [
+            -4.782559250156738,
+            37.87926830227438
+          ],
+          [
+            -4.782558483834692,
+            37.87926785883537
+          ],
+          [
+            -4.782557717430792,
+            37.879267334280634
+          ],
+          [
+            -4.782556951149672,
+            37.87926685071989
+          ],
+          [
+            -4.7825561847867,
+            37.87926624582475
+          ],
+          [
+            -4.782555265273913,
+            37.87926556020153
+          ],
+          [
+            -4.782554294356488,
+            37.87926483442427
+          ],
+          [
+            -4.782553323479989,
+            37.87926394719086
+          ],
+          [
+            -4.782552353012762,
+            37.879263059957445
+          ],
+          [
+            -4.782551433499976,
+            37.8792620518096
+          ],
+          [
+            -4.78255056494163,
+            37.879261083848085
+          ],
+          [
+            -4.782549798578658,
+            37.879260197002296
+          ],
+          [
+            -4.782549032215684,
+            37.879259188886714
+          ],
+          [
+            -4.782548163616412,
+            37.87925818073879
+          ],
+          [
+            -4.782547397212512,
+            37.879257212777226
+          ],
+          [
+            -4.782546630931393,
+            37.8792562046293
+          ],
+          [
+            -4.78254586456842,
+            37.87925519651367
+          ],
+          [
+            -4.7825450982463735,
+            37.87925422855205
+          ],
+          [
+            -4.782544434160628,
+            37.8792532204041
+          ],
+          [
+            -4.782543820988395,
+            37.879252131947986
+          ],
+          [
+            -4.782543259179875,
+            37.8792507607013
+          ],
+          [
+            -4.782542594643928,
+            37.879249147690295
+          ],
+          [
+            -4.782541828280956,
+            37.879247696135444
+          ],
+          [
+            -4.782540602427617,
+            37.87924640564904
+          ],
+          [
+            -4.782539172019825,
+            37.87924519585841
+          ],
+          [
+            -4.782538047952586,
+            37.87924410701454
+          ],
+          [
+            -4.782537230225899,
+            37.87924297798427
+          ],
+          [
+            -4.782536412990339,
+            37.87924176819361
+          ],
+          [
+            -4.782535493477553,
+            37.8792405584675
+          ],
+          [
+            -4.782534829391807,
+            37.87923963101513
+          ],
+          [
+            -4.7825337053245685,
+            37.87923821964643
+          ],
+          [
+            -4.782532632129915,
+            37.87923705004208
+          ],
+          [
+            -4.782531303999349,
+            37.87923584031592
+          ],
+          [
+            -4.782529975868784,
+            37.87923471128552
+          ],
+          [
+            -4.7825288003969035,
+            37.87923366256326
+          ],
+          [
+            -4.782527727734306,
+            37.87923249334645
+          ],
+          [
+            -4.782526756816879,
+            37.879231283620186
+          ],
+          [
+            -4.782525990494833,
+            37.879229993133535
+          ],
+          [
+            -4.782524917791307,
+            37.879227976836894
+          ],
+          [
+            -4.782523946873881,
+            37.879226323639024
+          ],
+          [
+            -4.782522976488509,
+            37.8792245089849
+          ],
+          [
+            -4.782522107848308,
+            37.879222895973335
+          ],
+          [
+            -4.782521136971809,
+            37.879221403843914
+          ],
+          [
+            -4.78252031973625,
+            37.87921999247489
+          ],
+          [
+            -4.782519400223464,
+            37.879218500345395
+          ],
+          [
+            -4.782518480710678,
+            37.87921696809412
+          ],
+          [
+            -4.782517458920665,
+            37.879215556660384
+          ],
+          [
+            -4.782516538875825,
+            37.87921414529126
+          ],
+          [
+            -4.78251577255378,
+            37.879212733922074
+          ],
+          [
+            -4.782515006190807,
+            37.87921132248827
+          ],
+          [
+            -4.78251423986876,
+            37.87920999181487
+          ],
+          [
+            -4.782513473505788,
+            37.87920845917574
+          ],
+          [
+            -4.782512707142814,
+            37.87920656414839
+          ],
+          [
+            -4.782511889907256,
+            37.87920446715531
+          ],
+          [
+            -4.782510817244657,
+            37.879202531618425
+          ],
+          [
+            -4.782509641772776,
+            37.87920103948858
+          ],
+          [
+            -4.782508313642212,
+            37.8791994264119
+          ],
+          [
+            -4.782507598192752,
+            37.87919829744554
+          ],
+          [
+            -4.782507036384232,
+            37.87919720860097
+          ],
+          [
+            -4.78250647461664,
+            37.879196159813574
+          ],
+          [
+            -4.782505963721634,
+            37.87919507142122
+          ],
+          [
+            -4.7825053505494,
+            37.879193861629744
+          ],
+          [
+            -4.782504737377168,
+            37.87919277278512
+          ],
+          [
+            -4.782504175568648,
+            37.879191724062245
+          ],
+          [
+            -4.78250376645974,
+            37.87919083724793
+          ],
+          [
+            -4.782503306969375,
+            37.87918994998131
+          ],
+          [
+            -4.782502898351595,
+            37.8791890627793
+          ],
+          [
+            -4.782502131988623,
+            37.87918805463043
+          ],
+          [
+            -4.782501110198609,
+            37.879187006359764
+          ],
+          [
+            -4.782500139281184,
+            37.87918591745043
+          ],
+          [
+            -4.782499372959138,
+            37.879184667149374
+          ],
+          [
+            -4.782498708873391,
+            37.87918325571503
+          ],
+          [
+            -4.782498146614672,
+            37.87918200580157
+          ],
+          [
+            -4.782497635719666,
+            37.87918063461819
+          ],
+          [
+            -4.782497124783732,
+            37.879179223119166
+          ],
+          [
+            -4.782496665293365,
+            37.87917797327025
+          ],
+          [
+            -4.78249615439836,
+            37.87917684423896
+          ],
+          [
+            -4.782495592098713,
+            37.87917563444721
+          ],
+          [
+            -4.782495081203706,
+            37.87917442472003
+          ],
+          [
+            -4.782494519436115,
+            37.87917329568869
+          ],
+          [
+            -4.782493957627595,
+            37.87917216626967
+          ],
+          [
+            -4.7824932930916475,
+            37.87917111793417
+          ],
+          [
+            -4.7824926804105425,
+            37.87917006966327
+          ],
+          [
+            -4.782492067238309,
+            37.8791689401796
+          ],
+          [
+            -4.782491454066077,
+            37.87916789190865
+          ],
+          [
+            -4.78249078998033,
+            37.87916692394592
+          ],
+          [
+            -4.782490176808097,
+            37.87916587554573
+          ],
+          [
+            -4.782489614999577,
+            37.879164867461135
+          ],
+          [
+            -4.782488950463631,
+            37.87916369792021
+          ],
+          [
+            -4.782488235505299,
+            37.87916220617725
+          ],
+          [
+            -4.782487469142325,
+            37.87916063328612
+          ],
+          [
+            -4.782486805097506,
+            37.879159302676385
+          ],
+          [
+            -4.7824861919252735,
+            37.879158052245664
+          ],
+          [
+            -4.782485578712113,
+            37.87915664094004
+          ],
+          [
+            -4.7824848632626535,
+            37.87915535083971
+          ],
+          [
+            -4.782484250581548,
+            37.8791541410476
+          ],
+          [
+            -4.782483637409315,
+            37.879152931320064
+          ],
+          [
+            -4.782482973364496,
+            37.8791517215279
+          ],
+          [
+            -4.7824822070015225,
+            37.87915051180034
+          ],
+          [
+            -4.782481236125022,
+            37.87914918073818
+          ],
+          [
+            -4.782480163421497,
+            37.87914789063772
+          ],
+          [
+            -4.7824792947812975,
+            37.87914655957554
+          ],
+          [
+            -4.782478272991284,
+            37.87914518871454
+          ],
+          [
+            -4.782477251201271,
+            37.879143938412795
+          ],
+          [
+            -4.782476433474586,
+            37.879142688498646
+          ],
+          [
+            -4.782475667111613,
+            37.87914147870632
+          ],
+          [
+            -4.7824751053440195,
+            37.87914006733577
+          ],
+          [
+            -4.782474543535501,
+            37.879138414135916
+          ],
+          [
+            -4.7824738789995545,
+            37.87913688136611
+          ],
+          [
+            -4.782473061763996,
+            37.879134865196136
+          ],
+          [
+            -4.782472295401022,
+            37.87913329269206
+          ],
+          [
+            -4.782471375888236,
+            37.87913196208187
+          ],
+          [
+            -4.782470200948411,
+            37.87913059083294
+          ],
+          [
+            -4.782469076840243,
+            37.879129219583994
+          ],
+          [
+            -4.782468208240972,
+            37.879127808213184
+          ],
+          [
+            -4.782467441877999,
+            37.87912635665594
+          ],
+          [
+            -4.782466675555952,
+            37.87912482433813
+          ],
+          [
+            -4.78246590919298,
+            37.87912357403603
+          ],
+          [
+            -4.782464734253154,
+            37.87912175937938
+          ],
+          [
+            -4.782463865612954,
+            37.87912026763555
+          ],
+          [
+            -4.782462894695528,
+            37.8791186545571
+          ],
+          [
+            -4.782461924310155,
+            37.87911675926901
+          ],
+          [
+            -4.78246126022441,
+            37.879115065429936
+          ],
+          [
+            -4.78246008475253,
+            37.879112807430026
+          ],
+          [
+            -4.782459062962517,
+            37.87911079119481
+          ],
+          [
+            -4.782458041172505,
+            37.87910881508135
+          ],
+          [
+            -4.782457070787133,
+            37.87910695985022
+          ],
+          [
+            -4.782456048997119,
+            37.879105064884875
+          ],
+          [
+            -4.782454924929881,
+            37.87910312889312
+          ],
+          [
+            -4.782453852226355,
+            37.87910115323174
+          ],
+          [
+            -4.782452830436342,
+            37.879099298000426
+          ],
+          [
+            -4.782451706369103,
+            37.879097564103716
+          ],
+          [
+            -4.78245068457909,
+            37.87909574944641
+          ],
+          [
+            -4.782449355916469,
+            37.87909369295967
+          ],
+          [
+            -4.782447516890898,
+            37.879091273437986
+          ],
+          [
+            -4.782445779651425,
+            37.87908901498509
+          ],
+          [
+            -4.782444246966406,
+            37.87908707944518
+          ],
+          [
+            -4.782442969708427,
+            37.87908530536173
+          ],
+          [
+            -4.782441692491376,
+            37.879083651773
+          ],
+          [
+            -4.78244021117007,
+            37.87908199857188
+          ],
+          [
+            -4.7824385253352375,
+            37.87908022410065
+          ],
+          [
+            -4.782436992609292,
+            37.87907840944291
+          ],
+          [
+            -4.782435561710373,
+            37.87907651408918
+          ],
+          [
+            -4.78243428449332,
+            37.87907437690592
+          ],
+          [
+            -4.782432956362755,
+            37.879071917197166
+          ],
+          [
+            -4.782431729977362,
+            37.87906933621821
+          ],
+          [
+            -4.78243060640125,
+            37.879066916695734
+          ],
+          [
+            -4.782429635524751,
+            37.87906465862977
+          ],
+          [
+            -4.782428869161778,
+            37.8790627230892
+          ],
+          [
+            -4.78242789824435,
+            37.87906106949997
+          ],
+          [
+            -4.782427030136206,
+            37.879059416298354
+          ],
+          [
+            -4.782426161496006,
+            37.87905776270902
+          ],
+          [
+            -4.78242534376932,
+            37.87905614969379
+          ],
+          [
+            -4.782424577447274,
+            37.87905461737453
+          ],
+          [
+            -4.7824238110843,
+            37.8790531252417
+          ],
+          [
+            -4.782423044762254,
+            37.87905159298696
+          ],
+          [
+            -4.782422278399282,
+            37.87904973814205
+          ],
+          [
+            -4.782421512036308,
+            37.879047681330974
+          ],
+          [
+            -4.782420745714262,
+            37.87904570560349
+          ],
+          [
+            -4.78241987756519,
+            37.87904372942369
+          ],
+          [
+            -4.782418600348138,
+            37.87904187470781
+          ],
+          [
+            -4.782417374003671,
+            37.879040221118096
+          ],
+          [
+            -4.782416403086246,
+            37.8790386887985
+          ],
+          [
+            -4.782415636723272,
+            37.87903707578287
+          ],
+          [
+            -4.782414870401227,
+            37.87903558358505
+          ],
+          [
+            -4.782414053165667,
+            37.879034172277066
+          ],
+          [
+            -4.782413235930108,
+            37.879032801414006
+          ],
+          [
+            -4.782412367289909,
+            37.879031430227826
+          ],
+          [
+            -4.782411549563221,
+            37.87903001879053
+          ],
+          [
+            -4.782410476859696,
+            37.87902856723135
+          ],
+          [
+            -4.782409148729131,
+            37.87902663162524
+          ],
+          [
+            -4.782407769234852,
+            37.87902449411748
+          ],
+          [
+            -4.782406645167613,
+            37.879022276236704
+          ],
+          [
+            -4.782405674250185,
+            37.87902025993439
+          ],
+          [
+            -4.78240460154666,
+            37.87901848578471
+          ],
+          [
+            -4.782403426606835,
+            37.87901683225909
+          ],
+          [
+            -4.782402404816822,
+            37.87901509836044
+          ],
+          [
+            -4.7824013830268095,
+            37.879013445093186
+          ],
+          [
+            -4.782400309832156,
+            37.879011791567436
+          ],
+          [
+            -4.782399186256044,
+            37.87901017848661
+          ],
+          [
+            -4.782398010784164,
+            37.87900864629559
+          ],
+          [
+            -4.782396887208052,
+            37.879007275432045
+          ],
+          [
+            -4.782395711736172,
+            37.87900582348476
+          ],
+          [
+            -4.7823947413508,
+            37.87900433135094
+          ],
+          [
+            -4.78239346409282,
+            37.87900231504812
+          ],
+          [
+            -4.782392340025582,
+            37.879000702031696
+          ],
+          [
+            -4.782391165085756,
+            37.878999089015224
+          ],
+          [
+            -4.7823899901050035,
+            37.878997395690305
+          ],
+          [
+            -4.782388201952017,
+            37.878995862982144
+          ],
+          [
+            -4.782386209285505,
+            37.878994492182954
+          ],
+          [
+            -4.782384676600487,
+            37.87899312093148
+          ],
+          [
+            -4.782383450215094,
+            37.878991750067634
+          ],
+          [
+            -4.782382326638981,
+            37.8789904190672
+          ],
+          [
+            -4.782381151208029,
+            37.87898908838981
+          ],
+          [
+            -4.782380027631917,
+            37.87898779789891
+          ],
+          [
+            -4.7823785966920696,
+            37.878986467221445
+          ],
+          [
+            -4.7823770640070515,
+            37.878985257361954
+          ],
+          [
+            -4.7823756850039,
+            37.8789839669356
+          ],
+          [
+            -4.7823744077459205,
+            37.87898247518897
+          ],
+          [
+            -4.78237323227404,
+            37.87898082159793
+          ],
+          [
+            -4.7823719550569885,
+            37.87897920858102
+          ],
+          [
+            -4.782370729203649,
+            37.878977757020856
+          ],
+          [
+            -4.782369451986598,
+            37.87897614393927
+          ],
+          [
+            -4.782368123323978,
+            37.87897457117337
+          ],
+          [
+            -4.782366846065997,
+            37.878973159799614
+          ],
+          [
+            -4.78236551797636,
+            37.87897178893538
+          ],
+          [
+            -4.782364240718381,
+            37.87897045786999
+          ],
+          [
+            -4.782363065778556,
+            37.87896908707034
+          ],
+          [
+            -4.782361941670389,
+            37.87896775639254
+          ],
+          [
+            -4.782360868966862,
+            37.878966626970396
+          ],
+          [
+            -4.782359898090363,
+            37.87896553844543
+          ],
+          [
+            -4.78235897853665,
+            37.87896453035811
+          ],
+          [
+            -4.782358059064792,
+            37.8789636430888
+          ],
+          [
+            -4.782356934956624,
+            37.878962876766664
+          ],
+          [
+            -4.7823559131666125,
+            37.87896219114065
+          ],
+          [
+            -4.782355249080865,
+            37.878961425206164
+          ],
+          [
+            -4.782354635908632,
+            37.87896069939359
+          ],
+          [
+            -4.782354125054554,
+            37.878960174836685
+          ],
+          [
+            -4.782353767350288,
+            37.87895956997134
+          ],
+          [
+            -4.782353307327868,
+            37.87895884415874
+          ],
+          [
+            -4.782352745560275,
+            37.878957956953954
+          ],
+          [
+            -4.782352081474529,
+            37.878956989376114
+          ],
+          [
+            -4.782351468302296,
+            37.87895622305393
+          ],
+          [
+            -4.782350957366362,
+            37.87895565869812
+          ],
+          [
+            -4.782350497343942,
+            37.87895517471535
+          ],
+          [
+            -4.782350140130803,
+            37.87895452927577
+          ],
+          [
+            -4.78234993557635,
+            37.87895376334121
+          ],
+          [
+            -4.78234993557635,
+            37.878953239171906
+          ],
+          [
+            -4.78234993557635,
+            37.87895283588523
+          ],
+          [
+            -4.78234993557635,
+            37.87895255354579
+          ],
+          [
+            -4.78234993557635,
+            37.87895223101981
+          ],
+          [
+            -4.78234993557635,
+            37.87895194868037
+          ],
+          [
+            -4.78234993557635,
+            37.878951585580204
+          ],
+          [
+            -4.78234993557635,
+            37.878951142171594
+          ],
+          [
+            -4.78234993557635,
+            37.87895069831073
+          ],
+          [
+            -4.782349884662835,
+            37.87895017420601
+          ],
+          [
+            -4.782349680108382,
+            37.878949690223216
+          ],
+          [
+            -4.782349629276723,
+            37.878949166053864
+          ],
+          [
+            -4.782349629276723,
+            37.878948722645255
+          ],
+          [
+            -4.78234942472227,
+            37.87894827878437
+          ],
+          [
+            -4.782349271490603,
+            37.87894787556225
+          ],
+          [
+            -4.78234911834079,
+            37.87894747227555
+          ],
+          [
+            -4.7823489646998505,
+            37.878947149749564
+          ],
+          [
+            -4.782348760636523,
+            37.87894674652745
+          ],
+          [
+            -4.7823485051685575,
+            37.87894614159737
+          ],
+          [
+            -4.782348147464291,
+            37.87894553673192
+          ],
+          [
+            -4.782347738846511,
+            37.87894493186645
+          ],
+          [
+            -4.7823471765059375,
+            37.87894432700095
+          ],
+          [
+            -4.782346410183892,
+            37.87894372207085
+          ],
+          [
+            -4.782345643861846,
+            37.87894327866219
+          ],
+          [
+            -4.782345132925912,
+            37.87894283486588
+          ],
+          [
+            -4.782344775712773,
+            37.87894243157916
+          ],
+          [
+            -4.7823443666038665,
+            37.87894210905313
+          ],
+          [
+            -4.7823440093907275,
+            37.878941826713664
+          ],
+          [
+            -4.782343600281821,
+            37.87894162507028
+          ],
+          [
+            -4.782343344813854,
+            37.878941464001095
+          ],
+          [
+            -4.782343089345886,
+            37.878941302544256
+          ],
+          [
+            -4.782342885282561,
+            37.87894122184814
+          ],
+          [
+            -4.782342833959775,
+            37.878940939831715
+          ],
+          [
+            -4.782342732132747,
+            37.87894081856141
+          ],
+          [
+            -4.782342578491808,
+            37.87894065749222
+          ],
+          [
+            -4.782342527578295,
+            37.87894065749222
+          ],
+          [
+            -4.782342527578295,
+            37.87894081856141
+          ],
+          [
+            -4.782342476664781,
+            37.8789408591356
+          ],
+          [
+            -4.782342323023841,
+            37.878940939831715
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.782085597198603,
+            37.87920559618617
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.782135332825419,
+            37.8794734071791
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.782119367428096,
+            37.8791426381041
+          ],
+          [
+            -4.782119776537002,
+            37.87916441384569
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.7820004560526295,
+            37.87916017967065
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.7811066418216805,
+            37.879175503356805
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.781719207348943,
+            37.87910231250092
+          ],
+          [
+            -4.781740052339957,
+            37.87909513424482
+          ],
+          [
+            -4.78174321953702,
+            37.87909319909271
+          ],
+          [
+            -4.781748226660057,
+            37.87909013458489
+          ],
+          [
+            -4.781752518456416,
+            37.879087553606574
+          ],
+          [
+            -4.781757933706104,
+            37.879083843143235
+          ],
+          [
+            -4.7817619191209815,
+            37.87907989169014
+          ],
+          [
+            -4.781766312662512,
+            37.87907585921783
+          ],
+          [
+            -4.7817718297392275,
+            37.87907118078988
+          ],
+          [
+            -4.781777246053026,
+            37.87906537455619
+          ],
+          [
+            -4.7817821504486355,
+            37.879058438061406
+          ],
+          [
+            -4.781783887729034,
+            37.879051421322224
+          ],
+          [
+            -4.78178501126422,
+            37.8790450501504
+          ],
+          [
+            -4.781785420291271,
+            37.87903900150359
+          ],
+          [
+            -4.7817855222001535,
+            37.879032710832874
+          ],
+          [
+            -4.781785113091247,
+            37.879026177621284
+          ],
+          [
+            -4.781783989474207,
+            37.879018032168354
+          ],
+          [
+            -4.781781945894182,
+            37.87900924088779
+          ],
+          [
+            -4.78177949320525,
+            37.87900125695432
+          ],
+          [
+            -4.781777246053026,
+            37.87899383679401
+          ],
+          [
+            -4.781774691455213,
+            37.878986739675646
+          ],
+          [
+            -4.781771217058123,
+            37.8789798843218
+          ],
+          [
+            -4.781766618962139,
+            37.87897246428856
+          ],
+          [
+            -4.781761714566528,
+            37.87896480248938
+          ],
+          [
+            -4.781756911916092,
+            37.878957624219865
+          ],
+          [
+            -4.781751802966028,
+            37.87895117202077
+          ],
+          [
+            -4.781746081334859,
+            37.87894512323704
+          ],
+          [
+            -4.781739746040331,
+            37.87893955875872
+          ],
+          [
+            -4.7817330015550406,
+            37.87893471970517
+          ],
+          [
+            -4.78172462366274,
+            37.87893044455506
+          ],
+          [
+            -4.781714201126306,
+            37.87892600878776
+          ],
+          [
+            -4.781704494080259,
+            37.878922137699284
+          ],
+          [
+            -4.781695297970146,
+            37.878919314691295
+          ],
+          [
+            -4.781686101860032,
+            37.87891737953458
+          ],
+          [
+            -4.781676701113612,
+            37.87891616993238
+          ],
+          [
+            -4.781665972277552,
+            37.87891608878396
+          ],
+          [
+            -4.781656366976678,
+            37.87891657321926
+          ],
+          [
+            -4.781643391070248,
+            37.87891923444742
+          ],
+          [
+            -4.781633479469747,
+            37.8789227827515
+          ],
+          [
+            -4.78162428327778,
+            37.87892625132841
+          ],
+          [
+            -4.78161529172212,
+            37.87892988065132
+          ],
+          [
+            -4.781606095530152,
+            37.878933428825654
+          ],
+          [
+            -4.781598227509676,
+            37.878936654861455
+          ],
+          [
+            -4.781588009609551,
+            37.87894189720162
+          ],
+          [
+            -4.781580550697982,
+            37.87894697789076
+          ],
+          [
+            -4.781574112594171,
+            37.87895205974248
+          ],
+          [
+            -4.781569106453389,
+            37.878957947133465
+          ],
+          [
+            -4.7815653255929655,
+            37.87896456059494
+          ],
+          [
+            -4.7815626693318345,
+            37.87897076999393
+          ],
+          [
+            -4.781561136605887,
+            37.87897585184402
+          ],
+          [
+            -4.781560318388075,
+            37.87898060974653
+          ],
+          [
+            -4.7815602166429025,
+            37.87898544879707
+          ],
+          [
+            -4.781560625751809,
+            37.87899061076073
+          ],
+          [
+            -4.781561340178087,
+            37.87899585309706
+          ],
+          [
+            -4.781562771077007,
+            37.87900141757111
+          ],
+          [
+            -4.781564201975926,
+            37.87900665990667
+          ],
+          [
+            -4.781566960064083,
+            37.879014079936454
+          ],
+          [
+            -4.7815699236889495,
+            37.87901956403613
+          ],
+          [
+            -4.781573398167894,
+            37.879024806370396
+          ],
+          [
+            -4.781578507117956,
+            37.879030048575075
+          ],
+          [
+            -4.781585250539138,
+            37.879035372186074
+          ],
+          [
+            -4.781593526686266,
+            37.879040694892176
+          ],
+          [
+            -4.781602314751582,
+            37.8790457757037
+          ],
+          [
+            -4.7816109999257606,
+            37.87905158271423
+          ],
+          [
+            -4.781619991563275,
+            37.87905755124549
+          ],
+          [
+            -4.781629903163777,
+            37.8790627124288
+          ],
+          [
+            -4.7816421646439276,
+            37.87906682605006
+          ],
+          [
+            -4.781654630760386,
+            37.8790696489232
+          ],
+          [
+            -4.781667198622018,
+            37.87907198723273
+          ],
+          [
+            -4.781680175592555,
+            37.87907384291697
+          ],
+          [
+            -4.781695195160865,
+            37.87907545593182
+          ],
+          [
+            -4.781709909411803,
+            37.87907682640647
+          ],
+          [
+            -4.7817237036179,
+            37.87907763284927
+          ],
+          [
+            -4.781735965179905,
+            37.87907884257802
+          ],
+          [
+            -4.781747204870044,
+            37.879080133584196
+          ],
+          [
+            -4.781757321024998,
+            37.879081343312926
+          ],
+          [
+            -4.781767129898072,
+            37.879082553041634
+          ],
+          [
+            -4.78177601970856,
+            37.879083439857276
+          ],
+          [
+            -4.781782558575288,
+            37.879084084908065
+          ],
+          [
+            -4.781786442081286,
+            37.87908432757742
+          ],
+          [
+            -4.781787770334631,
+            37.87908416605628
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.78095694905278,
+            37.87855630315691
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.780321010130138,
+            37.87840316565357
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.779939370127978,
+            37.87930141947554
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.779763238348096,
+            37.879369972621596
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff"
       }
     }
   ]
