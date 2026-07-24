@@ -2,192 +2,159 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Creador de Mapas y Rutas</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor de Mapas y Rutas</title>
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
     <style>
-        html, body {
-            height: 100%;
+        body, html {
             margin: 0;
             padding: 0;
+            height: 100%;
+            width: 100%;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             overflow: hidden;
         }
-
         #map {
+            height: 100%;
             width: 100%;
-            height: calc(100vh - 75px);
-        }
-
-        .toolbar {
-            position: fixed;
-            bottom: 0;
+            position: absolute;
+            top: 0;
             left: 0;
-            width: 100%;
-            height: 75px;
-            background: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: space-around;
-            padding: 0 5px;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.15);
-            z-index: 1000;
-            box-sizing: border-box;
-            overflow-x: auto;
+            z-index: 1;
         }
-
-        .btn {
-            background: #f0f0f0;
-            border: none;
+        /* Panel de control flotante */
+        .control-panel {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            z-index: 1000;
+            background: white;
+            padding: 12px;
             border-radius: 8px;
-            padding: 8px 10px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #333;
-            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-width: 48px;
-            height: 55px;
-            flex: 1;
-            margin: 0 2px;
-            user-select: none;
+            gap: 8px;
+            max-width: 220px;
         }
-
-        .btn span.icon {
-            font-size: 18px;
-            margin-bottom: 2px;
+        .btn {
+            background: #f8f9fa;
+            border: 1px solid #ccc;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            text-align: center;
+            transition: background 0.2s;
         }
-
-        .btn span.text {
-            font-size: 10px;
-            white-space: nowrap;
+        .btn:hover {
+            background: #e9ecef;
         }
-
         .btn-active-blue {
             background: #3388ff !important;
             color: white !important;
+            border-color: #2670e8 !important;
         }
-
         .btn-active-red {
-            background: #ff3333 !important;
+            background: #e74c3c !important;
             color: white !important;
+            border-color: #c0392b !important;
         }
-
-        .btn-yellow {
-            background: #ffcc00;
+        /* Estilo para los marcadores numéricos */
+        .number-icon {
+            background: #3388ff;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            line-height: 28px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            border: 2px solid white;
         }
-
+        /* Toast de avisos flotante */
         #toast-aviso {
-            position: fixed;
-            top: 15px;
+            position: absolute;
+            bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
+            z-index: 1000;
             background: rgba(0, 0, 0, 0.8);
             color: white;
             padding: 8px 16px;
             border-radius: 20px;
             font-size: 13px;
-            z-index: 2000;
+            pointer-events: none;
             opacity: 0;
             transition: opacity 0.3s ease;
-            pointer-events: none;
-            white-space: nowrap;
         }
-
-        .number-icon {
-            background: #3388ff;
-            border: 2px solid white;
-            border-radius: 50%;
-            color: white;
-            font-weight: bold;
-            text-align: center;
-            line-height: 24px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        }
-
-        .modal {
-            display: none;
+        /* Modal de carga/guardado de GitHub */
+        .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5);
-            z-index: 3000;
-            align-items: center;
+            z-index: 2000;
+            display: none;
             justify-content: center;
+            align-items: center;
         }
         .modal-content {
             background: white;
             padding: 20px;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 400px;
+            border-radius: 8px;
+            width: 300px;
             max-height: 80vh;
             overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
     </style>
 </head>
 <body>
 
-    <div id="toast-aviso"></div>
-
+    <!-- Contenedor del Mapa -->
     <div id="map"></div>
 
-    <!-- Input oculto para cargar el archivo GPX usando la función manejarArchivoGPX existente en app.js -->
-    <input type="file" id="gpx-file-input" accept=".gpx" style="display: none;" onchange="manejarArchivoGPX(event)">
-
-    <!-- Botonera inferior -->
-    <div class="toolbar">
-        <button id="btn-ruta" class="btn" onclick="setModo('ruta')">
-            <span class="icon">🛣️</span><span class="text">Calle</span>
-        </button>
-        <button id="btn-aislado" class="btn" onclick="setModo('aislado')">
-            <span class="icon">📍</span><span class="text">Aislado</span>
-        </button>
-        <button id="btn-puntos-rectos" class="btn" onclick="setModo('dibujar_puntos')">
-            <span class="icon">📏</span><span class="text">Rectos</span>
-        </button>
-        <button id="btn-continuo" class="btn" onclick="setModo('continuo')">
-            <span class="icon">✍️</span><span class="text">Mano</span>
-        </button>
-        <button id="btn-borrar" class="btn" onclick="setModo('borrar')">
-            <span class="icon">🗑️</span><span class="text">Borrar</span>
-        </button>
-        <button class="btn" onclick="deshacerUltimo()">
-            <span class="icon">↩️</span><span class="text">Deshacer</span>
-        </button>
-        <button class="btn" onclick="rehacerProximo()">
-            <span class="icon">🔁</span><span class="text">Rehacer</span>
-        </button>
-        <button class="btn" onclick="confirmarBorrarTodo()" style="background:#ffdddd;">
-            <span class="icon">💥</span><span class="text">Todo</span>
-        </button>
-        <!-- Botón para disparar la selección del archivo GPX -->
-        <button class="btn" onclick="document.getElementById('gpx-file-input').click()" style="background:#e2f0d9;">
-            <span class="icon">📂</span><span class="text">GPX</span>
-        </button>
-        <button class="btn btn-yellow" onclick="abrirModalGithub('guardar')">
-            <span class="icon">💾</span><span class="text">Guardar</span>
-        </button>
-        <button class="btn" onclick="abrirModalGithub('cargar')" style="background:#d4edda;">
-            <span class="icon">☁️</span><span class="text">Cargar</span>
-        </button>
+    <!-- Panel Flotante de Herramientas -->
+    <div class="control-panel">
+        <button id="btn-ruta" class="btn" onclick="setModo('ruta')">🚴 Ruta OSRM</button>
+        <button id="btn-aislado" class="btn" onclick="setModo('aislado')">📍 Punto Aislado</button>
+        <button id="btn-puntos-rectos" class="btn" onclick="setModo('dibujar_puntos')">📏 Rectos</button>
+        <button id="btn-continuo" class="btn" onclick="setModo('continuo')">✍️ Mano Alzada</button>
+        <button id="btn-borrar" class="btn" onclick="setModo('borrar')">🗑️ Borrar</button>
+        <hr style="border:0; border-top:1px solid #eee; margin:2px 0;">
+        <button class="btn" style="background:#e8f4fd; color:#0066cc;" onclick="deshacerUltimo()">↩️ Deshacer</button>
+        <button class="btn" style="background:#fefefe;" onclick="rehacerProximo()">↪️ Rehacer</button>
+        <button class="btn" style="background:#f8d7da; color:#721c24;" onclick="confirmarBorrarTodo()">⚠️ Borrar Todo</button>
+        <hr style="border:0; border-top:1px solid #eee; margin:2px 0;">
+        <!-- Botón de Importar GPX -->
+        <input type="file" id="input-gpx" accept=".gpx" style="display: none;" onchange="manejarArchivoGPX(event)">
+        <button class="btn" onclick="document.getElementById('input-gpx').click()">📂 Importar GPX</button>
+        <!-- NUEVO: Botón para importar ruta mediante imagen OCR -->
+        <input type="file" id="input-imagen-ruta" accept="image/*" style="display: none;" onchange="procesarImagenRuta(event)">
+        <button class="btn" style="background:#673ab7; color:white;" onclick="document.getElementById('input-imagen-ruta').click()">📷 Importar Imagen</button>
+        <!-- GitHub Integración -->
+        <button class="btn" style="background:#24292e; color:white;" onclick="abrirModalGithub('cargar')">☁️ Cargar de GitHub</button>
+        <button class="btn" style="background:#24292e; color:white;" onclick="abrirModalGithub('guardar')">💾 Guardar en GitHub</button>
+        <button class="btn" style="background:#ffc107;" onclick="abrirModalGithub('compartir')">🔗 Compartir Link</button>
     </div>
 
-    <div id="modal-load" class="modal">
+    <!-- Notificación Toast -->
+    <div id="toast-aviso">Aviso</div>
+
+    <!-- Modal para GitHub -->
+    <div id="modal-load" class="modal-overlay">
         <div class="modal-content">
-            <h3>Gestión de Mapas</h3>
+            <h3 style="margin-top:0; font-size:16px;">Mapas en GitHub</h3>
             <div id="lista-mapas">Cargando...</div>
-            <br>
-            <button class="btn" style="width:100%; background:#ccc; height:40px;" onclick="cerrarModal()">Cerrar</button>
+            <button class="btn" style="width:100%; margin-top:15px; background:#ccc;" onclick="cerrarModal()">Cerrar</button>
         </div>
     </div>
 
+    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Tu archivo de lógica app.js -->
     <script src="app.js"></script>
 </body>
 </html>
