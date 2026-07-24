@@ -305,7 +305,6 @@ function manejarArchivoGPX(event) {
     };
     lector.readAsText(archivo);
 }
-
 function confirmarBorrarTodo() {
     if (confirm("¿Estás seguro de que quieres borrar todo el mapa? Se perderán todos los puntos y trazos actuales.")) {
         historialAcciones.forEach(i => {
@@ -547,7 +546,7 @@ function enfocarMapaEnGrupo(grupoCapas, mapInstance) {
     }
 }
 
-// --- LÓGICA: Importación de Listado de Calles por Archivo de Texto (.txt) ---
+// --- LÓGICA: Importación de Listado de Calles por Archivo de Texto (.txt) (Geocodificación tolerante y flexible) ---
 async function procesarArchivoTextoRuta(event) {
     const archivo = event.target.files[0];
     if (!archivo) return;
@@ -569,42 +568,56 @@ async function procesarArchivoTextoRuta(event) {
         let grupoCapas = L.featureGroup();
         let puntosCoordenadas = [];
         let textosNoReconocidos = [];
-        
-        const viewboxCordoba = "-4.86,37.83,-4.68,37.93";
 
         for (let nombre of lineas) {
-            try {
-                const queryConCiudad = `${nombre}, Córdoba, España`;
-                const urlGeo = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(queryConCiudad)}&countrycodes=es&viewbox=${viewboxCordoba}&bounded=1&limit=1`;
-                
-                const res = await fetch(urlGeo);
-                const datos = await res.json();
-                
-                let encontradoValido = false;
-                if (datos && datos.length > 0) {
-                    const lat = parseFloat(datos[0].lat);
-                    const lon = parseFloat(datos[0].lon);
-                    
-                    if (lat >= 37.83 && lat <= 37.93 && lon >= -4.86 && lon <= -4.68) {
-                        const nuevoPunto = L.latLng(lat, lon);
-                        if (puntosCoordenadas.length === 0 || puntosCoordenadas[puntosCoordenadas.length - 1].latlng.distanceTo(nuevoPunto) > 50) {
-                            puntosCoordenadas.push({ latlng: nuevoPunto, nombre: nombre });
-                        }
-                        encontradoValido = true;
-                    }
-                }
+            let nombreLimpio = nombre
+                .replace(/^(c\/|cl\.|calle)\s*/i, '')
+                .replace(/^(avda\.|av\.|avenida)\s*/i, '')
+                .replace(/^(pza\.|plaza)\s*/i, '')
+                .trim();
 
-                if (!encontradoValido) {
-                    if (!textosNoReconocidos.includes(nombre)) {
-                        textosNoReconocidos.push(nombre);
+            let variantesBusqueda = [
+                `${nombre}, Córdoba, España`,
+                `${nombreLimpio}, Córdoba, España`,
+                `Calle ${nombreLimpio}, Córdoba, España`,
+                `Calle Marqués del Boil, Córdoba, España`,
+                `Calle ${nombre}, Córdoba, España`
+            ];
+
+            let encontradoValido = false;
+
+            for (let queryConCiudad of variantesBusqueda) {
+                try {
+                    const urlGeo = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(queryConCiudad)}&countrycodes=es&limit=1`;
+                    
+                    const res = await fetch(urlGeo);
+                    const datos = await res.json();
+                    
+                    if (datos && datos.length > 0) {
+                        const lat = parseFloat(datos[0].lat);
+                        const lon = parseFloat(datos[0].lon);
+                        
+                        if (lat >= 37.80 && lat <= 37.95 && lon >= -4.90 && lon <= -4.60) {
+                            const nuevoPunto = L.latLng(lat, lon);
+                            if (puntosCoordenadas.length === 0 || puntosCoordenadas[puntosCoordenadas.length - 1].latlng.distanceTo(nuevoPunto) > 20) {
+                                puntosCoordenadas.push({ latlng: nuevoPunto, nombre: nombre });
+                            }
+                            encontradoValido = true;
+                            break; 
+                        }
                     }
+                } catch (err) {
+                    console.error("Error en geocodificación:", err);
                 }
-            } catch (err) {
+                await new Promise(r => setTimeout(r, 200));
+            }
+
+            if (!encontradoValido) {
                 if (!textosNoReconocidos.includes(nombre)) {
                     textosNoReconocidos.push(nombre);
                 }
             }
-            await new Promise(r => setTimeout(r, 300));
+            await new Promise(r => setTimeout(r, 250));
         }
 
         if (textosNoReconocidos.length > 0) {
@@ -612,7 +625,7 @@ async function procesarArchivoTextoRuta(event) {
         }
 
         if (puntosCoordenadas.length === 0) {
-            alert("No se ha podido trazar ninguna ruta porque ninguna calle del archivo coincide con el callejero de Córdoba.");
+            alert("No se ha podido trazar ninguna ruta porque ninguna calle del archivo coincide con el callejero.");
             event.target.value = '';
             return;
         }
@@ -672,3 +685,4 @@ async function procesarArchivoTextoRuta(event) {
 
     lector.readAsText(archivo);
 }
+
