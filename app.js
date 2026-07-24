@@ -76,7 +76,15 @@ function setModo(modo) {
 }
 
 function obtenerEstilosActuales() {
-    return { color: '#3388ff', weight: 4, opacity: 1 };
+    const colorInput = document.getElementById('color-trazo');
+    const grosorInput = document.getElementById('grosor-trazo');
+    const opacidadInput = document.getElementById('opacidad-trazo');
+
+    return { 
+        color: colorInput ? colorInput.value : '#3388ff', 
+        weight: grosorInput ? parseInt(grosorInput.value) : 4, 
+        opacity: opacidadInput ? parseFloat(opacidadInput.value) : 1 
+    };
 }
 
 function mostrarToast(mensaje) {
@@ -179,7 +187,7 @@ async function gestionarPulsacion(e) {
 
         if (window.puntosDibujoLibre.length > 1) {
             const pAnt = window.puntosDibujoLibre[window.puntosDibujoLibre.length - 2];
-            const linea = L.polyline([pAnt, latlng], { color: estilos.color, weight: estilos.weight, interactive: true }).addTo(map);
+            const linea = L.polyline([pAnt, latlng], { color: estilos.color, weight: estilos.weight, opacity: estilos.opacity, interactive: true }).addTo(map);
 
             linea.on('click', function(ev) {
                 if (modoActual === 'borrar') {
@@ -217,7 +225,7 @@ async function gestionarPulsacion(e) {
         if (modoActual === 'ruta' && ultimoPuntoTramo) {
             const coords = await obtenerRutaPorCallesOSRM(ultimoPuntoTramo, latlng);
             if (coords && coords.length > 0) {
-                const linea = L.polyline(coords, { color: estilos.color, weight: estilos.weight, interactive: true }).addTo(map);
+                const linea = L.polyline(coords, { color: estilos.color, weight: estilos.weight, opacity: estilos.opacity, interactive: true }).addTo(map);
                 linea.on('click', function(ev) {
                     if (modoActual === 'borrar') {
                         L.DomEvent.stopPropagation(ev);
@@ -236,7 +244,6 @@ async function gestionarPulsacion(e) {
         contadorNumero++;
     }
 }
-
 async function obtenerRutaPorCallesOSRM(origen, destino) {
     const url = `https://routing.openstreetmap.de/routed-bike/route/v1/bike/${origen.lng},${origen.lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson`;
     try {
@@ -278,7 +285,7 @@ function manejarArchivoGPX(event) {
             if (coordenadas.length > 0) {
                 let grupoCapas = L.featureGroup();
                 const estilos = obtenerEstilosActuales();
-                const linea = L.polyline(coordenadas, { color: estilos.color, weight: estilos.weight, interactive: true }).addTo(map);
+                const linea = L.polyline(coordenadas, { color: estilos.color, weight: estilos.weight, opacity: estilos.opacity, interactive: true }).addTo(map);
                 
                 linea.on('click', function(ev) {
                     if (modoActual === 'borrar') {
@@ -305,6 +312,7 @@ function manejarArchivoGPX(event) {
     };
     lector.readAsText(archivo);
 }
+
 function confirmarBorrarTodo() {
     if (confirm("¿Estás seguro de que quieres borrar todo el mapa? Se perderán todos los puntos y trazos actuales.")) {
         historialAcciones.forEach(i => {
@@ -383,7 +391,7 @@ function exportarDatosMapa() {
             elementos.push({
                 type: "Feature",
                 geometry: { type: "LineString", coordinates: item.elemento.getLatLngs().map(ll => [ll.lng, ll.lat]) },
-                properties: { tipo: "linea", color: item.elemento.options.color }
+                properties: { tipo: "linea", color: item.elemento.options.color, weight: item.elemento.options.weight, opacity: item.elemento.options.opacity }
             });
         } else if (item.tipo === 'marcador') {
             const ll = item.elemento.getLatLng();
@@ -496,7 +504,12 @@ function procesarYAnadirGeoJSON(geojson, mapInstance) {
     geojson.features.forEach(f => {
         if (f.properties.tipo === 'linea') {
             const ll = f.geometry.coordinates.map(c => [c[1], c[0]]);
-            const l = L.polyline(ll, { color: f.properties.color || '#3388ff', weight: 4, interactive: true }).addTo(mapInstance);
+            const l = L.polyline(ll, { 
+                color: f.properties.color || '#3388ff', 
+                weight: f.properties.weight || 4, 
+                opacity: f.properties.opacity !== undefined ? f.properties.opacity : 1, 
+                interactive: true 
+            }).addTo(mapInstance);
             
             l.on('click', ev => { 
                 if (modoActual === 'borrar') { 
@@ -546,7 +559,6 @@ function enfocarMapaEnGrupo(grupoCapas, mapInstance) {
     }
 }
 
-// --- LÓGICA: Importación de Listado de Calles por Archivo de Texto (.txt) (Geocodificación tolerante y flexible) ---
 async function procesarArchivoTextoRuta(event) {
     const archivo = event.target.files[0];
     if (!archivo) return;
@@ -631,6 +643,8 @@ async function procesarArchivoTextoRuta(event) {
         }
 
         let ultimoPunto = null;
+        const estilos = obtenerEstilosActuales();
+
         for (let i = 0; i < puntosCoordenadas.length; i++) {
             const pt = puntosCoordenadas[i];
             const num = contadorNumero;
@@ -657,7 +671,7 @@ async function procesarArchivoTextoRuta(event) {
             if (ultimoPunto) {
                 const coordsRuta = await obtenerRutaPorCallesOSRM(ultimoPunto, pt.latlng);
                 if (coordsRuta && coordsRuta.length > 0) {
-                    const linea = L.polyline(coordsRuta, { color: '#3388ff', weight: 4, interactive: true }).addTo(map);
+                    const linea = L.polyline(coordsRuta, { color: estilos.color, weight: estilos.weight, opacity: estilos.opacity, interactive: true }).addTo(map);
                     linea.on('click', function(ev) {
                         if (modoActual === 'borrar') {
                             L.DomEvent.stopPropagation(ev);
