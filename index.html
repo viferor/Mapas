@@ -24,7 +24,7 @@
             left: 0;
             z-index: 1;
         }
-        /* Botonera inferior transparente y adaptable */
+        /* Botonera inferior fija, transparente y adaptable */
         #toolbar {
             position: absolute;
             bottom: 20px;
@@ -58,7 +58,6 @@
         #toolbar button:active, #toolbar label:active {
             background: #e0e0e0;
         }
-        /* Ocultar input de archivo nativo */
         #import-file {
             display: none;
         }
@@ -80,7 +79,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         // Inicializar mapa
-        const map = L.map('map').setView([37.8882, -4.7794], 13); // Córdoba por defecto
+        const map = L.map('map').setView([37.8882, -4.7794], 13);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
@@ -89,7 +88,7 @@
 
         let drawnItems = L.featureGroup().addTo(map);
 
-        // Solución para la carga de archivos de texto / GPX
+        // Lógica de carga de archivos (GPX, TXT, JSON)
         document.getElementById('import-file').addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -98,36 +97,73 @@
             reader.onload = function(e) {
                 const content = e.target.result;
                 try {
-                    // Si es un archivo GeoJSON o JSON estructurado
+                    // 1. Si es formato GeoJSON / JSON
                     if (file.name.endsWith('.json')) {
                         const data = JSON.parse(content);
                         const layer = L.geoJSON(data);
                         drawnItems.addLayer(layer);
                         map.fitBounds(layer.getBounds());
-                    } else {
-                        // Procesamiento básico para texto plano o GPX simulado
-                        console.log("Contenido del archivo cargado:", content);
-                        alert("Archivo cargado correctamente. Revisa la consola para ver los datos.");
-                        // Aquí puedes añadir tu lógica de parseo de texto/GPX personalizado
+                    } 
+                    // 2. Si es formato GPX (XML)
+                    else if (file.name.endsWith('.gpx') || content.includes('<gpx')) {
+                        const parser = new DOMParser();
+                        const xmlDoc = parser.parseFromString(content, "text/xml");
+                        const trkpts = xmlDoc.getElementsByTagName('trkpt');
+                        let latlngs = [];
+
+                        for (let i = 0; i < trkpts.length; i++) {
+                            const lat = parseFloat(trkpts[i].getAttribute('lat'));
+                            const lon = parseFloat(trkpts[i].getAttribute('lon'));
+                            latlngs.push([lat, lon]);
+                        }
+
+                        if (latlngs.length > 0) {
+                            const polyline = L.polyline(latlngs, { color: 'blue' });
+                            drawnItems.addLayer(polyline);
+                            map.fitBounds(polyline.getBounds());
+                        } else {
+                            alert("No se encontraron puntos de track (trkpt) en el archivo GPX.");
+                        }
+                    } 
+                    // 3. Si es un archivo de texto plano con coordenadas (ej: lat,lon por línea)
+                    else {
+                        const lines = content.split('\n');
+                        let latlngs = [];
+                        
+                        lines.forEach(line => {
+                            const parts = line.trim().split(',');
+                            if (parts.length >= 2) {
+                                const lat = parseFloat(parts[0]);
+                                const lon = parseFloat(parts[1]);
+                                if (!isNaN(lat) && !isNaN(lon)) {
+                                    latlngs.push([lat, lon]);
+                                }
+                            }
+                        });
+
+                        if (latlngs.length > 0) {
+                            const polyline = L.polyline(latlngs, { color: 'red' });
+                            drawnItems.addLayer(polyline);
+                            map.fitBounds(polyline.getBounds());
+                        } else {
+                            alert("El archivo de texto no contiene coordenadas válidas en formato 'lat,lon'.");
+                        }
                     }
                 } catch (error) {
                     console.error("Error al procesar el archivo:", error);
-                    alert("Hubo un error al leer el formato del archivo.");
+                    alert("Hubo un error al interpretar el archivo.");
                 }
             };
-            
-            // Leer como texto para archivos .txt, .gpx o .json
+
             reader.readAsText(file);
-            
-            // Limpiar el input para permitir cargar el mismo archivo dos veces si es necesario
-            event.target.value = '';
+            event.target.value = ''; // Resetear input
         });
 
-        // Botones de ejemplo
+        // Limpiar mapa
         document.getElementById('btn-clear').addEventListener('click', () => {
             drawnItems.clearLayers();
         });
-    </s:script>
+    </script>
 </body>
 </html>
 
