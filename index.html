@@ -19,10 +19,9 @@
 
         #map {
             width: 100%;
-            height: calc(100vh - 75px); /* Deja espacio abajo para la botonera */
+            height: calc(100vh - 75px);
         }
 
-        /* Contenedor de la botonera inferior adaptable a móviles */
         .toolbar {
             position: fixed;
             bottom: 0;
@@ -37,10 +36,9 @@
             box-shadow: 0 -2px 10px rgba(0,0,0,0.15);
             z-index: 1000;
             box-sizing: border-box;
-            overflow-x: auto; /* Permite deslizar si faltara espacio en pantallas muy pequeñas */
+            overflow-x: auto;
         }
 
-        /* Estilo general de los botones optimizado para toque táctil */
         .btn {
             background: #f0f0f0;
             border: none;
@@ -71,7 +69,6 @@
             white-space: nowrap;
         }
 
-        /* Estados activos */
         .btn-active-blue {
             background: #3388ff !important;
             color: white !important;
@@ -86,7 +83,6 @@
             background: #ffcc00;
         }
 
-        /* Notificaciones flotantes (Toast) */
         #toast-aviso {
             position: fixed;
             top: 15px;
@@ -104,7 +100,6 @@
             white-space: nowrap;
         }
 
-        /* Estilo para los números en los marcadores del mapa */
         .number-icon {
             background: #3388ff;
             border: 2px solid white;
@@ -116,7 +111,6 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
 
-        /* Modales generales de GitHub */
         .modal {
             display: none;
             position: fixed;
@@ -141,15 +135,14 @@
 
     <div id="toast-aviso"></div>
 
-    <!-- Mapa -->
     <div id="map"></div>
 
-    <!-- Botonera inferior adaptada con TODAS las opciones -->
+    <!-- Botonera inferior corregida con 'aislado' bien apuntado -->
     <div class="toolbar">
         <button id="btn-ruta" class="btn" onclick="setModo('ruta')">
             <span class="icon">🛣️</span><span class="text">Calle</span>
         </button>
-        <button id="btn-aislado" class="btn" onclick="setModo('ruta')"> <!-- o 'aislado' según prefieras -->
+        <button id="btn-aislado" class="btn" onclick="setModo('aislado')">
             <span class="icon">📍</span><span class="text">Aislado</span>
         </button>
         <button id="btn-puntos-rectos" class="btn" onclick="setModo('dibujar_puntos')">
@@ -178,7 +171,6 @@
         </button>
     </div>
 
-    <!-- Modal para GitHub -->
     <div id="modal-load" class="modal">
         <div class="modal-content">
             <h3>Gestión de Mapas</h3>
@@ -188,9 +180,7 @@
         </div>
     </div>
 
-    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Tu archivo logico app.js -->
     <script src="app.js"></script>
 </body>
 </html>
