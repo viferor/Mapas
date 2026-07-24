@@ -515,7 +515,7 @@ function procesarYAnadirGeoJSON(geojson, mapInstance) {
                 if (modoActual === 'borrar') { 
                     L.DomEvent.stopPropagation(ev); 
                     mapInstance.removeLayer(l); 
-                    historialAcciones = hist_acciones_filtrar(l); // Ajuste interno
+                    historialAcciones = historialAcciones.filter(item => item.elemento !== l); 
                     mostrarToast("Línea borrada"); 
                 } 
             });
