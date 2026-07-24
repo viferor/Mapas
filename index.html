@@ -137,7 +137,10 @@
 
     <div id="map"></div>
 
-    <!-- Botonera inferior corregida con 'aislado' bien apuntado -->
+    <!-- Input oculto para cargar el archivo GPX usando la función manejarArchivoGPX existente en app.js -->
+    <input type="file" id="gpx-file-input" accept=".gpx" style="display: none;" onchange="manejarArchivoGPX(event)">
+
+    <!-- Botonera inferior -->
     <div class="toolbar">
         <button id="btn-ruta" class="btn" onclick="setModo('ruta')">
             <span class="icon">🛣️</span><span class="text">Calle</span>
@@ -163,11 +166,15 @@
         <button class="btn" onclick="confirmarBorrarTodo()" style="background:#ffdddd;">
             <span class="icon">💥</span><span class="text">Todo</span>
         </button>
+        <!-- Botón para disparar la selección del archivo GPX -->
+        <button class="btn" onclick="document.getElementById('gpx-file-input').click()" style="background:#e2f0d9;">
+            <span class="icon">📂</span><span class="text">GPX</span>
+        </button>
         <button class="btn btn-yellow" onclick="abrirModalGithub('guardar')">
             <span class="icon">💾</span><span class="text">Guardar</span>
         </button>
         <button class="btn" onclick="abrirModalGithub('cargar')" style="background:#d4edda;">
-            <span class="icon">📂</span><span class="text">Cargar</span>
+            <span class="icon">☁️</span><span class="text">Cargar</span>
         </button>
     </div>
 
