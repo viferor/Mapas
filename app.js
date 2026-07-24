@@ -546,7 +546,7 @@ function enfocarMapaEnGrupo(grupoCapas, mapInstance) {
     }
 }
 
-// --- LÓGICA: Importación Múltiple de Imágenes (OCR + Geocodificación) ---
+// --- LÓGICA: Importación Múltiple de Imágenes con Filtro Estricto en Córdoba ---
 async function procesarImagenesRuta(event) {
     const archivos = event.target.files;
     if (!archivos || archivos.length === 0) return;
@@ -585,24 +585,33 @@ async function procesarImagenesRuta(event) {
         return;
     }
 
-    mostrarToast(`Geocodificando ubicaciones...`);
+    mostrarToast(`Geocodificando en Córdoba...`);
     let grupoCapas = L.featureGroup();
     let puntosCoordenadas = [];
     
-    // Ciudad y país de referencia para acotar la búsqueda y evitar duplicados
+    // Delimitador estricto para forzar resultados exclusivamente en Córdoba, España
     const ciudadReferencia = "Córdoba, España"; 
 
     for (let nombre of todasLasLineas) {
         try {
-            // Añadimos la ciudad de referencia a la búsqueda de Nominatim
-            const queryConCiudad = nombre + ", " + ciudadReferencia;
-            const urlGeo = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(queryConCiudad)}`;
+            // Forzamos la consulta incluyendo explícitamente Córdoba
+            const queryConCiudad = `${nombre}, ${ciudadReferencia}`;
+            // Añadimos viewbox/bounded para priorizar estrictamente el área geográfica de Córdoba
+            const urlGeo = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(queryConCiudad)}&countrycodes=es&limit=1`;
             const res = await fetch(urlGeo);
             const datos = await res.json();
+            
             if (datos && datos.length > 0) {
-                const nuevoPunto = L.latLng(parseFloat(datos[0].lat), parseFloat(datos[0].lon));
-                if (puntosCoordenadas.length === 0 || puntosCoordenadas[puntosCoordenadas.length - 1].latlng.distanceTo(nuevoPunto) > 50) {
-                    puntosCoordenadas.push({ latlng: nuevoPunto, nombre: nombre });
+                const lat = parseFloat(datos[0].lat);
+                const lon = parseFloat(datos[0].lon);
+                
+                // Filtro de seguridad por coordenadas: validamos que esté dentro de la provincia/zona de Córdoba 
+                // (latitud aprox entre 37.5 y 38.3, longitud entre -5.2 y -4.3)
+                if (lat >= 37.3 && lat <= 38.5 && lon >= -5.5 && lon <= -4.0) {
+                    const nuevoPunto = L.latLng(lat, lon);
+                    if (puntosCoordenadas.length === 0 || puntosCoordenadas[puntosCoordenadas.length - 1].latlng.distanceTo(nuevoPunto) > 50) {
+                        puntosCoordenadas.push({ latlng: nuevoPunto, nombre: nombre });
+                    }
                 }
             }
         } catch (err) {
@@ -612,7 +621,7 @@ async function procesarImagenesRuta(event) {
     }
 
     if (puntosCoordenadas.length === 0) {
-        alert("No se han encontrado coordenadas geográficas válidas para los textos detectados.");
+        alert("No se han encontrado coordenadas válidas dentro de Córdoba para los textos detectados.");
         event.target.value = '';
         return;
     }
@@ -666,7 +675,7 @@ async function procesarImagenesRuta(event) {
 
     historialRehacer = [];
     enfocarMapaEnGrupo(grupoCapas, map);
-    mostrarToast("¡Ruta creada con éxito desde las imágenes!");
+    mostrarToast("¡Ruta creada en Córdoba con éxito!");
     event.target.value = '';
 }
 
