@@ -82,8 +82,8 @@ function obtenerEstilosActuales() {
 
     return { 
         color: colorInput ? colorInput.value : '#3388ff', 
-        weight: grosorInput ? parseInt(grosorInput.value) : 4, 
-        opacity: opacidadInput ? parseFloat(opacidadInput.value) : 1 
+        weight: grosorInput ? parseInt(grosorInput.value, 10) || 4 : 4, 
+        opacity: opacidadInput ? parseFloat(opacidadInput.value) || 1 : 1 
     };
 }
 
@@ -506,7 +506,7 @@ function procesarYAnadirGeoJSON(geojson, mapInstance) {
             const ll = f.geometry.coordinates.map(c => [c[1], c[0]]);
             const l = L.polyline(ll, { 
                 color: f.properties.color || '#3388ff', 
-                weight: f.properties.weight || 4, 
+                weight: f.properties.weight !== undefined ? f.properties.weight : 4, 
                 opacity: f.properties.opacity !== undefined ? f.properties.opacity : 1, 
                 interactive: true 
             }).addTo(mapInstance);
@@ -515,7 +515,7 @@ function procesarYAnadirGeoJSON(geojson, mapInstance) {
                 if (modoActual === 'borrar') { 
                     L.DomEvent.stopPropagation(ev); 
                     mapInstance.removeLayer(l); 
-                    historialAcciones = historialAcciones.filter(item => item.elemento !== l); 
+                    historialAcciones = hist_acciones_filtrar(l); // Ajuste interno
                     mostrarToast("Línea borrada"); 
                 } 
             });
@@ -592,7 +592,6 @@ async function procesarArchivoTextoRuta(event) {
                 `${nombre}, Córdoba, España`,
                 `${nombreLimpio}, Córdoba, España`,
                 `Calle ${nombreLimpio}, Córdoba, España`,
-                `Calle Marqués del Boil, Córdoba, España`,
                 `Calle ${nombre}, Córdoba, España`
             ];
 
