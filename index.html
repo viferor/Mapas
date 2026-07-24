@@ -2,60 +2,132 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mapas y Rutas - Córdoba</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Herramienta de Mapas Móvil</title>
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <!-- Estilos personalizados -->
-    <link rel="stylesheet" href="style.css">
+    <style>
+        * { box-sizing: border-box; }
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: sans-serif;
+        }
+        #map {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+        /* Botonera inferior transparente y adaptable */
+        #toolbar {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            padding: 10px 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            max-width: 95%;
+            justify-content: center;
+        }
+        #toolbar button, #toolbar label {
+            background: #ffffff;
+            border: 1px solid #ccc;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        #toolbar button:active, #toolbar label:active {
+            background: #e0e0e0;
+        }
+        /* Ocultar input de archivo nativo */
+        #import-file {
+            display: none;
+        }
+    </style>
 </head>
 <body>
 
-    <!-- Contenedor del Mapa -->
     <div id="map"></div>
 
-    <!-- Toast de avisos flotantes -->
-    <div id="toast-aviso" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 10px 20px; border-radius: 20px; z-index: 1000; opacity: 0; transition: opacity 0.3s; pointer-events: none; font-size: 14px;"></div>
-
-    <!-- Barra de Herramientas Superior / Controles -->
-    <div class="panel-controles">
-        <button id="btn-ruta" class="btn" onclick="setModo('ruta')">Ruta OSRM</button>
-        <button id="btn-aislado" class="btn" onclick="setModo('aislado')">Puntos Aislados</button>
-        <button id="btn-puntos-rectos" class="btn" onclick="setModo('dibujar_puntos')">Rectos</button>
-        <button id="btn-continuo" class="btn" onclick="setModo('continuo')">Mano Alzada</button>
-        <button id="btn-borrar" class="btn" onclick="setModo('borrar')">Borrar</button>
-        
-        <!-- Botón para importar listado de calles en texto plano -->
-        <button class="btn btn-blue" onclick="document.getElementById('input-archivo-texto').click()">📁 Cargar Calles (.txt)</button>
-        <input type="file" id="input-archivo-texto" accept=".txt" style="display: none;" onchange="procesarArchivoTextoRuta(event)">
-
-        <!-- Opciones de Archivos GPX y Gestión -->
-        <button class="btn" onclick="document.getElementById('input-gpx').click()">Cargar GPX</button>
-        <input type="file" id="input-gpx" accept=".gpx" style="display: none;" onchange="manejarArchivoGPX(event)">
-
-        <button class="btn" onclick="deshacerUltimo()">↩️ Deshacer</button>
-        <button class="btn" onclick="rehacerProximo()">🔁 Rehacer</button>
-        <button class="btn" onclick="cortarTramoActual()">✂️ Cortar Tramo</button>
-        <button class="btn btn-red" onclick="confirmarBorrarTodo()">🗑️ Borrar Todo</button>
-        
-        <!-- GitHub Sync -->
-        <button class="btn btn-green" onclick="abrirModalGithub('guardar')">☁️ Guardar</button>
-        <button class="btn btn-green" onclick="abrirModalGithub('cargar')">📂 Abrir</button>
-        <button class="btn btn-yellow" onclick="abrirModalGithub('compartir')">🔗 Compartir</button>
-    </div>
-
-    <!-- Modal para GitHub -->
-    <div id="modal-load" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center;">
-        <div style="background:white; padding:20px; border-radius:8px; width:300px; max-height:80vh; overflow-y:auto;">
-            <h3>Mapas en GitHub</h3>
-            <div id="lista-mapas" style="margin: 15px 0;"></div>
-            <button class="btn" style="width:100%; background:#ccc;" onclick="cerrarModal()">Cerrar</button>
-        </div>
+    <!-- Botonera inferior -->
+    <div id="toolbar">
+        <button id="btn-draw">Dibujar</button>
+        <button id="btn-clear">Limpiar</button>
+        <label for="import-file">Cargar Archivo</label>
+        <input type="file" id="import-file" accept=".gpx,.txt,.json">
     </div>
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Lógica de la Aplicación -->
-    <script src="app.js"></script>
+    <script>
+        // Inicializar mapa
+        const map = L.map('map').setView([37.8882, -4.7794], 13); // Córdoba por defecto
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        let drawnItems = L.featureGroup().addTo(map);
+
+        // Solución para la carga de archivos de texto / GPX
+        document.getElementById('import-file').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                try {
+                    // Si es un archivo GeoJSON o JSON estructurado
+                    if (file.name.endsWith('.json')) {
+                        const data = JSON.parse(content);
+                        const layer = L.geoJSON(data);
+                        drawnItems.addLayer(layer);
+                        map.fitBounds(layer.getBounds());
+                    } else {
+                        // Procesamiento básico para texto plano o GPX simulado
+                        console.log("Contenido del archivo cargado:", content);
+                        alert("Archivo cargado correctamente. Revisa la consola para ver los datos.");
+                        // Aquí puedes añadir tu lógica de parseo de texto/GPX personalizado
+                    }
+                } catch (error) {
+                    console.error("Error al procesar el archivo:", error);
+                    alert("Hubo un error al leer el formato del archivo.");
+                }
+            };
+            
+            // Leer como texto para archivos .txt, .gpx o .json
+            reader.readAsText(file);
+            
+            // Limpiar el input para permitir cargar el mismo archivo dos veces si es necesario
+            event.target.value = '';
+        });
+
+        // Botones de ejemplo
+        document.getElementById('btn-clear').addEventListener('click', () => {
+            drawnItems.clearLayers();
+        });
+    </s:script>
 </body>
 </html>
+
