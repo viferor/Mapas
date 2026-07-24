@@ -546,7 +546,7 @@ function enfocarMapaEnGrupo(grupoCapas, mapInstance) {
     }
 }
 
-// --- LÓGICA: Importación Múltiple de Imágenes con Filtro Estricto en Córdoba ---
+// --- LÓGICA: Importación con Validación Estricta por Viewbox de Córdoba ---
 async function procesarImagenesRuta(event) {
     const archivos = event.target.files;
     if (!archivos || archivos.length === 0) return;
@@ -585,43 +585,57 @@ async function procesarImagenesRuta(event) {
         return;
     }
 
-    mostrarToast(`Geocodificando en Córdoba...`);
+    mostrarToast(`Geocodificando estrictamente en Córdoba...`);
     let grupoCapas = L.featureGroup();
     let puntosCoordenadas = [];
+    let textosNoReconocidos = [];
     
-    // Delimitador estricto para forzar resultados exclusivamente en Córdoba, España
-    const ciudadReferencia = "Córdoba, España"; 
+    // Caja delimitadora (viewbox) estricta para el núcleo urbano de Córdoba y alrededores cercanos:
+    // Formato en Nominatim: min_lon,min_lat,max_lon,max_lat (-4.86, 37.83, -4.68, 37.93)
+    const viewboxCordoba = "-4.86,37.83,-4.68,37.93";
 
     for (let nombre of todasLasLineas) {
         try {
-            // Forzamos la consulta incluyendo explícitamente Córdoba
-            const queryConCiudad = `${nombre}, ${ciudadReferencia}`;
-            // Añadimos viewbox/bounded para priorizar estrictamente el área geográfica de Córdoba
-            const urlGeo = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(queryConCiudad)}&countrycodes=es&limit=1`;
+            const queryConCiudad = `${nombre}, Córdoba, España`;
+            const urlGeo = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(queryConCiudad)}&countrycodes=es&viewbox=${viewboxCordoba}&bounded=1&limit=1`;
+            
             const res = await fetch(urlGeo);
             const datos = await res.json();
             
+            let encontradoValido = false;
             if (datos && datos.length > 0) {
                 const lat = parseFloat(datos[0].lat);
                 const lon = parseFloat(datos[0].lon);
                 
-                // Filtro de seguridad por coordenadas: validamos que esté dentro de la provincia/zona de Córdoba 
-                // (latitud aprox entre 37.5 y 38.3, longitud entre -5.2 y -4.3)
-                if (lat >= 37.3 && lat <= 38.5 && lon >= -5.5 && lon <= -4.0) {
+                // Doble comprobación matemática de coordenadas exactas de la ciudad
+                if (lat >= 37.83 && lat <= 37.93 && lon >= -4.86 && lon <= -4.68) {
                     const nuevoPunto = L.latLng(lat, lon);
                     if (puntosCoordenadas.length === 0 || puntosCoordenadas[puntosCoordenadas.length - 1].latlng.distanceTo(nuevoPunto) > 50) {
                         puntosCoordenadas.push({ latlng: nuevoPunto, nombre: nombre });
                     }
+                    encontradoValido = true;
+                }
+            }
+
+            if (!encontradoValido) {
+                if (!textosNoReconocidos.includes(nombre)) {
+                    textosNoReconocidos.push(nombre);
                 }
             }
         } catch (err) {
-            console.error("Error geocodificando: " + nombre, err);
+            if (!textosNoReconocidos.includes(nombre)) {
+                textosNoReconocidos.push(nombre);
+            }
         }
         await new Promise(r => setTimeout(r, 300));
     }
 
+    if (textosNoReconocidos.length > 0) {
+        alert(`⚠️ Atención: Los siguientes textos/calles no se han podido ubicar strictly en Córdoba y han sido descartados:\n\n- ${textosNoReconocidos.join('\n- ')}`);
+    }
+
     if (puntosCoordenadas.length === 0) {
-        alert("No se han encontrado coordenadas válidas dentro de Córdoba para los textos detectados.");
+        alert("No se ha podido trazar ninguna ruta porque los elementos no coinciden con calles de Córdoba.");
         event.target.value = '';
         return;
     }
@@ -675,7 +689,7 @@ async function procesarImagenesRuta(event) {
 
     historialRehacer = [];
     enfocarMapaEnGrupo(grupoCapas, map);
-    mostrarToast("¡Ruta creada en Córdoba con éxito!");
+    mostrarToast("¡Ruta procesada en Córdoba!");
     event.target.value = '';
 }
 
