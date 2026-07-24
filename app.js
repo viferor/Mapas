@@ -34,6 +34,15 @@ document.addEventListener("DOMContentLoaded", function () {
     configurarDibujoTactilTablet();
     setModo('ruta');
 
+    // Inicializar escuchadores para actualizar globalmente todos los trazos al mover los controles
+    const colorInput = document.getElementById('color-trazo');
+    const grosorInput = document.getElementById('grosor-trazo');
+    const opacidadInput = document.getElementById('opacidad-trazo');
+
+    if (colorInput) colorInput.addEventListener('input', actualizarEstiloTodosLosTrazos);
+    if (grosorInput) grosorInput.addEventListener('input', actualizarEstiloTodosLosTrazos);
+    if (opacidadInput) opacidadInput.addEventListener('input', actualizarEstiloTodosLosTrazos);
+
     const urlParams = new URLSearchParams(window.location.search);
     const mapaCompartido = urlParams.get('mapa');
     if (mapaCompartido) cargarMapaDesdeGithub(mapaCompartido);
@@ -85,6 +94,22 @@ function obtenerEstilosActuales() {
         weight: grosorInput ? parseInt(grosorInput.value, 10) || 4 : 4, 
         opacity: opacidadInput ? parseFloat(opacidadInput.value) || 1 : 1 
     };
+}
+
+// Función para actualizar globalmente el estilo de todas las líneas presentes en el historial y mapa
+function actualizarEstiloTodosLosTrazos() {
+    const estilos = obtenerEstilosActuales();
+    
+    // Recorremos todas las acciones guardadas en el historial
+    historialAcciones.forEach(item => {
+        if (item.tipo === 'linea' && item.elemento && typeof item.elemento.setStyle === 'function') {
+            item.elemento.setStyle({
+                color: estilos.color,
+                weight: estilos.weight,
+                opacity: estilos.opacity
+            });
+        }
+    });
 }
 
 function mostrarToast(mensaje) {
