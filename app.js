@@ -546,150 +546,131 @@ function enfocarMapaEnGrupo(grupoCapas, mapInstance) {
     }
 }
 
-// --- LÓGICA: Importación con Validación Estricta por Viewbox de Córdoba ---
-async function procesarImagenesRuta(event) {
-    const archivos = event.target.files;
-    if (!archivos || archivos.length === 0) return;
+// --- LÓGICA: Importación de Listado de Calles por Archivo de Texto (.txt) ---
+async function procesarArchivoTextoRuta(event) {
+    const archivo = event.target.files[0];
+    if (!archivo) return;
 
-    mostrarToast(`Preparando ${archivos.length} imagen(es)...`);
+    mostrarToast(`Leyendo listado de calles...`);
 
-    if (typeof Tesseract === 'undefined') {
-        await new Promise((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = 'https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js';
-            script.onload = resolve;
-            script.onerror = reject;
-            document.head.appendChild(script);
-        });
-    }
+    const lector = new FileReader();
+    lector.onload = async function(e) {
+        const contenidoTexto = e.target.result;
+        // Divide el archivo por saltos de línea, elimina espacios en blanco y descarta líneas vacías o muy cortas
+        const lineas = contenidoTexto.split('\n').map(l => l.trim()).filter(l => l.length > 2);
 
-    let todasLasLineas = [];
-
-    for (let i = 0; i < archivos.length; i++) {
-        const archivo = archivos[i];
-        mostrarToast(`Leyendo imagen ${i + 1} de ${archivos.length}...`);
-        
-        try {
-            const resultadoOCR = await Tesseract.recognize(archivo, 'spa');
-            const textoExtraido = resultadoOCR.data.text;
-            const lineas = textoExtraido.split('\n').map(l => l.trim()).filter(l => l.length > 2);
-            todasLasLineas = todasLasLineas.concat(lineas);
-        } catch (err) {
-            console.error("Error en OCR con la imagen", err);
+        if (lineas.length === 0) {
+            alert("El archivo de texto está vacío o no contiene líneas válidas.");
+            event.target.value = '';
+            return;
         }
-    }
 
-    if (todasLasLineas.length === 0) {
-        alert("No se ha podido reconocer texto válido en las imágenes seleccionadas.");
-        event.target.value = '';
-        return;
-    }
+        mostrarToast(`Geocodificando ${lineas.length} calles en Córdoba...`);
+        let grupoCapas = L.featureGroup();
+        let puntosCoordenadas = [];
+        let textosNoReconocidos = [];
+        
+        // Caja delimitadora (viewbox) estricta para el núcleo urbano de Córdoba y alrededores cercanos
+        const viewboxCordoba = "-4.86,37.83,-4.68,37.93";
 
-    mostrarToast(`Geocodificando estrictamente en Córdoba...`);
-    let grupoCapas = L.featureGroup();
-    let puntosCoordenadas = [];
-    let textosNoReconocidos = [];
-    
-    // Caja delimitadora (viewbox) estricta para el núcleo urbano de Córdoba y alrededores cercanos:
-    // Formato en Nominatim: min_lon,min_lat,max_lon,max_lat (-4.86, 37.83, -4.68, 37.93)
-    const viewboxCordoba = "-4.86,37.83,-4.68,37.93";
-
-    for (let nombre of todasLasLineas) {
-        try {
-            const queryConCiudad = `${nombre}, Córdoba, España`;
-            const urlGeo = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(queryConCiudad)}&countrycodes=es&viewbox=${viewboxCordoba}&bounded=1&limit=1`;
-            
-            const res = await fetch(urlGeo);
-            const datos = await res.json();
-            
-            let encontradoValido = false;
-            if (datos && datos.length > 0) {
-                const lat = parseFloat(datos[0].lat);
-                const lon = parseFloat(datos[0].lon);
+        for (let nombre of lineas) {
+            try {
+                const queryConCiudad = `${nombre}, Córdoba, España`;
+                const urlGeo = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(queryConCiudad)}&countrycodes=es&viewbox=${viewboxCordoba}&bounded=1&limit=1`;
                 
-                // Doble comprobación matemática de coordenadas exactas de la ciudad
-                if (lat >= 37.83 && lat <= 37.93 && lon >= -4.86 && lon <= -4.68) {
-                    const nuevoPunto = L.latLng(lat, lon);
-                    if (puntosCoordenadas.length === 0 || puntosCoordenadas[puntosCoordenadas.length - 1].latlng.distanceTo(nuevoPunto) > 50) {
-                        puntosCoordenadas.push({ latlng: nuevoPunto, nombre: nombre });
+                const res = await fetch(urlGeo);
+                const datos = await res.json();
+                
+                let encontradoValido = false;
+                if (datos && datos.length > 0) {
+                    const lat = parseFloat(datos[0].lat);
+                    const lon = parseFloat(datos[0].lon);
+                    
+                    if (lat >= 37.83 && lat <= 37.93 && lon >= -4.86 && lon <= -4.68) {
+                        const nuevoPunto = L.latLng(lat, lon);
+                        if (puntosCoordenadas.length === 0 || puntosCoordenadas[puntosCoordenadas.length - 1].latlng.distanceTo(nuevoPunto) > 50) {
+                            puntosCoordenadas.push({ latlng: nuevoPunto, nombre: nombre });
+                        }
+                        encontradoValido = true;
                     }
-                    encontradoValido = true;
                 }
-            }
 
-            if (!encontradoValido) {
+                if (!encontradoValido) {
+                    if (!textosNoReconocidos.includes(nombre)) {
+                        textosNoReconocidos.push(nombre);
+                    }
+                }
+            } catch (err) {
                 if (!textosNoReconocidos.includes(nombre)) {
                     textosNoReconocidos.push(nombre);
                 }
             }
-        } catch (err) {
-            if (!textosNoReconocidos.includes(nombre)) {
-                textosNoReconocidos.push(nombre);
-            }
+            await new Promise(r => setTimeout(r, 300));
         }
-        await new Promise(r => setTimeout(r, 300));
-    }
 
-    if (textosNoReconocidos.length > 0) {
-        alert(`⚠️ Atención: Los siguientes textos/calles no se han podido ubicar strictly en Córdoba y han sido descartados:\n\n- ${textosNoReconocidos.join('\n- ')}`);
-    }
+        if (textosNoReconocidos.length > 0) {
+            alert(`⚠️ Atención: Las siguientes calles del archivo no se han podido reconocer en Córdoba y han sido descartadas:\n\n- ${textosNoReconocidos.join('\n- ')}`);
+        }
 
-    if (puntosCoordenadas.length === 0) {
-        alert("No se ha podido trazar ninguna ruta porque los elementos no coinciden con calles de Córdoba.");
-        event.target.value = '';
-        return;
-    }
+        if (puntosCoordenadas.length === 0) {
+            alert("No se ha podido trazar ninguna ruta porque ninguna calle del archivo coincide con el callejero de Córdoba.");
+            event.target.value = '';
+            return;
+        }
 
-    let ultimoPunto = null;
-    for (let i = 0; i < puntosCoordenadas.length; i++) {
-        const pt = puntosCoordenadas[i];
-        const num = contadorNumero;
-        
-        const icon = L.divIcon({ className: 'number-icon', html: `<span>${num}</span>`, iconSize: [28, 28], iconAnchor: [14, 14] });
-        const marker = L.marker(pt.latlng, { icon: icon, draggable: true, interactive: true }).addTo(map);
-        
-        marker.on('click', function(ev) {
-            if (modoActual === 'borrar') {
-                L.DomEvent.stopPropagation(ev);
-                map.removeLayer(this);
-                historialAcciones = historialAcciones.filter(item => item.elemento !== this);
-                if (this.lineaAsociada) {
-                    map.removeLayer(this.lineaAsociada);
-                    historialAcciones = historialAcciones.filter(item => item.elemento !== this.lineaAsociada);
-                }
-                recalcularContadorNumeros();
-                mostrarToast("Punto borrado");
-            }
-        });
-
-        grupoCapas.addLayer(marker);
-
-        if (ultimoPunto) {
-            const coordsRuta = await obtenerRutaPorCallesOSRM(ultimoPunto, pt.latlng);
-            if (coordsRuta && coordsRuta.length > 0) {
-                const linea = L.polyline(coordsRuta, { color: '#3388ff', weight: 4, interactive: true }).addTo(map);
-                linea.on('click', function(ev) {
-                    if (modoActual === 'borrar') {
-                        L.DomEvent.stopPropagation(ev);
-                        map.removeLayer(this);
-                        historialAcciones = historialAcciones.filter(item => item.elemento !== this);
-                        mostrarToast("Tramo borrado");
+        let ultimoPunto = null;
+        for (let i = 0; i < puntosCoordenadas.length; i++) {
+            const pt = puntosCoordenadas[i];
+            const num = contadorNumero;
+            
+            const icon = L.divIcon({ className: 'number-icon', html: `<span>${num}</span>`, iconSize: [28, 28], iconAnchor: [14, 14] });
+            const marker = L.marker(pt.latlng, { icon: icon, draggable: true, interactive: true }).addTo(map);
+            
+            marker.on('click', function(ev) {
+                if (modoActual === 'borrar') {
+                    L.DomEvent.stopPropagation(ev);
+                    map.removeLayer(this);
+                    historialAcciones = historialAcciones.filter(item => item.elemento !== this);
+                    if (this.lineaAsociada) {
+                        map.removeLayer(this.lineaAsociada);
+                        historialAcciones = historialAcciones.filter(item => item.elemento !== this.lineaAsociada);
                     }
-                });
-                marker.lineaAsociada = linea;
-                historialAcciones.push({ tipo: 'linea', elemento: linea });
-                grupoCapas.addLayer(linea);
+                    recalcularContadorNumeros();
+                    mostrarToast("Punto borrado");
+                }
+            });
+
+            grupoCapas.addLayer(marker);
+
+            if (ultimoPunto) {
+                const coordsRuta = await obtenerRutaPorCallesOSRM(ultimoPunto, pt.latlng);
+                if (coordsRuta && coordsRuta.length > 0) {
+                    const linea = L.polyline(coordsRuta, { color: '#3388ff', weight: 4, interactive: true }).addTo(map);
+                    linea.on('click', function(ev) {
+                        if (modoActual === 'borrar') {
+                            L.DomEvent.stopPropagation(ev);
+                            map.removeLayer(this);
+                            historialAcciones = historialAcciones.filter(item => item.elemento !== this);
+                            mostrarToast("Tramo borrado");
+                        }
+                    });
+                    marker.lineaAsociada = linea;
+                    historialAcciones.push({ tipo: 'linea', elemento: linea });
+                    grupoCapas.addLayer(linea);
+                }
             }
+
+            ultimoPunto = pt.latlng;
+            historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: num, submodo: 'ruta' });
+            contadorNumero++;
         }
 
-        ultimoPunto = pt.latlng;
-        historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: num, submodo: 'ruta' });
-        contadorNumero++;
-    }
+        historialRehacer = [];
+        enfocarMapaEnGrupo(grupoCapas, map);
+        mostrarToast("¡Ruta procesada desde archivo de texto!");
+        event.target.value = '';
+    };
 
-    historialRehacer = [];
-    enfocarMapaEnGrupo(grupoCapas, map);
-    mostrarToast("¡Ruta procesada en Córdoba!");
-    event.target.value = '';
+    lector.readAsText(archivo);
 }
 
