@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Editor de Mapas y Rutas</title>
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -23,30 +23,32 @@
             left: 0;
             z-index: 1;
         }
-        /* Panel de control flotante */
+        /* Botonera inferior original adaptada para móviles */
         .control-panel {
             position: absolute;
-            top: 15px;
-            left: 15px;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             z-index: 1000;
             background: white;
-            padding: 12px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            padding: 10px 14px;
+            border-radius: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
             display: flex;
-            flex-direction: column;
             gap: 8px;
-            max-width: 220px;
+            align-items: center;
+            max-width: 95vw;
+            overflow-x: auto;
         }
         .btn {
             background: #f8f9fa;
             border: 1px solid #ccc;
             padding: 8px 12px;
-            border-radius: 6px;
+            border-radius: 20px;
             cursor: pointer;
             font-size: 13px;
             font-weight: 500;
-            text-align: center;
+            white-space: nowrap;
             transition: background 0.2s;
         }
         .btn:hover {
@@ -77,7 +79,7 @@
         /* Toast de avisos flotante */
         #toast-aviso {
             position: absolute;
-            bottom: 30px;
+            bottom: 90px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 1000;
@@ -116,28 +118,29 @@
     <!-- Contenedor del Mapa -->
     <div id="map"></div>
 
-    <!-- Panel Flotante de Herramientas -->
+    <!-- Panel Flotante Inferior Original -->
     <div class="control-panel">
-        <button id="btn-ruta" class="btn" onclick="setModo('ruta')">🚴 Ruta OSRM</button>
-        <button id="btn-aislado" class="btn" onclick="setModo('aislado')">📍 Punto Aislado</button>
+        <button id="btn-ruta" class="btn" onclick="setModo('ruta')">🚴 Ruta</button>
+        <button id="btn-aislado" class="btn" onclick="setModo('aislado')">📍 Aislado</button>
         <button id="btn-puntos-rectos" class="btn" onclick="setModo('dibujar_puntos')">📏 Rectos</button>
-        <button id="btn-continuo" class="btn" onclick="setModo('continuo')">✍️ Mano Alzada</button>
+        <button id="btn-continuo" class="btn" onclick="setModo('continuo')">✍️ Mano</button>
         <button id="btn-borrar" class="btn" onclick="setModo('borrar')">🗑️ Borrar</button>
-        <hr style="border:0; border-top:1px solid #eee; margin:2px 0;">
-        <button class="btn" style="background:#e8f4fd; color:#0066cc;" onclick="deshacerUltimo()">↩️ Deshacer</button>
-        <button class="btn" style="background:#fefefe;" onclick="rehacerProximo()">↪️ Rehacer</button>
-        <button class="btn" style="background:#f8d7da; color:#721c24;" onclick="confirmarBorrarTodo()">⚠️ Borrar Todo</button>
-        <hr style="border:0; border-top:1px solid #eee; margin:2px 0;">
-        <!-- Botón de Importar GPX -->
+        <button class="btn" style="background:#e8f4fd; color:#0066cc;" onclick="deshacerUltimo()">↩️</button>
+        <button class="btn" style="background:#fefefe;" onclick="rehacerProximo()">↪️</button>
+        <button class="btn" style="background:#f8d7da; color:#721c24;" onclick="confirmarBorrarTodo()">⚠️ Todo</button>
+        
+        <!-- Importar GPX -->
         <input type="file" id="input-gpx" accept=".gpx" style="display: none;" onchange="manejarArchivoGPX(event)">
-        <button class="btn" onclick="document.getElementById('input-gpx').click()">📂 Importar GPX</button>
-        <!-- NUEVO: Botón para importar ruta mediante imagen OCR -->
-        <input type="file" id="input-imagen-ruta" accept="image/*" style="display: none;" onchange="procesarImagenRuta(event)">
-        <button class="btn" style="background:#673ab7; color:white;" onclick="document.getElementById('input-imagen-ruta').click()">📷 Importar Imagen</button>
-        <!-- GitHub Integración -->
-        <button class="btn" style="background:#24292e; color:white;" onclick="abrirModalGithub('cargar')">☁️ Cargar de GitHub</button>
-        <button class="btn" style="background:#24292e; color:white;" onclick="abrirModalGithub('guardar')">💾 Guardar en GitHub</button>
-        <button class="btn" style="background:#ffc107;" onclick="abrirModalGithub('compartir')">🔗 Compartir Link</button>
+        <button class="btn" onclick="document.getElementById('input-gpx').click()">📂 GPX</button>
+        
+        <!-- Importar Varias Imágenes (Atributo multiple añadido) -->
+        <input type="file" id="input-imagen-ruta" accept="image/*" multiple style="display: none;" onchange="procesarImagenesRuta(event)">
+        <button class="btn" style="background:#673ab7; color:white;" onclick="document.getElementById('input-imagen-ruta').click()">📷 Imágenes</button>
+        
+        <!-- GitHub -->
+        <button class="btn" style="background:#24292e; color:white;" onclick="abrirModalGithub('cargar')">☁️ Cargar</button>
+        <button class="btn" style="background:#24292e; color:white;" onclick="abrirModalGithub('guardar')">💾 Guardar</button>
+        <button class="btn" style="background:#ffc107;" onclick="abrirModalGithub('compartir')">🔗 Link</button>
     </div>
 
     <!-- Notificación Toast -->

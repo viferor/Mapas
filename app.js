@@ -546,14 +546,13 @@ function enfocarMapaEnGrupo(grupoCapas, mapInstance) {
     }
 }
 
-// --- NUEVA LÓGICA: Importar Ruta Automática por Imagen (OCR + Geocodificación) ---
-async function procesarImagenRuta(event) {
-    const archivo = event.target.files[0];
-    if (!archivo) return;
+// --- LÓGICA: Importación Múltiple de Imágenes (OCR + Geocodificación) ---
+async function procesarImagenesRuta(event) {
+    const archivos = event.target.files;
+    if (!archivos || archivos.length === 0) return;
 
-    mostrarToast("Leyendo texto de la imagen...");
+    mostrarToast(`Preparando ${archivos.length} imagen(es)...`);
 
-    // Cargar Tesseract.js de forma dinámica si no está presente
     if (typeof Tesseract === 'undefined') {
         await new Promise((resolve, reject) => {
             const script = document.createElement('script');
@@ -564,106 +563,105 @@ async function procesarImagenRuta(event) {
         });
     }
 
-    try {
-        const resultadoOCR = await Tesseract.recognize(archivo, 'spa', {
-            logger: m => console.log(m)
+    let todasLasLineas = [];
+
+    for (let i = 0; i < archivos.length; i++) {
+        const archivo = archivos[i];
+        mostrarToast(`Leyendo imagen ${i + 1} de ${archivos.length}...`);
+        
+        try {
+            const resultadoOCR = await Tesseract.recognize(archivo, 'spa');
+            const textoExtraido = resultadoOCR.data.text;
+            const lineas = textoExtraido.split('\n').map(l => l.trim()).filter(l => l.length > 2);
+            todasLasLineas = todasLasLineas.concat(lineas);
+        } catch (err) {
+            console.error("Error en OCR con la imagen", err);
+        }
+    }
+
+    if (todasLasLineas.length === 0) {
+        alert("No se ha podido reconocer texto válido en las imágenes seleccionadas.");
+        event.target.value = '';
+        return;
+    }
+
+    mostrarToast(`Geocodificando ubicaciones...`);
+    let grupoCapas = L.featureGroup();
+    let puntosCoordenadas = [];
+
+    for (let nombre of todasLasLineas) {
+        try {
+            const urlGeo = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(nombre)}`;
+            const res = await fetch(urlGeo);
+            const datos = await res.json();
+            if (datos && datos.length > 0) {
+                const nuevoPunto = L.latLng(parseFloat(datos[0].lat), parseFloat(datos[0].lon));
+                if (puntosCoordenadas.length === 0 || puntosCoordenadas[puntosCoordenadas.length - 1].latlng.distanceTo(nuevoPunto) > 50) {
+                    puntosCoordenadas.push({ latlng: nuevoPunto, nombre: nombre });
+                }
+            }
+        } catch (err) {
+            console.error("Error geocodificando: " + nombre, err);
+        }
+        await new Promise(r => setTimeout(r, 300));
+    }
+
+    if (puntosCoordenadas.length === 0) {
+        alert("No se han encontrado coordenadas geográficas válidas para los textos detectados.");
+        event.target.value = '';
+        return;
+    }
+
+    let ultimoPunto = null;
+    for (let i = 0; i < puntosCoordenadas.length; i++) {
+        const pt = puntosCoordenadas[i];
+        const num = contadorNumero;
+        
+        const icon = L.divIcon({ className: 'number-icon', html: `<span>${num}</span>`, iconSize: [28, 28], iconAnchor: [14, 14] });
+        const marker = L.marker(pt.latlng, { icon: icon, draggable: true, interactive: true }).addTo(map);
+        
+        marker.on('click', function(ev) {
+            if (modoActual === 'borrar') {
+                L.DomEvent.stopPropagation(ev);
+                map.removeLayer(this);
+                historialAcciones = historialAcciones.filter(item => item.elemento !== this);
+                if (this.lineaAsociada) {
+                    map.removeLayer(this.lineaAsociada);
+                    historialAcciones = historialAcciones.filter(item => item.elemento !== this.lineaAsociada);
+                }
+                recalcularContadorNumeros();
+                mostrarToast("Punto borrado");
+            }
         });
 
-        const textoExtraido = resultadoOCR.data.text;
-        // Limpiamos líneas vacías o muy cortas
-        const lineas = textoExtraido.split('\n').map(l => l.trim()).filter(l => l.length > 2);
+        grupoCapas.addLayer(marker);
 
-        if (lineas.length === 0) {
-            alert("No se ha podido reconocer texto válido en la imagen.");
-            event.target.value = '';
-            return;
-        }
-
-        mostrarToast(`Texto detectado. Buscando ubicaciones...`);
-        let grupoCapas = L.featureGroup();
-        let puntosCoordenadas = [];
-
-        // Geocodificar cada línea encontrada mediante Nominatim (OpenStreetMap)
-        for (let nombre of lineas) {
-            try {
-                const urlGeo = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(nombre)}`;
-                const res = await fetch(urlGeo);
-                const datos = await res.json();
-                if (datos && datos.length > 0) {
-                    puntosCoordenadas.push({
-                        latlng: L.latLng(parseFloat(datos[0].lat), parseFloat(datos[0].lon)),
-                        nombre: nombre
-                    });
-                }
-            } catch (err) {
-                console.error("Error geocodificando: " + nombre, err);
-            }
-            // Pequeña pausa para respetar los límites de la API pública de Nominatim
-            await new Promise(r => setTimeout(r, 400));
-        }
-
-        if (puntosCoordenadas.length === 0) {
-            alert("No se han encontrado coordenadas geográficas para los textos de la imagen.");
-            event.target.value = '';
-            return;
-        }
-
-        // Trazar puntos y rutas automáticamente
-        let ultimoPunto = null;
-        for (let i = 0; i < puntosCoordenadas.length; i++) {
-            const pt = puntosCoordenadas[i];
-            const num = contadorNumero;
-            
-            const icon = L.divIcon({ className: 'number-icon', html: `<span>${num}</span>`, iconSize: [28, 28], iconAnchor: [14, 14] });
-            const marker = L.marker(pt.latlng, { icon: icon, draggable: true, interactive: true }).addTo(map);
-            
-            marker.on('click', function(ev) {
-                if (modoActual === 'borrar') {
-                    L.DomEvent.stopPropagation(ev);
-                    map.removeLayer(this);
-                    historialAcciones = historialAcciones.filter(item => item.elemento !== this);
-                    if (this.lineaAsociada) {
-                        map.removeLayer(this.lineaAsociada);
-                        historialAcciones = historialAcciones.filter(item => item.elemento !== this.lineaAsociada);
+        if (ultimoPunto) {
+            const coordsRuta = await obtenerRutaPorCallesOSRM(ultimoPunto, pt.latlng);
+            if (coordsRuta && coordsRuta.length > 0) {
+                const linea = L.polyline(coordsRuta, { color: '#3388ff', weight: 4, interactive: true }).addTo(map);
+                linea.on('click', function(ev) {
+                    if (modoActual === 'borrar') {
+                        L.DomEvent.stopPropagation(ev);
+                        map.removeLayer(this);
+                        historialAcciones = historialAcciones.filter(item => item.elemento !== this);
+                        mostrarToast("Tramo borrado");
                     }
-                    recalcularContadorNumeros();
-                    mostrarToast("Punto borrado");
-                }
-            });
-
-            grupoCapas.addLayer(marker);
-
-            if (ultimoPunto) {
-                const coordsRuta = await obtenerRutaPorCallesOSRM(ultimoPunto, pt.latlng);
-                if (coordsRuta && coordsRuta.length > 0) {
-                    const linea = L.polyline(coordsRuta, { color: '#3388ff', weight: 4, interactive: true }).addTo(map);
-                    linea.on('click', function(ev) {
-                        if (modoActual === 'borrar') {
-                            L.DomEvent.stopPropagation(ev);
-                            map.removeLayer(this);
-                            historialAcciones = historialAcciones.filter(item => item.elemento !== this);
-                            mostrarToast("Tramo borrado");
-                        }
-                    });
-                    marker.lineaAsociada = linea;
-                    historialAcciones.push({ tipo: 'linea', elemento: linea });
-                    grupoCapas.addLayer(linea);
-                }
+                });
+                marker.lineaAsociada = linea;
+                historialAcciones.push({ tipo: 'linea', elemento: linea });
+                grupoCapas.addLayer(linea);
             }
-
-            ultimoPunto = pt.latlng;
-            historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: num, submodo: 'ruta' });
-            contadorNumero++;
         }
 
-        historialRehacer = [];
-        enfocarMapaEnGrupo(grupoCapas, map);
-        mostrarToast("¡Ruta generada desde la imagen!");
-
-    } catch (e) {
-        alert("Error al procesar la imagen.");
-        console.error(e);
+        ultimoPunto = pt.latlng;
+        historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: num, submodo: 'ruta' });
+        contadorNumero++;
     }
+
+    historialRehacer = [];
+    enfocarMapaEnGrupo(grupoCapas, map);
+    mostrarToast("¡Ruta creada con éxito desde las imágenes!");
     event.target.value = '';
 }
 
