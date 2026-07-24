@@ -588,10 +588,15 @@ async function procesarImagenesRuta(event) {
     mostrarToast(`Geocodificando ubicaciones...`);
     let grupoCapas = L.featureGroup();
     let puntosCoordenadas = [];
+    
+    // Ciudad y país de referencia para acotar la búsqueda y evitar duplicados
+    const ciudadReferencia = "Córdoba, España"; 
 
     for (let nombre of todasLasLineas) {
         try {
-            const urlGeo = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(nombre)}`;
+            // Añadimos la ciudad de referencia a la búsqueda de Nominatim
+            const queryConCiudad = nombre + ", " + ciudadReferencia;
+            const urlGeo = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(queryConCiudad)}`;
             const res = await fetch(urlGeo);
             const datos = await res.json();
             if (datos && datos.length > 0) {
