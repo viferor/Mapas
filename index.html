@@ -2,273 +2,60 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Herramienta de Mapas Móvil</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mapas y Rutas - Córdoba</title>
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <style>
-        * { box-sizing: border-box; }
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            font-family: sans-serif;
-        }
-        #map {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
-        }
-        /* Botonera inferior fija, transparente y adaptable con todas las opciones */
-        #toolbar {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(8px);
-            padding: 8px 12px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            max-width: 98%;
-            justify-content: center;
-        }
-        #toolbar button, #toolbar label {
-            background: #ffffff;
-            border: 1px solid #ccc;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 13px;
-            cursor: pointer;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s, border-color 0.2s;
-        }
-        #toolbar button:active, #toolbar label:active, #toolbar button.active {
-            background: #007bff;
-            color: white;
-            border-color: #0056b3;
-        }
-        #import-file {
-            display: none;
-        }
-    </style>
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+    <!-- Contenedor del Mapa -->
     <div id="map"></div>
 
-    <!-- Botonera inferior completa -->
-    <div id="toolbar">
-        <button id="btn-draw">Dibujar</button>
-        <button id="btn-undo">Deshacer</button>
-        <button id="btn-redo">Rehacer</button>
-        <button id="btn-clear">Limpiar</button>
-        <label for="import-file">Cargar</label>
-        <input type="file" id="import-file" accept=".gpx,.txt,.json">
-        <button id="btn-export">Exportar</button>
+    <!-- Toast de avisos flotantes -->
+    <div id="toast-aviso" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 10px 20px; border-radius: 20px; z-index: 1000; opacity: 0; transition: opacity 0.3s; pointer-events: none; font-size: 14px;"></div>
+
+    <!-- Barra de Herramientas Superior / Controles -->
+    <div class="panel-controles">
+        <button id="btn-ruta" class="btn" onclick="setModo('ruta')">Ruta OSRM</button>
+        <button id="btn-aislado" class="btn" onclick="setModo('aislado')">Puntos Aislados</button>
+        <button id="btn-puntos-rectos" class="btn" onclick="setModo('dibujar_puntos')">Rectos</button>
+        <button id="btn-continuo" class="btn" onclick="setModo('continuo')">Mano Alzada</button>
+        <button id="btn-borrar" class="btn" onclick="setModo('borrar')">Borrar</button>
+        
+        <!-- Botón para importar listado de calles en texto plano -->
+        <button class="btn btn-blue" onclick="document.getElementById('input-archivo-texto').click()">📁 Cargar Calles (.txt)</button>
+        <input type="file" id="input-archivo-texto" accept=".txt" style="display: none;" onchange="procesarArchivoTextoRuta(event)">
+
+        <!-- Opciones de Archivos GPX y Gestión -->
+        <button class="btn" onclick="document.getElementById('input-gpx').click()">Cargar GPX</button>
+        <input type="file" id="input-gpx" accept=".gpx" style="display: none;" onchange="manejarArchivoGPX(event)">
+
+        <button class="btn" onclick="deshacerUltimo()">↩️ Deshacer</button>
+        <button class="btn" onclick="rehacerProximo()">🔁 Rehacer</button>
+        <button class="btn" onclick="cortarTramoActual()">✂️ Cortar Tramo</button>
+        <button class="btn btn-red" onclick="confirmarBorrarTodo()">🗑️ Borrar Todo</button>
+        
+        <!-- GitHub Sync -->
+        <button class="btn btn-green" onclick="abrirModalGithub('guardar')">☁️ Guardar</button>
+        <button class="btn btn-green" onclick="abrirModalGithub('cargar')">📂 Abrir</button>
+        <button class="btn btn-yellow" onclick="abrirModalGithub('compartir')">🔗 Compartir</button>
+    </div>
+
+    <!-- Modal para GitHub -->
+    <div id="modal-load" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center;">
+        <div style="background:white; padding:20px; border-radius:8px; width:300px; max-height:80vh; overflow-y:auto;">
+            <h3>Mapas en GitHub</h3>
+            <div id="lista-mapas" style="margin: 15px 0;"></div>
+            <button class="btn" style="width:100%; background:#ccc;" onclick="cerrarModal()">Cerrar</button>
+        </div>
     </div>
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const map = L.map('map').setView([37.8882, -4.7794], 13);
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '© OpenStreetMap'
-            }).addTo(map);
-
-            let drawnItems = L.featureGroup().addTo(map);
-            let historyStack = [];
-            let redoStack = [];
-            let currentPoints = [];
-            let currentPolyline = null;
-            let isDrawing = false;
-
-            function saveState() {
-                const layersData = [];
-                drawnItems.eachLayer(layer => {
-                    if (layer instanceof L.Polyline) {
-                        layersData.push(layer.getLatLngs());
-                    }
-                });
-                historyStack.push(layersData);
-                redoStack = []; // Limpiar rehacer al realizar una nueva acción
-            }
-
-            // Activar/Desactivar modo dibujo al hacer clic en el mapa
-            const btnDraw = document.getElementById('btn-draw');
-            btnDraw.addEventListener('click', () => {
-                isDrawing = !isDrawing;
-                btnDraw.classList.toggle('active', isDrawing);
-                if (!isDrawing && currentPoints.length > 0) {
-                    saveState();
-                    currentPoints = [];
-                    currentPolyline = null;
-                }
-            });
-
-            map.on('click', function(e) {
-                if (!isDrawing) return;
-                currentPoints.push([e.latlng.lat, e.latlng.lng]);
-
-                if (currentPolyline) {
-                    currentPolyline.setLatLngs(currentPoints);
-                } else {
-                    currentPolyline = L.polyline(currentPoints, { color: 'blue', weight: 4 }).addTo(drawnItems);
-                }
-            });
-
-            // Botón Deshacer
-            document.getElementById('btn-undo').addEventListener('click', () => {
-                if (historyStack.length === 0) return;
-                
-                const currentState = [];
-                drawnItems.eachLayer(layer => {
-                    if (layer instanceof L.Polyline) currentState.push(layer.getLatLngs());
-                });
-                redoStack.push(currentState);
-
-                historyStack.pop();
-                drawnItems.clearLayers();
-
-                if (historyStack.length > 0) {
-                    const lastState = historyStack[historyStack.length - 1];
-                    lastState.forEach(pts => {
-                        L.polyline(pts, { color: 'blue', weight: 4 }).addTo(drawnItems);
-                    });
-                }
-                currentPoints = [];
-                currentPolyline = null;
-            });
-
-            // Botón Rehacer
-            document.getElementById('btn-redo').addEventListener('click', () => {
-                if (redoStack.length === 0) return;
-
-                const nextState = redoStack.pop();
-                const currentState = [];
-                drawnItems.eachLayer(layer => {
-                    if (layer instanceof L.Polyline) currentState.push(layer.getLatLngs());
-                });
-                historyStack.push(currentState);
-
-                drawnItems.clearLayers();
-                nextState.forEach(pts => {
-                    L.polyline(pts, { color: 'blue', weight: 4 }).addTo(drawnItems);
-                });
-            });
-
-            // Botón Limpiar Todo
-            document.getElementById('btn-clear').addEventListener('click', () => {
-                if (confirm("¿Seguro que quieres borrar todo el mapa?")) {
-                    saveState();
-                    drawnItems.clearLayers();
-                    currentPoints = [];
-                    currentPolyline = null;
-                }
-            });
-
-            // Botón Exportar (Guardar como JSON/GeoJSON)
-            document.getElementById('btn-export').addEventListener('click', () => {
-                const geojson = drawnItems.toGeoJSON();
-                if (geojson.features.length === 0) {
-                    alert("No hay elementos para exportar.");
-                    return;
-                }
-                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(geojson));
-                const downloadAnchor = document.createElement('a');
-                downloadAnchor.setAttribute("href", dataStr);
-                downloadAnchor.setAttribute("download", "ruta_mapa.json");
-                document.body.appendChild(downloadAnchor);
-                downloadAnchor.click();
-                downloadAnchor.remove();
-            });
-
-            // Lógica de carga de archivos (GPX, TXT, JSON)
-            const fileInput = document.getElementById('import-file');
-            fileInput.addEventListener('change', function(event) {
-                const file = event.target.files[0];
-                if (!file) return;
-
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const content = e.target.result;
-                    try {
-                        saveState();
-                        if (file.name.endsWith('.json')) {
-                            const data = JSON.parse(content);
-                            const layer = L.geoJSON(data);
-                            drawnItems.addLayer(layer);
-                            map.fitBounds(layer.getBounds());
-                        } else if (file.name.endsWith('.gpx') || content.includes('<gpx')) {
-                            const parser = new DOMParser();
-                            const xmlDoc = parser.parseFromString(content, "text/xml");
-                            const trkpts = xmlDoc.getElementsByTagName('trkpt');
-                            let latlngs = [];
-
-                            for (let i = 0; i < trkpts.length; i++) {
-                                const lat = parseFloat(trkpts[i].getAttribute('lat'));
-                                const lon = parseFloat(trkpts[i].getAttribute('lon'));
-                                if (!isNaN(lat) && !isNaN(lon)) {
-                                    latlngs.push([lat, lon]);
-                                }
-                            }
-
-                            if (latlngs.length > 0) {
-                                const polyline = L.polyline(latlngs, { color: 'blue', weight: 4 });
-                                drawnItems.addLayer(polyline);
-                                map.fitBounds(polyline.getBounds());
-                            } else {
-                                alert("No se encontraron puntos válidos en el archivo GPX.");
-                            }
-                        } else {
-                            const lines = content.split('\n');
-                            let latlngs = [];
-                            
-                            lines.forEach(line => {
-                                const parts = line.trim().split(',');
-                                if (parts.length >= 2) {
-                                    const lat = parseFloat(parts[0]);
-                                    const lon = parseFloat(parts[1]);
-                                    if (!isNaN(lat) && !isNaN(lon)) {
-                                        latlngs.push([lat, lon]);
-                                    }
-                                }
-                            });
-
-                            if (latlngs.length > 0) {
-                                const polyline = L.polyline(latlngs, { color: 'red', weight: 4 });
-                                drawnItems.addLayer(polyline);
-                                map.fitBounds(polyline.getBounds());
-                            } else {
-                                alert("El archivo no contiene coordenadas válidas.");
-                            }
-                        }
-                    } catch (error) {
-                        console.error("Error al procesar el archivo:", error);
-                        alert("Hubo un error al interpretar el archivo.");
-                    }
-                };
-
-                reader.readAsText(file);
-                event.target.value = '';
-            });
-        });
-    </script>
+    <!-- Lógica de la Aplicación -->
+    <script src="app.js"></script>
 </body>
 </html>
-
