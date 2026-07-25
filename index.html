@@ -2,10 +2,11 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mapas y Rutas - Córdoba</title>
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Leaflet CSS (con Subresource Integrity para evitar código modificado si el CDN se viera comprometido) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <style>
         html, body {
             margin: 0;
@@ -155,13 +156,21 @@
         
         <!-- Controles de Estilo Integrados (Color, Grosor y Opacidad) -->
         <div class="btn" style="background: rgba(248,249,250,0.85); cursor: default;">
-            🎨 <input type="color" id="color-trazo" value="#3388ff" style="border:none; width:22px; height:18px; background:transparent; cursor:pointer;" title="Color del trazo">
+            <label for="color-trazo">🎨 <span style="position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0);">Color del trazo</span></label>
+            <input type="color" id="color-trazo" value="#3388ff" style="border:none; width:22px; height:18px; background:transparent; cursor:pointer;" title="Color del trazo" aria-label="Color del trazo">
         </div>
         <div class="btn" style="background: rgba(248,249,250,0.85); cursor: default; font-size: 11px;">
-            Grosor: <input type="range" id="grosor-trazo" min="1" max="10" value="4" style="width: 45px; cursor: pointer;">
+            <label for="grosor-trazo">Grosor:</label> <input type="range" id="grosor-trazo" min="1" max="10" value="4" style="width: 45px; cursor: pointer;" aria-label="Grosor del trazo">
         </div>
         <div class="btn" style="background: rgba(248,249,250,0.85); cursor: default; font-size: 11px;">
-            Opacidad: <input type="range" id="opacidad-trazo" min="0.1" max="1" step="0.1" value="1" style="width: 45px; cursor: pointer;">
+            <label for="opacidad-trazo">Opacidad:</label> <input type="range" id="opacidad-trazo" min="0.1" max="1" step="0.1" value="1" style="width: 45px; cursor: pointer;" aria-label="Opacidad del trazo">
+        </div>
+        <div class="btn" style="background: rgba(248,249,250,0.85); cursor: default; font-size: 11px;">
+            <label for="ambito-estilo">Aplicar a:</label>
+            <select id="ambito-estilo" style="border:none; background:transparent; font-size:11px; cursor:pointer;" aria-label="Ámbito del cambio de estilo">
+                <option value="todos">Todos</option>
+                <option value="ultimo">Último</option>
+            </select>
         </div>
 
         <!-- Botón para importar listado de calles en texto plano -->
@@ -186,14 +195,15 @@
     <!-- Modal para GitHub -->
     <div id="modal-load" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center;">
         <div style="background:white; padding:20px; border-radius:8px; width:300px; max-height:80vh; overflow-y:auto;">
-            <h3>Mapas en GitHub</h3>
+            <h3 id="modal-titulo">Mapas en GitHub</h3>
             <div id="lista-mapas" style="margin: 15px 0;"></div>
             <button class="btn" style="width:100%; background:#ccc;" onclick="cerrarModal()">Cerrar</button>
         </div>
     </div>
 
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Leaflet JS (con Subresource Integrity) -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <!-- Lógica de la Aplicación -->
     <script src="app.js"></script>
 </body>

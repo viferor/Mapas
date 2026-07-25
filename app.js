@@ -10,7 +10,40 @@ let historialAcciones = [];
 let historialRehacer = [];
 
 let ultimoPuntoTramo = null; 
+let ultimoMarcadorTramo = null; // referencia al marcador anterior, para poder vincular las líneas en ambos sentidos
 let trazoLibreActivo = false; 
+
+// --- Helpers de vínculo marcador<->línea (evitan líneas "huérfanas" al borrar un punto intermedio) ---
+function vincularLineaEntreMarcadores(marcadorAnterior, marcadorNuevo, linea) {
+    if (!marcadorAnterior.lineasAsociadas) marcadorAnterior.lineasAsociadas = [];
+    if (!marcadorNuevo.lineasAsociadas) marcadorNuevo.lineasAsociadas = [];
+    marcadorAnterior.lineasAsociadas.push(linea);
+    marcadorNuevo.lineasAsociadas.push(linea);
+    linea.marcadoresVinculados = [marcadorAnterior, marcadorNuevo];
+}
+
+function eliminarMarcadorYLineas(marcador, mensaje) {
+    map.removeLayer(marcador);
+    historialAcciones = historialAcciones.filter(item => item.elemento !== marcador);
+
+    if (marcador.lineasAsociadas && marcador.lineasAsociadas.length) {
+        marcador.lineasAsociadas.forEach(linea => {
+            map.removeLayer(linea);
+            historialAcciones = historialAcciones.filter(item => item.elemento !== linea);
+            // Quitar también la referencia en el otro marcador vinculado a esa línea
+            if (linea.marcadoresVinculados) {
+                linea.marcadoresVinculados.forEach(m => {
+                    if (m !== marcador && m.lineasAsociadas) {
+                        m.lineasAsociadas = m.lineasAsociadas.filter(l => l !== linea);
+                    }
+                });
+            }
+        });
+    }
+
+    recalcularContadorNumeros();
+    mostrarToast(mensaje || "Punto borrado");
+}
 
 let estaDibujandoLibre = false;
 let polilineaContinuaActual = null;
@@ -202,6 +235,52 @@ function configurarDibujoTactilTablet() {
 
     mapaContenedor.addEventListener('touchend', finalizarTrazoTablet);
     mapaContenedor.addEventListener('touchcancel', finalizarTrazoTablet);
+
+    // --- Equivalentes de ratón, para que "Mano Alzada" también funcione en ordenador de escritorio ---
+    let ultimoEventoFueTouch = 0;
+    mapaContenedor.addEventListener('touchstart', () => { ultimoEventoFueTouch = Date.now(); }, { passive: true, capture: true });
+
+    mapaContenedor.addEventListener('mousedown', (e) => {
+        if (Date.now() - ultimoEventoFueTouch < 500) return; // ignora el mouse "fantasma" que generan algunos navegadores tras un touch
+        if (modoActual !== 'continuo') return;
+
+        map.dragging.disable();
+        estaDibujandoLibre = true;
+
+        const rect = mapaContenedor.getBoundingClientRect();
+        const latlng = map.containerPointToLatLng(L.point(e.clientX - rect.left, e.clientY - rect.top));
+        const estilos = obtenerEstilosActuales();
+
+        polilineaContinuaActual = L.polyline([latlng], {
+            color: estilos.color,
+            weight: estilos.weight,
+            opacity: estilos.opacity,
+            smoothFactor: 1,
+            interactive: true,
+            bubblingMouseEvents: false
+        }).addTo(map);
+
+        polilineaContinuaActual.on('click', function(ev) {
+            if (modoActual === 'borrar') {
+                L.DomEvent.stopPropagation(ev);
+                map.removeLayer(this);
+                historialAcciones = historialAcciones.filter(item => item.elemento !== this);
+                mostrarToast("Línea borrada");
+            }
+        });
+
+        historialAcciones.push({ tipo: 'linea', elemento: polilineaContinuaActual });
+        historialRehacer = [];
+    });
+
+    mapaContenedor.addEventListener('mousemove', (e) => {
+        if (!estaDibujandoLibre || !polilineaContinuaActual) return;
+        const rect = mapaContenedor.getBoundingClientRect();
+        const latlng = map.containerPointToLatLng(L.point(e.clientX - rect.left, e.clientY - rect.top));
+        polilineaContinuaActual.addLatLng(latlng);
+    });
+
+    window.addEventListener('mouseup', finalizarTrazoTablet);
 }
 
 async function gestionarPulsacion(e) {
@@ -249,37 +328,39 @@ async function gestionarPulsacion(e) {
         marker.on('click', function(ev) {
             if (modoActual === 'borrar') {
                 L.DomEvent.stopPropagation(ev);
-                map.removeLayer(this);
-                historialAcciones = historialAcciones.filter(item => item.elemento !== this);
-                if (this.lineaAsociada) {
-                    map.removeLayer(this.lineaAsociada);
-                    historialAcciones = historialAcciones.filter(item => item.elemento !== this.lineaAsociada);
-                }
-                recalcularContadorNumeros();
-                mostrarToast("Punto borrado");
+                eliminarMarcadorYLineas(this, "Punto borrado");
             }
         });
 
+        let avisoSinRuta = false;
         if (modoActual === 'ruta' && ultimoPuntoTramo) {
             const coords = await obtenerRutaPorCallesOSRM(ultimoPuntoTramo, latlng);
             if (coords && coords.length > 0) {
+                avisoSinRuta = coords.length === 2; // el fallback siempre devuelve exactamente 2 puntos (línea recta)
                 const linea = L.polyline(coords, { color: estilos.color, weight: estilos.weight, opacity: estilos.opacity, interactive: true }).addTo(map);
                 linea.on('click', function(ev) {
                     if (modoActual === 'borrar') {
                         L.DomEvent.stopPropagation(ev);
                         map.removeLayer(this);
                         historialAcciones = historialAcciones.filter(item => item.elemento !== this);
+                        if (this.marcadoresVinculados) {
+                            this.marcadoresVinculados.forEach(m => {
+                                if (m.lineasAsociadas) m.lineasAsociadas = m.lineasAsociadas.filter(l => l !== this);
+                            });
+                        }
                         mostrarToast("Tramo borrado");
                     }
                 });
-                marker.lineaAsociada = linea;
+                if (ultimoMarcadorTramo) vincularLineaEntreMarcadores(ultimoMarcadorTramo, marker, linea);
                 historialAcciones.push({ tipo: 'linea', elemento: linea });
             }
         }
         ultimoPuntoTramo = (modoActual === 'ruta') ? latlng : null;
+        ultimoMarcadorTramo = (modoActual === 'ruta') ? marker : null;
         historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: num, submodo: modoActual });
         historialRehacer = [];
         contadorNumero++;
+        if (avisoSinRuta) mostrarToast("⚠️ Sin ruta por calles: se trazó línea recta");
     }
 }
 async function obtenerRutaPorCallesOSRM(origen, destino) {
@@ -363,6 +444,7 @@ function confirmarBorrarTodo() {
         historialAcciones = [];
         historialRehacer = [];
         ultimoPuntoTramo = null;
+        ultimoMarcadorTramo = null;
         contadorNumero = 1;
         window.puntosDibujoLibre = [];
         trazoLibreActivo = false;
@@ -382,14 +464,17 @@ function deshacerUltimo() {
         historialRehacer.push(accion);
 
         if (accion.tipo === 'marcador') {
-            if (accion.elemento.lineaAsociada) {
-                map.removeLayer(accion.elemento.lineaAsociada);
-                historialAcciones = historialAcciones.filter(item => item.elemento !== accion.elemento.lineaAsociada);
-                historialRehacer.push({ tipo: 'linea', elemento: accion.elemento.lineaAsociada });
+            if (accion.elemento.lineasAsociadas && accion.elemento.lineasAsociadas.length) {
+                accion.elemento.lineasAsociadas.forEach(linea => {
+                    map.removeLayer(linea);
+                    historialAcciones = historialAcciones.filter(item => item.elemento !== linea);
+                    historialRehacer.push({ tipo: 'linea', elemento: linea });
+                });
             }
             recalcularContadorNumeros();
             const ultimo = historialAcciones.slice().reverse().find(i => i.tipo === 'marcador' && i.submodo === 'ruta');
             ultimoPuntoTramo = ultimo ? ultimo.elemento.getLatLng() : null;
+            ultimoMarcadorTramo = ultimo ? ultimo.elemento : null;
         }
         mostrarToast("Deshecho");
     }
@@ -406,7 +491,10 @@ function rehacerProximo() {
         historialAcciones.push(accion);
         if (accion.tipo === 'marcador') {
             recalcularContadorNumeros();
-            if (accion.submodo === 'ruta') ultimoPuntoTramo = accion.elemento.getLatLng();
+            if (accion.submodo === 'ruta') {
+                ultimoPuntoTramo = accion.elemento.getLatLng();
+                ultimoMarcadorTramo = accion.elemento;
+            }
         }
         mostrarToast("Rehecho");
     }
@@ -415,6 +503,7 @@ function rehacerProximo() {
 function obtenerToken() {
     let token = localStorage.getItem('github_token');
     if (!token) {
+        alert("Vas a introducir un Token de GitHub. Recomendaciones:\n\n• Usa un token de acceso fino (\"fine-grained\") limitado SOLO al repositorio '" + GITHUB_REPO + "', con permiso de lectura/escritura de contenidos.\n• No uses tu contraseña ni un token con acceso a todos tus repos.\n• El token se guardará solo en este navegador (localStorage), nunca se envía a ningún servidor salvo a la API de GitHub.");
         token = prompt("Introduce tu Token de GitHub:");
         if (token) localStorage.setItem('github_token', token.trim());
     }
@@ -453,14 +542,15 @@ async function guardarEnGithub(nombreArchivo) {
 
     try {
         let sha = null;
-        const resExist = await fetch(url, { headers: { 'Authorization': `token ${token}` } });
+        const resExist = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
         if (resExist.ok) sha = (await resExist.json()).sha;
 
         const body = { message: `Guardar mapa`, content: contenido };
         if (sha) body.sha = sha;
 
-        const res = await fetch(url, { method: 'PUT', headers: { 'Authorization': `token ${token}` }, body: JSON.stringify(body) });
+        const res = await fetch(url, { method: 'PUT', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
         if (res.ok) { alert("¡Guardado!"); cerrarModal(); }
+        else { const err = await res.json().catch(() => ({})); alert("No se pudo guardar: " + (err.message || res.status)); }
     } catch (e) { alert("Error: " + e.message); }
 }
 
@@ -468,34 +558,66 @@ async function abrirModalGithub(accion) {
     const token = obtenerToken();
     if (!token) return;
 
+    const titulos = { guardar: 'Guardar mapa en GitHub', cargar: 'Abrir mapa desde GitHub', compartir: 'Compartir mapa' };
+    const tituloEl = document.getElementById('modal-titulo');
+    if (tituloEl) tituloEl.innerText = titulos[accion] || 'Mapas en GitHub';
+
     document.getElementById('modal-load').style.display = 'flex';
     const lista = document.getElementById('lista-mapas');
     lista.innerHTML = 'Cargando...';
 
     const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FOLDER}`;
     try {
-        const res = await fetch(url, { headers: { 'Authorization': `token ${token}` } });
+        const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
         const archivos = res.ok ? await res.json() : [];
-        const jsonFiles = archivos.filter(f => f.name.endsWith('.json'));
+        const jsonFiles = Array.isArray(archivos) ? archivos.filter(f => f.name.endsWith('.json')) : [];
 
-        lista.innerHTML = accion === 'guardar' ? `<button class="btn btn-blue" style="width: 100%; margin-bottom:10px; border-radius:6px;" onclick="promptGuardarNuevo()">+ Nuevo...</button>` : '';
+        lista.innerHTML = '';
 
-        if (jsonFiles.length === 0 && accion !== 'guardar') {
-            lista.innerHTML = 'No hay mapas guardados.';
+        if (accion === 'guardar') {
+            const btnNuevo = document.createElement('button');
+            btnNuevo.className = 'btn btn-blue';
+            btnNuevo.style.cssText = 'width:100%; margin-bottom:10px; border-radius:6px;';
+            btnNuevo.textContent = '+ Nuevo...';
+            btnNuevo.addEventListener('click', promptGuardarNuevo);
+            lista.appendChild(btnNuevo);
+        }
+
+        if (jsonFiles.length === 0) {
+            if (accion !== 'guardar') lista.innerHTML = 'No hay mapas guardados.';
             return;
         }
 
+        // Construcción segura vía DOM (evita inyectar nombres de archivo sin escapar en atributos onclick)
         jsonFiles.forEach(file => {
             const n = file.name.replace('.json', '');
             const item = document.createElement('div');
             item.style.cssText = 'display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid #ddd; padding-bottom:6px;';
-            
-            let btn = '';
-            if (accion === 'guardar') btn = `<button class="btn btn-blue" style="border-radius:6px;" onclick="guardarEnGithub('${n}')">Sobrescribir</button>`;
-            else if (accion === 'cargar') btn = `<button class="btn" style="border-radius:6px; background:#e0e0e0;" onclick="cargarMapaDesdeGithub('${file.name}')">Cargar</button>`;
-            else if (accion === 'compartir') btn = `<button class="btn btn-yellow" style="border-radius:6px;" onclick="compartirMapaEspecifico('${file.name}')">Link</button>`;
 
-            item.innerHTML = `<span style="font-weight:600;">${n}</span> ${btn}`;
+            const nombreSpan = document.createElement('span');
+            nombreSpan.style.fontWeight = '600';
+            nombreSpan.textContent = n; // textContent escapa automáticamente
+
+            const btn = document.createElement('button');
+            btn.style.borderRadius = '6px';
+
+            if (accion === 'guardar') {
+                btn.className = 'btn btn-blue';
+                btn.textContent = 'Sobrescribir';
+                btn.addEventListener('click', () => guardarEnGithub(n));
+            } else if (accion === 'cargar') {
+                btn.className = 'btn';
+                btn.style.background = '#e0e0e0';
+                btn.textContent = 'Cargar';
+                btn.addEventListener('click', () => cargarMapaDesdeGithub(file.name));
+            } else if (accion === 'compartir') {
+                btn.className = 'btn btn-yellow';
+                btn.textContent = 'Link';
+                btn.addEventListener('click', () => compartirMapaEspecifico(file.name));
+            }
+
+            item.appendChild(nombreSpan);
+            item.appendChild(btn);
             lista.appendChild(item);
         });
     } catch (e) { lista.innerHTML = "Error de conexión con GitHub"; }
@@ -519,6 +641,7 @@ async function cargarMapaDesdeGithub(fileName) {
         historialAcciones = [];
         historialRehacer = [];
         ultimoPuntoTramo = null;
+        ultimoMarcadorTramo = null;
         contadorNumero = 1;
 
         procesarYAnadirGeoJSON(geojson, map);
@@ -618,6 +741,7 @@ async function procesarArchivoTextoRuta(event) {
         let grupoCapas = L.featureGroup();
         let puntosCoordenadas = [];
         let textosNoReconocidos = [];
+        const cacheGeocodificacion = {}; // evita repetir peticiones para nombres de calle duplicados en el archivo
 
         for (let nombre of lineas) {
             let nombreLimpio = nombre
@@ -626,39 +750,54 @@ async function procesarArchivoTextoRuta(event) {
                 .replace(/^(pza\.|plaza)\s*/i, '')
                 .trim();
 
-            let variantesBusqueda = [
-                `${nombre}, Córdoba, España`,
-                `${nombreLimpio}, Córdoba, España`,
-                `Calle ${nombreLimpio}, Córdoba, España`,
-                `Calle ${nombre}, Córdoba, España`
-            ];
-
+            const claveCache = nombre.toLowerCase();
             let encontradoValido = false;
 
-            for (let queryConCiudad of variantesBusqueda) {
-                try {
-                    const urlGeo = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(queryConCiudad)}&countrycodes=es&limit=1`;
-                    
-                    const res = await fetch(urlGeo);
-                    const datos = await res.json();
-                    
-                    if (datos && datos.length > 0) {
-                        const lat = parseFloat(datos[0].lat);
-                        const lon = parseFloat(datos[0].lon);
-                        
-                        if (lat >= 37.80 && lat <= 37.95 && lon >= -4.90 && lon <= -4.60) {
-                            const nuevoPunto = L.latLng(lat, lon);
-                            if (puntosCoordenadas.length === 0 || puntosCoordenadas[puntosCoordenadas.length - 1].latlng.distanceTo(nuevoPunto) > 20) {
-                                puntosCoordenadas.push({ latlng: nuevoPunto, nombre: nombre });
-                            }
-                            encontradoValido = true;
-                            break; 
-                        }
+            if (cacheGeocodificacion[claveCache] !== undefined) {
+                const cacheado = cacheGeocodificacion[claveCache];
+                if (cacheado) {
+                    if (puntosCoordenadas.length === 0 || puntosCoordenadas[puntosCoordenadas.length - 1].latlng.distanceTo(cacheado) > 20) {
+                        puntosCoordenadas.push({ latlng: cacheado, nombre: nombre });
                     }
-                } catch (err) {
-                    console.error("Error en geocodificación:", err);
+                    encontradoValido = true;
                 }
-                await new Promise(r => setTimeout(r, 200));
+            } else {
+                let variantesBusqueda = [
+                    `${nombre}, Córdoba, España`,
+                    `${nombreLimpio}, Córdoba, España`,
+                    `Calle ${nombreLimpio}, Córdoba, España`,
+                    `Calle ${nombre}, Córdoba, España`
+                ];
+
+                for (let queryConCiudad of variantesBusqueda) {
+                    try {
+                        const urlGeo = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(queryConCiudad)}&countrycodes=es&limit=1`;
+
+                        const res = await fetch(urlGeo);
+                        const datos = await res.json();
+
+                        if (datos && datos.length > 0) {
+                            const lat = parseFloat(datos[0].lat);
+                            const lon = parseFloat(datos[0].lon);
+
+                            if (lat >= 37.80 && lat <= 37.95 && lon >= -4.90 && lon <= -4.60) {
+                                const nuevoPunto = L.latLng(lat, lon);
+                                cacheGeocodificacion[claveCache] = nuevoPunto;
+                                if (puntosCoordenadas.length === 0 || puntosCoordenadas[puntosCoordenadas.length - 1].latlng.distanceTo(nuevoPunto) > 20) {
+                                    puntosCoordenadas.push({ latlng: nuevoPunto, nombre: nombre });
+                                }
+                                encontradoValido = true;
+                                break;
+                            }
+                        }
+                    } catch (err) {
+                        console.error("Error en geocodificación:", err);
+                    }
+                    // Nominatim exige un máximo de 1 petición/segundo; se respeta ese límite entre variantes
+                    await new Promise(r => setTimeout(r, 1000));
+                }
+
+                if (!encontradoValido) cacheGeocodificacion[claveCache] = null;
             }
 
             if (!encontradoValido) {
@@ -666,7 +805,6 @@ async function procesarArchivoTextoRuta(event) {
                     textosNoReconocidos.push(nombre);
                 }
             }
-            await new Promise(r => setTimeout(r, 250));
         }
 
         if (textosNoReconocidos.length > 0) {
@@ -680,6 +818,8 @@ async function procesarArchivoTextoRuta(event) {
         }
 
         let ultimoPunto = null;
+        let ultimoMarcador = null;
+        let huboTramosSinRuta = false;
         const estilos = obtenerEstilosActuales();
 
         for (let i = 0; i < puntosCoordenadas.length; i++) {
@@ -692,14 +832,7 @@ async function procesarArchivoTextoRuta(event) {
             marker.on('click', function(ev) {
                 if (modoActual === 'borrar') {
                     L.DomEvent.stopPropagation(ev);
-                    map.removeLayer(this);
-                    historialAcciones = historialAcciones.filter(item => item.elemento !== this);
-                    if (this.lineaAsociada) {
-                        map.removeLayer(this.lineaAsociada);
-                        historialAcciones = historialAcciones.filter(item => item.elemento !== this.lineaAsociada);
-                    }
-                    recalcularContadorNumeros();
-                    mostrarToast("Punto borrado");
+                    eliminarMarcadorYLineas(this, "Punto borrado");
                 }
             });
 
@@ -708,29 +841,36 @@ async function procesarArchivoTextoRuta(event) {
             if (ultimoPunto) {
                 const coordsRuta = await obtenerRutaPorCallesOSRM(ultimoPunto, pt.latlng);
                 if (coordsRuta && coordsRuta.length > 0) {
+                    if (coordsRuta.length === 2) huboTramosSinRuta = true; // el fallback siempre devuelve 2 puntos (línea recta)
                     const linea = L.polyline(coordsRuta, { color: estilos.color, weight: estilos.weight, opacity: estilos.opacity, interactive: true }).addTo(map);
                     linea.on('click', function(ev) {
                         if (modoActual === 'borrar') {
                             L.DomEvent.stopPropagation(ev);
                             map.removeLayer(this);
                             historialAcciones = historialAcciones.filter(item => item.elemento !== this);
+                            if (this.marcadoresVinculados) {
+                                this.marcadoresVinculados.forEach(m => {
+                                    if (m.lineasAsociadas) m.lineasAsociadas = m.lineasAsociadas.filter(l => l !== this);
+                                });
+                            }
                             mostrarToast("Tramo borrado");
                         }
                     });
-                    marker.lineaAsociada = linea;
+                    if (ultimoMarcador) vincularLineaEntreMarcadores(ultimoMarcador, marker, linea);
                     historialAcciones.push({ tipo: 'linea', elemento: linea });
                     grupoCapas.addLayer(linea);
                 }
             }
 
             ultimoPunto = pt.latlng;
+            ultimoMarcador = marker;
             historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: num, submodo: 'ruta' });
             contadorNumero++;
         }
 
         historialRehacer = [];
         enfocarMapaEnGrupo(grupoCapas, map);
-        mostrarToast("¡Ruta procesada desde archivo de texto!");
+        mostrarToast(huboTramosSinRuta ? "Ruta procesada (algunos tramos sin ruta por calles)" : "¡Ruta procesada desde archivo de texto!");
         event.target.value = '';
     };
 
