@@ -34,14 +34,14 @@ document.addEventListener("DOMContentLoaded", function () {
     configurarDibujoTactilTablet();
     setModo('ruta');
 
-    // Inicializar escuchadores para actualizar globalmente todos los trazos al mover los controles
+    // Escuchadores para los controles de estilo con selector de ámbito (todos vs último)
     const colorInput = document.getElementById('color-trazo');
     const grosorInput = document.getElementById('grosor-trazo');
     const opacidadInput = document.getElementById('opacidad-trazo');
 
-    if (colorInput) colorInput.addEventListener('input', actualizarEstiloTodosLosTrazos);
-    if (grosorInput) grosorInput.addEventListener('input', actualizarEstiloTodosLosTrazos);
-    if (opacidadInput) opacidadInput.addEventListener('input', actualizarEstiloTodosLosTrazos);
+    if (colorInput) colorInput.addEventListener('input', manejarCambioEstiloDinamico);
+    if (grosorInput) grosorInput.addEventListener('input', manejarCambioEstiloDinamico);
+    if (opacidadInput) opacidadInput.addEventListener('input', manejarCambioEstiloDinamico);
 
     const urlParams = new URLSearchParams(window.location.search);
     const mapaCompartido = urlParams.get('mapa');
@@ -96,20 +96,33 @@ function obtenerEstilosActuales() {
     };
 }
 
-// Función para actualizar globalmente el estilo de todas las líneas presentes en el historial y mapa
-function actualizarEstiloTodosLosTrazos() {
+// Función que lee el interruptor/selector de ámbito ('todos' o 'ultimo') y aplica los estilos correspondientes
+function manejarCambioEstiloDinamico() {
+    const selectorAmbito = document.getElementById('ambito-estilo'); // <select> o radio buttons con ID 'ambito-estilo'
+    const ambito = selectorAmbito ? selectorAmbito.value : 'todos'; // valores esperados: 'todos' o 'ultimo'
     const estilos = obtenerEstilosActuales();
-    
-    // Recorremos todas las acciones guardadas en el historial
-    historialAcciones.forEach(item => {
-        if (item.tipo === 'linea' && item.elemento && typeof item.elemento.setStyle === 'function') {
-            item.elemento.setStyle({
+
+    if (ambito === 'todos') {
+        historialAcciones.forEach(item => {
+            if (item.tipo === 'linea' && item.elemento && typeof item.elemento.setStyle === 'function') {
+                item.elemento.setStyle({
+                    color: estilos.color,
+                    weight: estilos.weight,
+                    opacity: estilos.opacity
+                });
+            }
+        });
+    } else if (ambito === 'ultimo') {
+        // Buscar el último elemento de tipo línea en el historial
+        const ultimaLinea = historialAcciones.slice().reverse().find(item => item.tipo === 'linea' && item.elemento);
+        if (ultimaLinea && typeof ultimaLinea.elemento.setStyle === 'function') {
+            ultimaLinea.elemento.setStyle({
                 color: estilos.color,
                 weight: estilos.weight,
                 opacity: estilos.opacity
             });
         }
-    });
+    }
 }
 
 function mostrarToast(mensaje) {
