@@ -53,6 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
     map = L.map('map', {
         zoomControl: false,
         touchZoom: true,
+        doubleClickZoom: false, // evita que el doble-toque para "cortar tramo" también dispare el zoom nativo de Leaflet
         tap: false 
     }).setView([37.8882, -4.7794], 13);
 
@@ -106,6 +107,16 @@ function setModo(modo) {
     if (modo !== 'ruta') {
         ultimoPuntoTramo = null;
     }
+
+    // En modo "Borrar", desactivamos el arrastre de los marcadores existentes: en pantalla táctil
+    // un toque casi siempre incluye un pequeño desplazamiento del dedo, y eso puede iniciar
+    // un arrastre accidental en vez de disparar el borrado con un toque simple.
+    historialAcciones.forEach(item => {
+        if (item.tipo === 'marcador' && item.elemento && item.elemento.dragging) {
+            if (modoActual === 'borrar') item.elemento.dragging.disable();
+            else item.elemento.dragging.enable();
+        }
+    });
 
     const mensajes = {
         'ruta': "Modo: Callejero OSRM",
