@@ -29,6 +29,7 @@ function eliminarMarcadorYLineas(marcador, mensaje) {
     if (marcador.lineasAsociadas && marcador.lineasAsociadas.length) {
         marcador.lineasAsociadas.forEach(linea => {
             map.removeLayer(linea);
+            if (linea._zonaToque) map.removeLayer(linea._zonaToque);
             historialAcciones = historialAcciones.filter(item => item.elemento !== linea);
             // Quitar también la referencia en el otro marcador vinculado a esa línea
             if (linea.marcadoresVinculados) {
@@ -43,6 +44,42 @@ function eliminarMarcadorYLineas(marcador, mensaje) {
 
     recalcularContadorNumeros();
     mostrarToast(mensaje || "Punto borrado");
+}
+
+// --- Zona de toque ampliada para líneas: en pantalla táctil, tocar exactamente sobre el
+// grosor visual de una línea es difícil incluso con trazos medios/gruesos. Añadimos una línea
+// invisible más ancha por debajo, que comparte el mismo borrado, para que sea mucho más fácil
+// acertar con el dedo al borrar. ---
+function anadirZonaDeToque(lineaVisible, coordenadas, mapaInstancia, mensajeBorrado) {
+    const pesoToque = Math.max((lineaVisible.options.weight || 4) + 22, 26);
+    const zonaToque = L.polyline(coordenadas, {
+        color: '#000000',
+        weight: pesoToque,
+        opacity: 0,
+        interactive: true,
+        bubblingMouseEvents: false
+    }).addTo(mapaInstancia);
+
+    lineaVisible._zonaToque = zonaToque;
+
+    const manejarClickBorrado = function(ev) {
+        if (modoActual === 'borrar') {
+            L.DomEvent.stopPropagation(ev);
+            mapaInstancia.removeLayer(lineaVisible);
+            mapaInstancia.removeLayer(zonaToque);
+            historialAcciones = historialAcciones.filter(item => item.elemento !== lineaVisible);
+            if (lineaVisible.marcadoresVinculados) {
+                lineaVisible.marcadoresVinculados.forEach(m => {
+                    if (m.lineasAsociadas) m.lineasAsociadas = m.lineasAsociadas.filter(l => l !== lineaVisible);
+                });
+            }
+            mostrarToast(mensajeBorrado || "Línea borrada");
+        }
+    };
+
+    lineaVisible.on('click', manejarClickBorrado);
+    zonaToque.on('click', manejarClickBorrado);
+    return zonaToque;
 }
 
 let estaDibujandoLibre = false;
@@ -213,14 +250,7 @@ function configurarDibujoTactilTablet() {
             bubblingMouseEvents: false
         }).addTo(map);
 
-        polilineaContinuaActual.on('click', function(ev) {
-            if (modoActual === 'borrar') {
-                L.DomEvent.stopPropagation(ev);
-                map.removeLayer(this);
-                historialAcciones = historialAcciones.filter(item => item.elemento !== this);
-                mostrarToast("Línea borrada");
-            }
-        });
+        anadirZonaDeToque(polilineaContinuaActual, [latlng], map, "Línea borrada");
 
         historialAcciones.push({ tipo: 'linea', elemento: polilineaContinuaActual });
         historialRehacer = [];
@@ -234,6 +264,7 @@ function configurarDibujoTactilTablet() {
         const rect = mapaContenedor.getBoundingClientRect();
         const latlng = map.containerPointToLatLng(L.point(touch.clientX - rect.left, touch.clientY - rect.top));
         polilineaContinuaActual.addLatLng(latlng);
+        if (polilineaContinuaActual._zonaToque) polilineaContinuaActual._zonaToque.addLatLng(latlng);
     }, { passive: true });
 
     const finalizarTrazoTablet = () => {
@@ -271,14 +302,7 @@ function configurarDibujoTactilTablet() {
             bubblingMouseEvents: false
         }).addTo(map);
 
-        polilineaContinuaActual.on('click', function(ev) {
-            if (modoActual === 'borrar') {
-                L.DomEvent.stopPropagation(ev);
-                map.removeLayer(this);
-                historialAcciones = historialAcciones.filter(item => item.elemento !== this);
-                mostrarToast("Línea borrada");
-            }
-        });
+        anadirZonaDeToque(polilineaContinuaActual, [latlng], map, "Línea borrada");
 
         historialAcciones.push({ tipo: 'linea', elemento: polilineaContinuaActual });
         historialRehacer = [];
@@ -289,6 +313,7 @@ function configurarDibujoTactilTablet() {
         const rect = mapaContenedor.getBoundingClientRect();
         const latlng = map.containerPointToLatLng(L.point(e.clientX - rect.left, e.clientY - rect.top));
         polilineaContinuaActual.addLatLng(latlng);
+        if (polilineaContinuaActual._zonaToque) polilineaContinuaActual._zonaToque.addLatLng(latlng);
     });
 
     window.addEventListener('mouseup', finalizarTrazoTablet);
@@ -315,16 +340,9 @@ async function gestionarPulsacion(e) {
 
         if (window.puntosDibujoLibre.length > 1) {
             const pAnt = window.puntosDibujoLibre[window.puntosDibujoLibre.length - 2];
-            const linea = L.polyline([pAnt, latlng], { color: estilos.color, weight: estilos.weight, opacity: estilos.opacity, interactive: true }).addTo(map);
-
-            linea.on('click', function(ev) {
-                if (modoActual === 'borrar') {
-                    L.DomEvent.stopPropagation(ev);
-                    map.removeLayer(this);
-                    historialAcciones = historialAcciones.filter(item => item.elemento !== this);
-                    mostrarToast("Segmento borrado");
-                }
-            });
+            const coordsSegmento = [pAnt, latlng];
+            const linea = L.polyline(coordsSegmento, { color: estilos.color, weight: estilos.weight, opacity: estilos.opacity, interactive: true }).addTo(map);
+            anadirZonaDeToque(linea, coordsSegmento, map, "Segmento borrado");
             historialAcciones.push({ tipo: 'linea', elemento: linea });
         }
         historialRehacer = [];
@@ -349,19 +367,7 @@ async function gestionarPulsacion(e) {
             if (coords && coords.length > 0) {
                 avisoSinRuta = coords.length === 2; // el fallback siempre devuelve exactamente 2 puntos (línea recta)
                 const linea = L.polyline(coords, { color: estilos.color, weight: estilos.weight, opacity: estilos.opacity, interactive: true }).addTo(map);
-                linea.on('click', function(ev) {
-                    if (modoActual === 'borrar') {
-                        L.DomEvent.stopPropagation(ev);
-                        map.removeLayer(this);
-                        historialAcciones = historialAcciones.filter(item => item.elemento !== this);
-                        if (this.marcadoresVinculados) {
-                            this.marcadoresVinculados.forEach(m => {
-                                if (m.lineasAsociadas) m.lineasAsociadas = m.lineasAsociadas.filter(l => l !== this);
-                            });
-                        }
-                        mostrarToast("Tramo borrado");
-                    }
-                });
+                anadirZonaDeToque(linea, coords, map, "Tramo borrado");
                 if (ultimoMarcadorTramo) vincularLineaEntreMarcadores(ultimoMarcadorTramo, marker, linea);
                 historialAcciones.push({ tipo: 'linea', elemento: linea });
             }
@@ -416,15 +422,7 @@ function manejarArchivoGPX(event) {
                 let grupoCapas = L.featureGroup();
                 const estilos = obtenerEstilosActuales();
                 const linea = L.polyline(coordenadas, { color: estilos.color, weight: estilos.weight, opacity: estilos.opacity, interactive: true }).addTo(map);
-                
-                linea.on('click', function(ev) {
-                    if (modoActual === 'borrar') {
-                        L.DomEvent.stopPropagation(ev);
-                        map.removeLayer(this);
-                        historialAcciones = historialAcciones.filter(item => item.elemento !== this);
-                        mostrarToast("GPX borrado");
-                    }
-                });
+                anadirZonaDeToque(linea, coordenadas, map, "GPX borrado");
 
                 historialAcciones.push({ tipo: 'linea', elemento: linea });
                 grupoCapas.addLayer(linea);
@@ -446,10 +444,16 @@ function manejarArchivoGPX(event) {
 function confirmarBorrarTodo() {
     if (confirm("¿Estás seguro de que quieres borrar todo el mapa? Se perderán todos los puntos y trazos actuales.")) {
         historialAcciones.forEach(i => {
-            if (i && i.elemento) map.removeLayer(i.elemento);
+            if (i && i.elemento) {
+                map.removeLayer(i.elemento);
+                if (i.elemento._zonaToque) map.removeLayer(i.elemento._zonaToque);
+            }
         });
         historialRehacer.forEach(i => {
-            if (i && i.elemento) map.removeLayer(i.elemento);
+            if (i && i.elemento) {
+                map.removeLayer(i.elemento);
+                if (i.elemento._zonaToque) map.removeLayer(i.elemento._zonaToque);
+            }
         });
 
         historialAcciones = [];
@@ -472,12 +476,14 @@ function deshacerUltimo() {
     const accion = historialAcciones.pop();
     if (accion && accion.elemento) {
         map.removeLayer(accion.elemento);
+        if (accion.elemento._zonaToque) map.removeLayer(accion.elemento._zonaToque);
         historialRehacer.push(accion);
 
         if (accion.tipo === 'marcador') {
             if (accion.elemento.lineasAsociadas && accion.elemento.lineasAsociadas.length) {
                 accion.elemento.lineasAsociadas.forEach(linea => {
                     map.removeLayer(linea);
+                    if (linea._zonaToque) map.removeLayer(linea._zonaToque);
                     historialAcciones = historialAcciones.filter(item => item.elemento !== linea);
                     historialRehacer.push({ tipo: 'linea', elemento: linea });
                 });
@@ -499,6 +505,7 @@ function rehacerProximo() {
     const accion = historialRehacer.pop();
     if (accion && accion.elemento) {
         accion.elemento.addTo(map);
+        if (accion.elemento._zonaToque) accion.elemento._zonaToque.addTo(map);
         historialAcciones.push(accion);
         if (accion.tipo === 'marcador') {
             recalcularContadorNumeros();
@@ -683,17 +690,11 @@ function procesarYAnadirGeoJSON(geojson, mapInstance) {
                 interactive: true 
             }).addTo(mapInstance);
             
-            l.on('click', ev => { 
-                if (modoActual === 'borrar') { 
-                    L.DomEvent.stopPropagation(ev); 
-                    mapInstance.removeLayer(l); 
-                    historialAcciones = historialAcciones.filter(item => item.elemento !== l); 
-                    mostrarToast("Línea borrada"); 
-                } 
-            });
+            const zonaToque = anadirZonaDeToque(l, ll, mapInstance, "Línea borrada");
             
             historialAcciones.push({ tipo: 'linea', elemento: l });
             grupoCapas.addLayer(l);
+            grupoCapas.addLayer(zonaToque);
 
         } else if (f.properties.tipo === 'marcador') {
             const latlng = [f.geometry.coordinates[1], f.geometry.coordinates[0]];
@@ -854,22 +855,11 @@ async function procesarArchivoTextoRuta(event) {
                 if (coordsRuta && coordsRuta.length > 0) {
                     if (coordsRuta.length === 2) huboTramosSinRuta = true; // el fallback siempre devuelve 2 puntos (línea recta)
                     const linea = L.polyline(coordsRuta, { color: estilos.color, weight: estilos.weight, opacity: estilos.opacity, interactive: true }).addTo(map);
-                    linea.on('click', function(ev) {
-                        if (modoActual === 'borrar') {
-                            L.DomEvent.stopPropagation(ev);
-                            map.removeLayer(this);
-                            historialAcciones = historialAcciones.filter(item => item.elemento !== this);
-                            if (this.marcadoresVinculados) {
-                                this.marcadoresVinculados.forEach(m => {
-                                    if (m.lineasAsociadas) m.lineasAsociadas = m.lineasAsociadas.filter(l => l !== this);
-                                });
-                            }
-                            mostrarToast("Tramo borrado");
-                        }
-                    });
+                    const zonaToque = anadirZonaDeToque(linea, coordsRuta, map, "Tramo borrado");
                     if (ultimoMarcador) vincularLineaEntreMarcadores(ultimoMarcador, marker, linea);
                     historialAcciones.push({ tipo: 'linea', elemento: linea });
                     grupoCapas.addLayer(linea);
+                    grupoCapas.addLayer(zonaToque);
                 }
             }
 
