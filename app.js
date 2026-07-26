@@ -365,11 +365,12 @@ async function gestionarPulsacion(e) {
         if (modoActual === 'ruta' && ultimoPuntoTramo) {
             const coords = await obtenerRutaPorCallesOSRM(ultimoPuntoTramo, latlng);
             if (coords && coords.length > 0) {
-                avisoSinRuta = coords.length === 2; // el fallback siempre devuelve exactamente 2 puntos (línea recta)
                 const linea = L.polyline(coords, { color: estilos.color, weight: estilos.weight, opacity: estilos.opacity, interactive: true }).addTo(map);
                 anadirZonaDeToque(linea, coords, map, "Tramo borrado");
                 if (ultimoMarcadorTramo) vincularLineaEntreMarcadores(ultimoMarcadorTramo, marker, linea);
                 historialAcciones.push({ tipo: 'linea', elemento: linea });
+            } else {
+                avisoSinRuta = true; // no se encontró una ruta a pie real: no se dibuja nada de relleno
             }
         }
         ultimoPuntoTramo = (modoActual === 'ruta') ? latlng : null;
@@ -377,11 +378,11 @@ async function gestionarPulsacion(e) {
         historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: num, submodo: modoActual });
         historialRehacer = [];
         contadorNumero++;
-        if (avisoSinRuta) mostrarToast("⚠️ Sin ruta por calles: se trazó línea recta");
+        if (avisoSinRuta) mostrarToast("⚠️ No se encontró ruta a pie entre estos dos puntos: no se ha trazado nada");
     }
 }
 async function obtenerRutaPorCallesOSRM(origen, destino) {
-    const url = `https://routing.openstreetmap.de/routed-bike/route/v1/bike/${origen.lng},${origen.lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson`;
+    const url = `https://routing.openstreetmap.de/routed-foot/route/v1/foot/${origen.lng},${origen.lat};${destino.lng},${destino.lat}?overview=full&geometries=geojson`;
     try {
         const response = await fetch(url);
         if (response.ok) {
@@ -391,7 +392,10 @@ async function obtenerRutaPorCallesOSRM(origen, destino) {
             }
         }
     } catch (e) {}
-    return [ [origen.lat, origen.lng], [destino.lat, destino.lng] ];
+    // Estrictamente peatonal: si no hay una ruta real a pie entre los dos puntos, no se inventa
+    // una línea recta de relleno (podría atravesar edificios, un río, una autovía, etc.). Se
+    // devuelve null y quien llame a esta función debe dejar ese tramo sin dibujar.
+    return null;
 }
 
 function manejarArchivoGPX(event) {
@@ -742,139 +746,258 @@ async function procesarArchivoTextoRuta(event) {
     lector.onload = async function(e) {
         const contenidoTexto = e.target.result;
         const lineas = contenidoTexto.split('\n').map(l => l.trim()).filter(l => l.length > 2);
-
-        if (lineas.length === 0) {
-            alert("El archivo de texto está vacío o no contiene líneas válidas.");
-            event.target.value = '';
-            return;
-        }
-
-        mostrarToast(`Geocodificando ${lineas.length} calles en Córdoba...`);
-        let grupoCapas = L.featureGroup();
-        let puntosCoordenadas = [];
-        let textosNoReconocidos = [];
-        const cacheGeocodificacion = {}; // evita repetir peticiones para nombres de calle duplicados en el archivo
-
-        for (let nombre of lineas) {
-            let nombreLimpio = nombre
-                .replace(/^(c\/|cl\.|calle)\s*/i, '')
-                .replace(/^(avda\.|av\.|avenida)\s*/i, '')
-                .replace(/^(pza\.|plaza)\s*/i, '')
-                .trim();
-
-            const claveCache = nombre.toLowerCase();
-            let encontradoValido = false;
-
-            if (cacheGeocodificacion[claveCache] !== undefined) {
-                const cacheado = cacheGeocodificacion[claveCache];
-                if (cacheado) {
-                    if (puntosCoordenadas.length === 0 || puntosCoordenadas[puntosCoordenadas.length - 1].latlng.distanceTo(cacheado) > 20) {
-                        puntosCoordenadas.push({ latlng: cacheado, nombre: nombre });
-                    }
-                    encontradoValido = true;
-                }
-            } else {
-                let variantesBusqueda = [
-                    `${nombre}, Córdoba, España`,
-                    `${nombreLimpio}, Córdoba, España`,
-                    `Calle ${nombreLimpio}, Córdoba, España`,
-                    `Calle ${nombre}, Córdoba, España`
-                ];
-
-                for (let queryConCiudad of variantesBusqueda) {
-                    try {
-                        const urlGeo = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(queryConCiudad)}&countrycodes=es&limit=1`;
-
-                        const res = await fetch(urlGeo);
-                        const datos = await res.json();
-
-                        if (datos && datos.length > 0) {
-                            const lat = parseFloat(datos[0].lat);
-                            const lon = parseFloat(datos[0].lon);
-
-                            if (lat >= 37.80 && lat <= 37.95 && lon >= -4.90 && lon <= -4.60) {
-                                const nuevoPunto = L.latLng(lat, lon);
-                                cacheGeocodificacion[claveCache] = nuevoPunto;
-                                if (puntosCoordenadas.length === 0 || puntosCoordenadas[puntosCoordenadas.length - 1].latlng.distanceTo(nuevoPunto) > 20) {
-                                    puntosCoordenadas.push({ latlng: nuevoPunto, nombre: nombre });
-                                }
-                                encontradoValido = true;
-                                break;
-                            }
-                        }
-                    } catch (err) {
-                        console.error("Error en geocodificación:", err);
-                    }
-                    // Nominatim exige un máximo de 1 petición/segundo; se respeta ese límite entre variantes
-                    await new Promise(r => setTimeout(r, 1000));
-                }
-
-                if (!encontradoValido) cacheGeocodificacion[claveCache] = null;
-            }
-
-            if (!encontradoValido) {
-                if (!textosNoReconocidos.includes(nombre)) {
-                    textosNoReconocidos.push(nombre);
-                }
-            }
-        }
-
-        if (textosNoReconocidos.length > 0) {
-            alert(`⚠️ Atención: Las siguientes calles del archivo no se han podido reconocer en Córdoba y han sido descartadas:\n\n- ${textosNoReconocidos.join('\n- ')}`);
-        }
-
-        if (puntosCoordenadas.length === 0) {
-            alert("No se ha podido trazar ninguna ruta porque ninguna calle del archivo coincide con el callejero.");
-            event.target.value = '';
-            return;
-        }
-
-        let ultimoPunto = null;
-        let ultimoMarcador = null;
-        let huboTramosSinRuta = false;
-        const estilos = obtenerEstilosActuales();
-
-        for (let i = 0; i < puntosCoordenadas.length; i++) {
-            const pt = puntosCoordenadas[i];
-            const num = contadorNumero;
-            
-            const icon = L.divIcon({ className: 'number-icon', html: `<span>${num}</span>`, iconSize: [28, 28], iconAnchor: [14, 14] });
-            const marker = L.marker(pt.latlng, { icon: icon, draggable: true, interactive: true }).addTo(map);
-            
-            marker.on('click', function(ev) {
-                if (modoActual === 'borrar') {
-                    L.DomEvent.stopPropagation(ev);
-                    eliminarMarcadorYLineas(this, "Punto borrado");
-                }
-            });
-
-            grupoCapas.addLayer(marker);
-
-            if (ultimoPunto) {
-                const coordsRuta = await obtenerRutaPorCallesOSRM(ultimoPunto, pt.latlng);
-                if (coordsRuta && coordsRuta.length > 0) {
-                    if (coordsRuta.length === 2) huboTramosSinRuta = true; // el fallback siempre devuelve 2 puntos (línea recta)
-                    const linea = L.polyline(coordsRuta, { color: estilos.color, weight: estilos.weight, opacity: estilos.opacity, interactive: true }).addTo(map);
-                    const zonaToque = anadirZonaDeToque(linea, coordsRuta, map, "Tramo borrado");
-                    if (ultimoMarcador) vincularLineaEntreMarcadores(ultimoMarcador, marker, linea);
-                    historialAcciones.push({ tipo: 'linea', elemento: linea });
-                    grupoCapas.addLayer(linea);
-                    grupoCapas.addLayer(zonaToque);
-                }
-            }
-
-            ultimoPunto = pt.latlng;
-            ultimoMarcador = marker;
-            historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: num, submodo: 'ruta' });
-            contadorNumero++;
-        }
-
-        historialRehacer = [];
-        enfocarMapaEnGrupo(grupoCapas, map);
-        mostrarToast(huboTramosSinRuta ? "Ruta procesada (algunos tramos sin ruta por calles)" : "¡Ruta procesada desde archivo de texto!");
-        event.target.value = '';
+        await procesarListadoCalles(lineas, event);
     };
 
     lector.readAsText(archivo);
+}
+
+// --- Carga de un listado de calles a partir de una FOTO/IMAGEN, usando reconocimiento de texto (OCR) ---
+// Tesseract.js se carga bajo demanda (solo la primera vez que se usa esta función) para no penalizar
+// la carga inicial de la app con una librería que muchas veces no hará falta.
+function cargarScriptExterno(src) {
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error("No se pudo cargar la librería de OCR. Comprueba tu conexión a internet."));
+        document.head.appendChild(script);
+    });
+}
+
+// Muestra el modal de revisión/edición del texto OCR y devuelve una promesa con las líneas editadas
+// (o null si el usuario cancela). Se reutiliza también cuando el OCR no ha detectado nada, para que
+// el usuario pueda escribir el listado a mano en el mismo cuadro.
+function mostrarModalEdicionOCR(lineasIniciales) {
+    return new Promise((resolve) => {
+        const modal = document.getElementById('modal-ocr');
+        const textarea = document.getElementById('texto-ocr');
+        const btnContinuar = document.getElementById('btn-ocr-continuar');
+        const btnCancelar = document.getElementById('btn-ocr-cancelar');
+
+        textarea.value = lineasIniciales.join('\n');
+        modal.style.display = 'flex';
+
+        const limpiar = () => {
+            modal.style.display = 'none';
+            btnContinuar.removeEventListener('click', onContinuar);
+            btnCancelar.removeEventListener('click', onCancelar);
+        };
+        const onContinuar = () => {
+            const lineasEditadas = textarea.value.split('\n').map(l => l.trim()).filter(l => l.length > 2);
+            limpiar();
+            resolve(lineasEditadas);
+        };
+        const onCancelar = () => {
+            limpiar();
+            resolve(null);
+        };
+
+        btnContinuar.addEventListener('click', onContinuar);
+        btnCancelar.addEventListener('click', onCancelar);
+    });
+}
+
+async function procesarImagenCalles(event) {
+    const archivos = Array.from(event.target.files || []);
+    if (archivos.length === 0) return;
+
+    try {
+        if (typeof Tesseract === 'undefined') {
+            mostrarToast("Cargando motor de reconocimiento de texto (solo la primera vez)...");
+            await cargarScriptExterno('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js');
+        }
+
+        // Un único worker reutilizado para todas las imágenes: más rápido que crear uno nuevo por foto
+        const worker = await Tesseract.createWorker('spa', 1, {
+            logger: m => {
+                if (m.status === 'recognizing text' && typeof m.progress === 'number') {
+                    mostrarToast(`Escaneando imagen ${indiceActual}/${archivos.length}... ${Math.round(m.progress * 100)}%`);
+                }
+            }
+        });
+
+        let indiceActual = 1;
+        let todasLasLineas = [];
+        let imagenesSinTexto = [];
+
+        for (const archivo of archivos) {
+            mostrarToast(`Escaneando imagen ${indiceActual}/${archivos.length}...`);
+            const { data: { text } } = await worker.recognize(archivo);
+            const lineasImagen = text.split('\n').map(l => l.trim()).filter(l => l.length > 2);
+
+            if (lineasImagen.length === 0) {
+                imagenesSinTexto.push(archivo.name || `imagen ${indiceActual}`);
+            } else {
+                todasLasLineas = todasLasLineas.concat(lineasImagen);
+            }
+            indiceActual++;
+        }
+
+        await worker.terminate();
+
+        if (imagenesSinTexto.length > 0) {
+            mostrarToast(`⚠️ No se pudo leer texto en: ${imagenesSinTexto.join(', ')}`);
+        }
+
+        if (todasLasLineas.length === 0) {
+            mostrarToast("El OCR no ha detectado texto legible. Puedes escribir el listado a mano.");
+        }
+
+        // El OCR nunca es perfecto: se muestra en un cuadro editable para poder corregir nombres
+        // mal leídos (o escribirlos a mano si no se detectó nada) antes de geocodificar
+        const lineasEditadas = await mostrarModalEdicionOCR(todasLasLineas);
+        if (!lineasEditadas || lineasEditadas.length === 0) {
+            event.target.value = '';
+            return;
+        }
+
+        await procesarListadoCalles(lineasEditadas, event);
+    } catch (err) {
+        alert("Error al escanear la imagen: " + err.message);
+        event.target.value = '';
+    }
+}
+
+// --- Lógica compartida: dado un listado de nombres de calle (venga de un .txt o de una imagen escaneada),
+// los geocodifica en Córdoba y traza la ruta a pie entre ellos ---
+async function procesarListadoCalles(lineas, event) {
+    if (lineas.length === 0) {
+        alert("El listado está vacío o no contiene líneas válidas.");
+        if (event) event.target.value = '';
+        return;
+    }
+
+    mostrarToast(`Geocodificando ${lineas.length} calles en Córdoba...`);
+    let grupoCapas = L.featureGroup();
+    let puntosCoordenadas = [];
+    let textosNoReconocidos = [];
+    const cacheGeocodificacion = {}; // evita repetir peticiones para nombres de calle duplicados en el archivo
+
+    for (let nombre of lineas) {
+        let nombreLimpio = nombre
+            .replace(/^(c\/|cl\.|calle)\s*/i, '')
+            .replace(/^(avda\.|av\.|avenida)\s*/i, '')
+            .replace(/^(pza\.|plaza)\s*/i, '')
+            .trim();
+
+        const claveCache = nombre.toLowerCase();
+        let encontradoValido = false;
+
+        if (cacheGeocodificacion[claveCache] !== undefined) {
+            const cacheado = cacheGeocodificacion[claveCache];
+            if (cacheado) {
+                if (puntosCoordenadas.length === 0 || puntosCoordenadas[puntosCoordenadas.length - 1].latlng.distanceTo(cacheado) > 20) {
+                    puntosCoordenadas.push({ latlng: cacheado, nombre: nombre });
+                }
+                encontradoValido = true;
+            }
+        } else {
+            let variantesBusqueda = [
+                `${nombre}, Córdoba, España`,
+                `${nombreLimpio}, Córdoba, España`,
+                `Calle ${nombreLimpio}, Córdoba, España`,
+                `Calle ${nombre}, Córdoba, España`
+            ];
+
+            for (let queryConCiudad of variantesBusqueda) {
+                try {
+                    const urlGeo = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(queryConCiudad)}&countrycodes=es&limit=1`;
+
+                    const res = await fetch(urlGeo);
+                    const datos = await res.json();
+
+                    if (datos && datos.length > 0) {
+                        const lat = parseFloat(datos[0].lat);
+                        const lon = parseFloat(datos[0].lon);
+
+                        if (lat >= 37.80 && lat <= 37.95 && lon >= -4.90 && lon <= -4.60) {
+                            const nuevoPunto = L.latLng(lat, lon);
+                            cacheGeocodificacion[claveCache] = nuevoPunto;
+                            if (puntosCoordenadas.length === 0 || puntosCoordenadas[puntosCoordenadas.length - 1].latlng.distanceTo(nuevoPunto) > 20) {
+                                puntosCoordenadas.push({ latlng: nuevoPunto, nombre: nombre });
+                            }
+                            encontradoValido = true;
+                            break;
+                        }
+                    }
+                } catch (err) {
+                    console.error("Error en geocodificación:", err);
+                }
+                // Nominatim exige un máximo de 1 petición/segundo; se respeta ese límite entre variantes
+                await new Promise(r => setTimeout(r, 1000));
+            }
+
+            if (!encontradoValido) cacheGeocodificacion[claveCache] = null;
+        }
+
+        if (!encontradoValido) {
+            if (!textosNoReconocidos.includes(nombre)) {
+                textosNoReconocidos.push(nombre);
+            }
+        }
+    }
+
+    if (textosNoReconocidos.length > 0) {
+        alert(`⚠️ Atención: Las siguientes calles no se han podido reconocer en Córdoba y han sido descartadas:\n\n- ${textosNoReconocidos.join('\n- ')}`);
+    }
+
+    if (puntosCoordenadas.length === 0) {
+        alert("No se ha podido trazar ninguna ruta porque ninguna calle coincide con el callejero.");
+        if (event) event.target.value = '';
+        return;
+    }
+
+    let ultimoPunto = null;
+    let ultimoMarcador = null;
+    let tramosSinRuta = [];
+    const estilos = obtenerEstilosActuales();
+
+    for (let i = 0; i < puntosCoordenadas.length; i++) {
+        const pt = puntosCoordenadas[i];
+        const num = contadorNumero;
+        
+        const icon = L.divIcon({ className: 'number-icon', html: `<span>${num}</span>`, iconSize: [28, 28], iconAnchor: [14, 14] });
+        const marker = L.marker(pt.latlng, { icon: icon, draggable: true, interactive: true }).addTo(map);
+        
+        marker.on('click', function(ev) {
+            if (modoActual === 'borrar') {
+                L.DomEvent.stopPropagation(ev);
+                eliminarMarcadorYLineas(this, "Punto borrado");
+            }
+        });
+
+        grupoCapas.addLayer(marker);
+
+        if (ultimoPunto) {
+            const coordsRuta = await obtenerRutaPorCallesOSRM(ultimoPunto, pt.latlng);
+            if (coordsRuta && coordsRuta.length > 0) {
+                const linea = L.polyline(coordsRuta, { color: estilos.color, weight: estilos.weight, opacity: estilos.opacity, interactive: true }).addTo(map);
+                const zonaToque = anadirZonaDeToque(linea, coordsRuta, map, "Tramo borrado");
+                if (ultimoMarcador) vincularLineaEntreMarcadores(ultimoMarcador, marker, linea);
+                historialAcciones.push({ tipo: 'linea', elemento: linea });
+                grupoCapas.addLayer(linea);
+                grupoCapas.addLayer(zonaToque);
+            } else {
+                // No se ha encontrado una ruta a pie real entre estos dos puntos: no se dibuja nada de
+                // relleno (ni línea recta). El punto se mantiene, pero queda sin conectar visualmente.
+                tramosSinRuta.push(`${puntosCoordenadas[i - 1].nombre} → ${pt.nombre}`);
+            }
+        }
+
+        ultimoPunto = pt.latlng;
+        ultimoMarcador = marker;
+        historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: num, submodo: 'ruta' });
+        contadorNumero++;
+    }
+
+    historialRehacer = [];
+    enfocarMapaEnGrupo(grupoCapas, map);
+
+    if (tramosSinRuta.length > 0) {
+        alert(`⚠️ No se ha encontrado ruta a pie en estos tramos (se han dejado sin trazar):\n\n- ${tramosSinRuta.join('\n- ')}`);
+    }
+    mostrarToast(tramosSinRuta.length > 0 ? "Ruta procesada (con algún tramo sin conectar)" : "¡Ruta a pie procesada!");
+    if (event) event.target.value = '';
 }
 

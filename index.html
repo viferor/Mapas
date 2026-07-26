@@ -182,6 +182,10 @@
         <button class="btn btn-blue" onclick="document.getElementById('input-archivo-texto').click()">📁 Cargar Calles (.txt)</button>
         <input type="file" id="input-archivo-texto" accept=".txt" style="display: none;" onchange="procesarArchivoTextoRuta(event)">
 
+        <!-- Botón para importar una foto/imagen del listado de calles (se lee con OCR en el propio navegador) -->
+        <button class="btn btn-blue" onclick="document.getElementById('input-imagen-calles').click()">📷 Escanear Imagen</button>
+        <input type="file" id="input-imagen-calles" accept="image/*" multiple style="display: none;" onchange="procesarImagenCalles(event)">
+
         <!-- Opciones de Archivos GPX y Gestión -->
         <button class="btn" onclick="document.getElementById('input-gpx').click()">Cargar GPX</button>
         <input type="file" id="input-gpx" accept=".gpx" style="display: none;" onchange="manejarArchivoGPX(event)">
@@ -203,6 +207,19 @@
             <h3 id="modal-titulo">Mapas en GitHub</h3>
             <div id="lista-mapas" style="margin: 15px 0;"></div>
             <button class="btn" style="width:100%; background:#ccc;" onclick="cerrarModal()">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Modal para revisar/editar el texto detectado por OCR antes de trazar la ruta -->
+    <div id="modal-ocr" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center;">
+        <div style="background:white; padding:20px; border-radius:8px; width:340px; max-width:90vw; max-height:85vh; display:flex; flex-direction:column;">
+            <h3 style="margin-top:0;">Revisa el listado de calles</h3>
+            <p style="font-size:13px; color:#555; margin-top:-8px;">Corrige lo que el OCR haya leído mal (una calle por línea) y luego pulsa "Trazar ruta".</p>
+            <textarea id="texto-ocr" placeholder="Una calle por línea..." style="flex:1; min-height:220px; width:100%; box-sizing:border-box; font-size:14px; padding:8px; border:1px solid #ccc; border-radius:6px; resize:vertical;"></textarea>
+            <div style="display:flex; gap:8px; margin-top:12px;">
+                <button id="btn-ocr-cancelar" class="btn" style="flex:1; background:#ccc; justify-content:center;">Cancelar</button>
+                <button id="btn-ocr-continuar" class="btn btn-blue" style="flex:1; justify-content:center;">Trazar ruta</button>
+            </div>
         </div>
     </div>
 
