@@ -12,8 +12,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 1,
-        "submodo": "ruta"
+        "numero": 1
       }
     },
     {
@@ -27,8 +26,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 2,
-        "submodo": "ruta"
+        "numero": 2
       }
     },
     {
@@ -36,14 +34,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.7797123631506215,
-          37.88266452353888
+          -4.779792641734822,
+          37.882319488650644
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 3,
-        "submodo": "ruta"
+        "numero": 3
       }
     },
     {
@@ -115,9 +112,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -125,14 +122,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.779866603245038,
-          37.88228255871532
+          -4.7785537695267015,
+          37.88226054255682
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 4,
-        "submodo": "ruta"
+        "numero": 4
       }
     },
     {
@@ -168,9 +164,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -184,8 +180,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 5,
-        "submodo": "ruta"
+        "numero": 5
       }
     },
     {
@@ -213,9 +208,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -229,8 +224,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 6,
-        "submodo": "ruta"
+        "numero": 6
       }
     },
     {
@@ -298,9 +292,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -308,14 +302,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.777293269633219,
-          37.883092457080764
+          -4.778249203735655,
+          37.88321052123386
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 7,
-        "submodo": "ruta"
+        "numero": 7
       }
     },
     {
@@ -371,9 +364,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -381,14 +374,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.778247608445115,
-          37.88321927585726
+          -4.777231399161373,
+          37.88311612065993
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 8,
-        "submodo": "ruta"
+        "numero": 8
       }
     },
     {
@@ -428,9 +420,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -438,14 +430,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.777116253051426,
-          37.884005955237
+          -4.778088726044439,
+          37.88361478411502
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 9,
-        "submodo": "ruta"
+        "numero": 9
       }
     },
     {
@@ -489,9 +480,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -499,14 +490,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.777161484399474,
-          37.882489809867465
+          -4.777163207553113,
+          37.88339892314349
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 10,
-        "submodo": "ruta"
+        "numero": 10
       }
     },
     {
@@ -550,9 +540,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -560,14 +550,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.77799348470926,
-          37.88245298377499
+          -4.777075161597007,
+          37.88403436332945
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 11,
-        "submodo": "ruta"
+        "numero": 11
       }
     },
     {
@@ -615,9 +604,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -625,14 +614,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.777890121609642,
-          37.88185636918622
+          -4.777562389379467,
+          37.88238926763876
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 12,
-        "submodo": "ruta"
+        "numero": 12
       }
     },
     {
@@ -660,9 +648,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -670,14 +658,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.778391301594354,
-          37.88146831645368
+          -4.7770777366473,
+          37.88221878141501
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 13,
-        "submodo": "ruta"
+        "numero": 13
       }
     },
     {
@@ -737,9 +724,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -747,14 +734,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.777444606700437,
-          37.88186409586133
+          -4.776742581301604,
+          37.88129839762926
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 14,
-        "submodo": "ruta"
+        "numero": 14
       }
     },
     {
@@ -802,9 +788,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -812,14 +798,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.77725634028468,
-          37.8822549948078
+          -4.777393244966111,
+          37.881831091057855
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 15,
-        "submodo": "ruta"
+        "numero": 15
       }
     },
     {
@@ -875,9 +860,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -885,14 +870,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.777051424160111,
-          37.8820349634803
+          -4.778062147608127,
+          37.88171926195093
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 16,
-        "submodo": "ruta"
+        "numero": 16
       }
     },
     {
@@ -980,9 +964,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -990,14 +974,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.776845772043795,
-          37.88173420466381
+          -4.778335914958017,
+          37.881529114983664
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 17,
-        "submodo": "ruta"
+        "numero": 17
       }
     },
     {
@@ -1045,9 +1028,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -1055,14 +1038,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.776740289844599,
-          37.881296193510465
+          -4.778150612620103,
+          37.881229583933056
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 18,
-        "submodo": "ruta"
+        "numero": 18
       }
     },
     {
@@ -1070,14 +1052,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.7780080651681205,
-          37.881424584887995
+          -4.778109999676475,
+          37.88092529840412
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 20,
-        "submodo": "ruta"
+        "numero": 20
       }
     },
     {
@@ -1105,9 +1086,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -1115,14 +1096,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.778502999863948,
-          37.880884222952524
+          -4.779310282176866,
+          37.8801833651493
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 21,
-        "submodo": "ruta"
+        "numero": 21
       }
     },
     {
@@ -1162,9 +1142,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -1178,8 +1158,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 22,
-        "submodo": "ruta"
+        "numero": 22
       }
     },
     {
@@ -1243,9 +1222,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -1253,14 +1232,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.778776616154033,
-          37.88104873890848
+          -4.778312966525962,
+          37.88061777483834
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 23,
-        "submodo": "ruta"
+        "numero": 23
       }
     },
     {
@@ -2708,9 +2686,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -2726,9 +2704,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -2744,9 +2722,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -2762,9 +2740,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -2964,9 +2942,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -2982,9 +2960,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -3156,9 +3134,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -3174,9 +3152,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -3976,9 +3954,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -3994,9 +3972,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -4012,9 +3990,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -4022,14 +4000,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.779367313428347,
-          37.880156534675606
+          -4.777568264799997,
+          37.88005522038628
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 24,
-        "submodo": "ruta"
+        "numero": 24
       }
     },
     {
@@ -4145,9 +4122,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -4155,14 +4132,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.778166932437421,
-          37.88123432302472
+          -4.777601455832699,
+          37.87964376527501
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 25,
-        "submodo": "ruta"
+        "numero": 25
       }
     },
     {
@@ -4678,9 +4654,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -4688,14 +4664,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.778892984150631,
-          37.88162574501056
+          -4.777365718697247,
+          37.879245795926764
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 26,
-        "submodo": "ruta"
+        "numero": 26
       }
     },
     {
@@ -4771,9 +4746,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -4781,14 +4756,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.778255512378422,
-          37.88074596835944
+          -4.777292382601011,
+          37.87975177898796
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 27,
-        "submodo": "ruta"
+        "numero": 27
       }
     },
     {
@@ -4852,9 +4826,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -4862,14 +4836,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.777441980632173,
-          37.88031357929165
+          -4.777084598699067,
+          37.87994627823261
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 28,
-        "submodo": "ruta"
+        "numero": 28
       }
     },
     {
@@ -4905,9 +4878,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -4915,14 +4888,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.777266056367398,
-          37.88023366716747
+          -4.776826582338409,
+          37.87978736447951
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 29,
-        "submodo": "ruta"
+        "numero": 29
       }
     },
     {
@@ -4950,9 +4922,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -4960,14 +4932,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.7769967946590475,
-          37.8801789081051
+          -4.776404288811783,
+          37.88002784259813
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 30,
-        "submodo": "ruta"
+        "numero": 30
       }
     },
     {
@@ -4983,9 +4954,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -5693,9 +5664,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -5711,9 +5682,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -5729,9 +5700,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -5739,14 +5710,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.777475277931932,
-          37.879647422882186
+          -4.776610918640909,
+          37.88064307820229
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 31,
-        "submodo": "ruta"
+        "numero": 31
       }
     },
     {
@@ -5798,9 +5768,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -5808,14 +5778,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.776937340674552,
-          37.87965323966371
+          -4.777308847978572,
+          37.88120934323043
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 32,
-        "submodo": "ruta"
+        "numero": 32
       }
     },
     {
@@ -5847,9 +5816,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -5857,14 +5826,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.776716648660029,
-          37.88003082430599
+          -4.776388377501394,
+          37.881395351257765
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 33,
-        "submodo": "ruta"
+        "numero": 33
       }
     },
     {
@@ -5904,9 +5872,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -5914,14 +5882,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.776161489093171,
-          37.87999402767109
+          -4.776654604829557,
+          37.881737312040386
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 34,
-        "submodo": "ruta"
+        "numero": 34
       }
     },
     {
@@ -5961,9 +5928,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -5971,14 +5938,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.776594835666118,
-          37.88065304814881
+          -4.77594666458449,
+          37.88098126161143
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 35,
-        "submodo": "ruta"
+        "numero": 35
       }
     },
     {
@@ -5986,14 +5952,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.7762176639906455,
-          37.88141485054338
+          -4.77462466637277,
+          37.88076841065164
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 36,
-        "submodo": "ruta"
+        "numero": 36
       }
     },
     {
@@ -6029,9 +5994,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -6039,14 +6004,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.7758542916092415,
-          37.88103193305952
+          -4.772996639742962,
+          37.88187411837672
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 37,
-        "submodo": "ruta"
+        "numero": 37
       }
     },
     {
@@ -6082,9 +6046,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -6092,14 +6056,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.774665603429134,
-          37.88078935774658
+          -4.7753864162312,
+          37.87980669541432
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 38,
-        "submodo": "ruta"
+        "numero": 38
       }
     },
     {
@@ -6139,9 +6102,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -6149,14 +6112,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.773042688251768,
-          37.88188647399103
+          -4.775751495763505,
+          37.88049740495363
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 39,
-        "submodo": "ruta"
+        "numero": 39
       }
     },
     {
@@ -6188,9 +6150,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -6198,14 +6160,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.775342957217073,
-          37.87979886598453
+          -4.776566737644988,
+          37.88254806173987
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 40,
-        "submodo": "ruta"
+        "numero": 40
       }
     },
     {
@@ -6213,14 +6174,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.776384780947938,
-          37.882088889165765
+          -4.776661806244721,
+          37.88400293900977
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 41,
-        "submodo": "ruta"
+        "numero": 41
       }
     },
     {
@@ -6252,9 +6212,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -6262,14 +6222,13 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -4.776687600161263,
-          37.88393883449237
+          -4.7827780833797995,
+          37.88046568935934
         ]
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 42,
-        "submodo": "ruta"
+        "numero": 42
       }
     },
     {
@@ -6961,9 +6920,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -7319,9 +7278,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -7337,9 +7296,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -7355,9 +7314,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -7373,9 +7332,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -7391,9 +7350,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -7409,9 +7368,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -7803,9 +7762,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -8465,9 +8424,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -9091,9 +9050,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -9109,9 +9068,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -9125,8 +9084,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 43,
-        "submodo": "ruta"
+        "numero": 43
       }
     },
     {
@@ -9162,9 +9120,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -9178,8 +9136,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 44,
-        "submodo": "ruta"
+        "numero": 44
       }
     },
     {
@@ -9495,9 +9452,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -9729,9 +9686,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -9747,9 +9704,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -10233,9 +10190,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -10251,9 +10208,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -10269,9 +10226,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -10287,9 +10244,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -10305,9 +10262,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -10323,9 +10280,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -10341,9 +10298,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -10359,9 +10316,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -10377,9 +10334,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -10395,9 +10352,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -10413,9 +10370,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -10431,9 +10388,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -10449,9 +10406,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -10467,9 +10424,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -10485,9 +10442,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -10503,9 +10460,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -10521,9 +10478,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -10539,9 +10496,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -10557,9 +10514,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -10573,8 +10530,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 45,
-        "submodo": "ruta"
+        "numero": 45
       }
     },
     {
@@ -10634,9 +10590,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -10650,8 +10606,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 46,
-        "submodo": "ruta"
+        "numero": 46
       }
     },
     {
@@ -10665,8 +10620,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 47,
-        "submodo": "ruta"
+        "numero": 47
       }
     },
     {
@@ -10706,9 +10660,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -10722,8 +10676,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 48,
-        "submodo": "ruta"
+        "numero": 48
       }
     },
     {
@@ -10737,8 +10690,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 49,
-        "submodo": "ruta"
+        "numero": 49
       }
     },
     {
@@ -10826,9 +10778,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -10842,8 +10794,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 50,
-        "submodo": "ruta"
+        "numero": 50
       }
     },
     {
@@ -11591,9 +11542,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -11609,9 +11560,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -11627,9 +11578,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -11645,9 +11596,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -11663,9 +11614,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -11681,9 +11632,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -11699,9 +11650,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -11717,9 +11668,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -11735,9 +11686,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -11753,9 +11704,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -11769,8 +11720,7 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 51,
-        "submodo": "ruta"
+        "numero": 51
       }
     },
     {
@@ -12758,9 +12708,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -12808,9 +12758,9 @@
       },
       "properties": {
         "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     },
     {
@@ -12824,8 +12774,737 @@
       },
       "properties": {
         "tipo": "marcador",
-        "numero": 52,
-        "submodo": "ruta"
+        "numero": 52
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.777730602722482,
+            37.87953379932407
+          ],
+          [
+            -4.777713641401174,
+            37.879516539796136
+          ],
+          [
+            -4.777712006930056,
+            37.8795151686836
+          ],
+          [
+            -4.777709554159269,
+            37.87951299164989
+          ],
+          [
+            -4.777703117119568,
+            37.879507910095285
+          ],
+          [
+            -4.777698314469131,
+            37.8795040390374
+          ],
+          [
+            -4.777690038322003,
+            37.87949847460131
+          ],
+          [
+            -4.777682170301527,
+            37.879493796070996
+          ],
+          [
+            -4.777675733179971,
+            37.87949000628936
+          ],
+          [
+            -4.777669704266923,
+            37.87948718356156
+          ],
+          [
+            -4.7776639825539,
+            37.87948379602963
+          ],
+          [
+            -4.777658362749757,
+            37.87948008558622
+          ],
+          [
+            -4.7776534572900395,
+            37.87947653730902
+          ],
+          [
+            -4.777649677493724,
+            37.87947371470991
+          ],
+          [
+            -4.777644568461806,
+            37.87946984365022
+          ],
+          [
+            -4.777640481301756,
+            37.87946693977385
+          ],
+          [
+            -4.777636597713904,
+            37.87946419806375
+          ],
+          [
+            -4.777632919662761,
+            37.87946177861886
+          ],
+          [
+            -4.777630058847176,
+            37.879460084464704
+          ],
+          [
+            -4.777626176241579,
+            37.87945798767263
+          ],
+          [
+            -4.777622292571873,
+            37.879456293647586
+          ],
+          [
+            -4.7776190236296365,
+            37.87945476178889
+          ],
+          [
+            -4.777616570940705,
+            37.879453229154876
+          ],
+          [
+            -4.7776145273606785,
+            37.87945193905974
+          ],
+          [
+            -4.777612483780654,
+            37.87945048731505
+          ],
+          [
+            -4.777610541945801,
+            37.879449277721605
+          ],
+          [
+            -4.777608907474683,
+            37.87944806799893
+          ],
+          [
+            -4.777607374830592,
+            37.87944685814702
+          ],
+          [
+            -4.777606251213552,
+            37.879445890187945
+          ],
+          [
+            -4.777605024869086,
+            37.8794450837492
+          ],
+          [
+            -4.777603900269792,
+            37.87944435755373
+          ],
+          [
+            -4.7776023676257005,
+            37.879443470742444
+          ],
+          [
+            -4.777600631327555,
+            37.87944274454698
+          ],
+          [
+            -4.7775990986834636,
+            37.879441857735664
+          ],
+          [
+            -4.777598178638623,
+            37.87944105103845
+          ],
+          [
+            -4.777596339613051,
+            37.87944000283597
+          ],
+          [
+            -4.777594806968959,
+            37.8794389538582
+          ],
+          [
+            -4.777593274243013,
+            37.87943750224245
+          ],
+          [
+            -4.777591435217442,
+            37.879435485822285
+          ],
+          [
+            -4.777589493382589,
+            37.87943371155342
+          ],
+          [
+            -4.77758755162959,
+            37.879432179565036
+          ],
+          [
+            -4.777585610776991,
+            37.87943096984208
+          ],
+          [
+            -4.777583567196967,
+            37.8794297601191
+          ],
+          [
+            -4.77758142080766,
+            37.87942855039609
+          ],
+          [
+            -4.777579480036916,
+            37.879427340543856
+          ],
+          [
+            -4.77757743645689,
+            37.879425807909286
+          ],
+          [
+            -4.777575392876866,
+            37.87942427604995
+          ],
+          [
+            -4.777573553851293,
+            37.87942306619764
+          ],
+          [
+            -4.77757161201644,
+            37.87942201721961
+          ],
+          [
+            -4.777569568436416,
+            37.879420807367275
+          ],
+          [
+            -4.777567626601563,
+            37.87941959764414
+          ],
+          [
+            -4.777565685830819,
+            37.87941838792096
+          ],
+          [
+            -4.777563846805247,
+            37.87941733958896
+          ],
+          [
+            -4.777561904970394,
+            37.87941637162949
+          ],
+          [
+            -4.777557817810344,
+            37.87941492001331
+          ],
+          [
+            -4.777554446058825,
+            37.87941362991751
+          ],
+          [
+            -4.7775522996695186,
+            37.87941242019425
+          ],
+          [
+            -4.7775491325543085,
+            37.87941080718678
+          ],
+          [
+            -4.777546679865377,
+            37.87940919417929
+          ],
+          [
+            -4.777544023604246,
+            37.879407661544334
+          ],
+          [
+            -4.777540856407182,
+            37.87940612955542
+          ],
+          [
+            -4.77753809733677,
+            37.87940467729295
+          ],
+          [
+            -4.777536053756744,
+            37.879403306824386
+          ],
+          [
+            -4.777534214731172,
+            37.87940209710097
+          ],
+          [
+            -4.777531966596694,
+            37.8794006447092
+          ],
+          [
+            -4.777529923016668,
+            37.87939911284936
+          ],
+          [
+            -4.777528287563295,
+            37.87939782197797
+          ],
+          [
+            -4.777526346710697,
+            37.879396370361434
+          ],
+          [
+            -4.777524507685125,
+            37.87939483850149
+          ],
+          [
+            -4.777522565932127,
+            37.87939322549367
+          ],
+          [
+            -4.777520215970622,
+            37.879391047810245
+          ],
+          [
+            -4.7775175587272365,
+            37.87938830532204
+          ],
+          [
+            -4.777515311575012,
+            37.879385563738225
+          ],
+          [
+            -4.777513063440534,
+            37.87938306301365
+          ],
+          [
+            -4.77751142798716,
+            37.879381288614276
+          ],
+          [
+            -4.777508976280482,
+            37.87937886903745
+          ],
+          [
+            -4.777506728064149,
+            37.87937685274489
+          ],
+          [
+            -4.777504378184498,
+            37.879374997972775
+          ],
+          [
+            -4.777502130050021,
+            37.87937322344401
+          ],
+          [
+            -4.777500086469995,
+            37.87937169158359
+          ],
+          [
+            -4.777497633699209,
+            37.87937007857526
+          ],
+          [
+            -4.777494057475092,
+            37.87936822380296
+          ],
+          [
+            -4.777490788532855,
+            37.87936636812612
+          ],
+          [
+            -4.7774882340168965,
+            37.87936451335376
+          ],
+          [
+            -4.7774854749464835,
+            37.87936273895392
+          ],
+          [
+            -4.777482614130899,
+            37.87936088405225
+          ],
+          [
+            -4.777479855142342,
+            37.87935910965234
+          ],
+          [
+            -4.777477607007864,
+            37.87935757766243
+          ],
+          [
+            -4.777475257046358,
+            37.879355722889834
+          ],
+          [
+            -4.77747300891188,
+            37.8793539484898
+          ],
+          [
+            -4.777470863504828,
+            37.87935233548106
+          ],
+          [
+            -4.7774688199248025,
+            37.879350722472296
+          ],
+          [
+            -4.777466571790324,
+            37.87934910933427
+          ],
+          [
+            -4.7774643236558445,
+            37.879347576698045
+          ],
+          [
+            -4.777462381820992,
+            37.879345560404644
+          ],
+          [
+            -4.7774604410502475,
+            37.87934306058321
+          ],
+          [
+            -4.777458397470223,
+            37.8793403180932
+          ],
+          [
+            -4.777456864744276,
+            37.87933822155618
+          ],
+          [
+            -4.777454616609798,
+            37.87933572095923
+          ],
+          [
+            -4.777452573029772,
+            37.87933378581343
+          ],
+          [
+            -4.777450529449748,
+            37.879331849763055
+          ],
+          [
+            -4.777448485869723,
+            37.87932983359845
+          ],
+          [
+            -4.777446442289698,
+            37.879327898452495
+          ],
+          [
+            -4.777444296882645,
+            37.879326123922596
+          ],
+          [
+            -4.777442048748167,
+            37.87932426914921
+          ],
+          [
+            -4.777439800613688,
+            37.87932241347124
+          ],
+          [
+            -4.777437961588117,
+            37.87932063984574
+          ],
+          [
+            -4.77743561162661,
+            37.87931838101222
+          ],
+          [
+            -4.777432852556199,
+            37.87931644586596
+          ],
+          [
+            -4.777429480886536,
+            37.87931459096313
+          ],
+          [
+            -4.777425597298683,
+            37.87931273541415
+          ],
+          [
+            -4.777422328356447,
+            37.87931071911978
+          ],
+          [
+            -4.777419773840488,
+            37.87930886434601
+          ],
+          [
+            -4.777417422896729,
+            37.879307170963614
+          ],
+          [
+            -4.777415379316703,
+            37.879305557953856
+          ],
+          [
+            -4.77741343854596,
+            37.879304025316735
+          ],
+          [
+            -4.777411803010732,
+            37.879302493454865
+          ],
+          [
+            -4.777409862239987,
+            37.87930128360056
+          ],
+          [
+            -4.7774080232144165,
+            37.879299589442695
+          ],
+          [
+            -4.77740618320659,
+            37.87929676670759
+          ],
+          [
+            -4.777404242353992,
+            37.87929354068759
+          ],
+          [
+            -4.777402403328419,
+            37.87929112110787
+          ],
+          [
+            -4.777400461493567,
+            37.87928910494212
+          ],
+          [
+            -4.777398519740568,
+            37.87928741155929
+          ],
+          [
+            -4.777396578887969,
+            37.87928571740109
+          ],
+          [
+            -4.777394535307945,
+            37.87928410439087
+          ],
+          [
+            -4.777392798109399,
+            37.87928257252859
+          ],
+          [
+            -4.777391367128626,
+            37.87928128165518
+          ],
+          [
+            -4.777390141848268,
+            37.87927991118432
+          ],
+          [
+            -4.777388812694522,
+            37.87927870145887
+          ],
+          [
+            -4.77738758733231,
+            37.87927773349756
+          ],
+          [
+            -4.777386360987844,
+            37.87927684577976
+          ],
+          [
+            -4.777385134643378,
+            37.87927579757497
+          ],
+          [
+            -4.777384011026339,
+            37.87927491063244
+          ],
+          [
+            -4.777382784681873,
+            37.87927402304379
+          ],
+          [
+            -4.777381660082579,
+            37.87927305585775
+          ],
+          [
+            -4.777380638292565,
+            37.87927224928789
+          ],
+          [
+            -4.777379923866288,
+            37.87927160346344
+          ],
+          [
+            -4.777379413012209,
+            37.879270958414274
+          ],
+          [
+            -4.777379105648475,
+            37.87927047488584
+          ],
+          [
+            -4.777378697521822,
+            37.87926999045292
+          ],
+          [
+            -4.777378391140342,
+            37.87926934540373
+          ],
+          [
+            -4.777377982031434,
+            37.879268861875296
+          ],
+          [
+            -4.777377572922528,
+            37.879268377442315
+          ],
+          [
+            -4.777376960241422,
+            37.87926781354114
+          ],
+          [
+            -4.777376449387344,
+            37.87926732923739
+          ],
+          [
+            -4.77737593845141,
+            37.87926676443172
+          ],
+          [
+            -4.77737542759733,
+            37.879266039139026
+          ],
+          [
+            -4.777374916661397,
+            37.879265635854054
+          ],
+          [
+            -4.7773744058073175,
+            37.879265312941804
+          ],
+          [
+            -4.777373894871384,
+            37.87926490965683
+          ],
+          [
+            -4.777373485762477,
+            37.87926450637184
+          ],
+          [
+            -4.777373077635826,
+            37.87926410308687
+          ],
+          [
+            -4.777372566781746,
+            37.8792636999311
+          ],
+          [
+            -4.777372055845813,
+            37.879263135125406
+          ],
+          [
+            -4.7773717495461865,
+            37.879262490076165
+          ],
+          [
+            -4.7773710340557995,
+            37.879262086920406
+          ],
+          [
+            -4.777369807711334,
+            37.87926160326269
+          ],
+          [
+            -4.777368479539842,
+            37.87926095821346
+          ],
+          [
+            -4.7773673550224025,
+            37.87926047390965
+          ],
+          [
+            -4.777366742341296,
+            37.87926007062466
+          ],
+          [
+            -4.777365925105737,
+            37.87925974848768
+          ],
+          [
+            -4.777364289652365,
+            37.87925934520268
+          ],
+          [
+            -4.7773628597357,
+            37.87925910266312
+          ],
+          [
+            -4.777362144245312,
+            37.879258780526136
+          ],
+          [
+            -4.777361633391234,
+            37.879258538761896
+          ],
+          [
+            -4.777361531564207,
+            37.87925845761386
+          ],
+          [
+            -4.777361531564207,
+            37.87925829609313
+          ],
+          [
+            -4.777361531564207,
+            37.879258135476874
+          ],
+          [
+            -4.7773613270097535,
+            37.879257892808106
+          ],
+          [
+            -4.777361224282327,
+            37.879257570800334
+          ],
+          [
+            -4.777361020710128,
+            37.87925732890686
+          ],
+          [
+            -4.777361020710128,
+            37.87925724775882
+          ],
+          [
+            -4.777360816155674,
+            37.87925724775882
+          ],
+          [
+            -4.777360816155674,
+            37.87925716751531
+          ],
+          [
+            -4.777360816155674,
+            37.87925692575107
+          ],
+          [
+            -4.777360611601221,
+            37.87925724775882
+          ],
+          [
+            -4.7773607133463925,
+            37.879257570800334
+          ],
+          [
+            -4.777361735136406,
+            37.879257651043844
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#ff0000",
+        "weight": 7,
+        "opacity": 0.4
       }
     }
   ]
