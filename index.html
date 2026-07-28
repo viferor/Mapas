@@ -158,6 +158,10 @@
         <button id="btn-puntos-rectos" class="btn" onclick="setModo('dibujar_puntos')">Rectos</button>
         <button id="btn-continuo" class="btn" onclick="setModo('continuo')">Mano Alzada</button>
         <button id="btn-borrar" class="btn" onclick="setModo('borrar')">Borrar</button>
+        <label class="btn" style="cursor:pointer;" title="Con el modo Borrar activado: desmarcado = borra el elemento completo al tocarlo; marcado = goma de borrar de mano libre, recorta solo el trazo exacto por el que pasas">
+            <input type="checkbox" id="switch-borrado-preciso" style="margin:0; touch-action: manipulation;" onchange="borradoPreciso = this.checked; mostrarToast(this.checked ? '🧹 Borrado preciso (mano libre)' : '🧹 Borrado por elemento completo');">
+            Preciso
+        </label>
         
         <!-- Controles de Estilo Integrados (Color, Grosor y Opacidad) -->
         <div class="btn" style="cursor: default;">
@@ -213,8 +217,8 @@
     <!-- Modal para revisar/editar el texto detectado por OCR antes de trazar la ruta -->
     <div id="modal-ocr" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center;">
         <div style="background:white; padding:20px; border-radius:8px; width:340px; max-width:90vw; max-height:85vh; display:flex; flex-direction:column;">
-            <h3 style="margin-top:0;">Revisa el listado de calles</h3>
-            <p style="font-size:13px; color:#555; margin-top:-8px;">Corrige lo que el OCR haya leído mal (una calle por línea) y luego pulsa "Trazar ruta".</p>
+            <h3 id="titulo-ocr" style="margin-top:0;">Revisa el listado de calles</h3>
+            <p id="mensaje-ocr" style="font-size:13px; color:#555; margin-top:-8px;">Corrige lo que el OCR haya leído mal (una calle por línea) y luego pulsa "Trazar ruta".</p>
             <textarea id="texto-ocr" placeholder="Una calle por línea..." style="flex:1; min-height:220px; width:100%; box-sizing:border-box; font-size:14px; padding:8px; border:1px solid #ccc; border-radius:6px; resize:vertical;"></textarea>
             <div style="display:flex; gap:8px; margin-top:12px;">
                 <button id="btn-ocr-cancelar" class="btn" style="flex:1; background:#ccc; justify-content:center;">Cancelar</button>

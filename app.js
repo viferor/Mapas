@@ -13,6 +13,12 @@ let ultimoPuntoTramo = null;
 let ultimoMarcadorTramo = null; // referencia al marcador anterior, para poder vincular las líneas en ambos sentidos
 let trazoLibreActivo = false; 
 
+// --- Goma de borrar de precisión (modo "Borrar" con el conmutador "Preciso" activado) ---
+let borradoPreciso = false;         // false = borrado por elemento completo (comportamiento clásico); true = mano libre, recorte preciso
+let borradoPrecisoActivo = false;   // true mientras se está arrastrando el dedo/ratón borrando
+let ultimoPuntoBorrado = null;
+const RADIO_BORRADO_PRECISO_METROS = 6; // pequeño y preciso, tal como se pidió
+
 // --- Helpers de vínculo marcador<->línea (evitan líneas "huérfanas" al borrar un punto intermedio) ---
 function vincularLineaEntreMarcadores(marcadorAnterior, marcadorNuevo, linea) {
     if (!marcadorAnterior.lineasAsociadas) marcadorAnterior.lineasAsociadas = [];
@@ -23,6 +29,14 @@ function vincularLineaEntreMarcadores(marcadorAnterior, marcadorNuevo, linea) {
 }
 
 function eliminarMarcadorYLineas(marcador, mensaje) {
+    const entradaMarcador = historialAcciones.find(item => item.tipo === 'marcador' && item.elemento === marcador);
+    const restaurar = [{
+        tipo: 'marcador',
+        elemento: marcador,
+        numero: entradaMarcador ? entradaMarcador.numero : null,
+        submodo: entradaMarcador ? entradaMarcador.submodo : 'ruta'
+    }];
+
     map.removeLayer(marcador);
     historialAcciones = historialAcciones.filter(item => item.elemento !== marcador);
 
@@ -39,11 +53,14 @@ function eliminarMarcadorYLineas(marcador, mensaje) {
                     }
                 });
             }
+            restaurar.push({ tipo: 'linea', elemento: linea });
         });
     }
 
     recalcularContadorNumeros();
     mostrarToast(mensaje || "Punto borrado");
+    historialAcciones.push({ tipo: 'borrado', restaurar });
+    historialRehacer = [];
 }
 
 // --- Zona de toque ampliada para líneas: en pantalla táctil, tocar exactamente sobre el
@@ -63,7 +80,7 @@ function anadirZonaDeToque(lineaVisible, coordenadas, mapaInstancia, mensajeBorr
     lineaVisible._zonaToque = zonaToque;
 
     const manejarClickBorrado = function(ev) {
-        if (modoActual === 'borrar') {
+        if (modoActual === 'borrar' && !borradoPreciso) {
             L.DomEvent.stopPropagation(ev);
             mapaInstancia.removeLayer(lineaVisible);
             mapaInstancia.removeLayer(zonaToque);
@@ -74,12 +91,179 @@ function anadirZonaDeToque(lineaVisible, coordenadas, mapaInstancia, mensajeBorr
                 });
             }
             mostrarToast(mensajeBorrado || "Línea borrada");
+            historialAcciones.push({ tipo: 'borrado', restaurar: [{ tipo: 'linea', elemento: lineaVisible }] });
+            historialRehacer = [];
         }
     };
 
     lineaVisible.on('click', manejarClickBorrado);
     zonaToque.on('click', manejarClickBorrado);
     return zonaToque;
+}
+
+// Inserta puntos intermedios interpolados en una línea para que ningún tramo entre dos puntos
+// consecutivos supere "distMaxMetros". Así la goma de borrar puede "cortar" en cualquier punto
+// de la línea y no solo en sus vértices originales (importante para tramos rectos con pocos puntos).
+function densificarPuntos(puntos, distMaxMetros) {
+    if (!puntos || puntos.length < 2) return puntos;
+    let resultado = [puntos[0]];
+    for (let i = 1; i < puntos.length; i++) {
+        const a = puntos[i - 1], b = puntos[i];
+        const distancia = a.distanceTo(b);
+        const pasos = Math.min(500, Math.ceil(distancia / distMaxMetros)); // límite de seguridad para no generar listas gigantes
+        for (let s = 1; s <= pasos; s++) {
+            const t = s / pasos;
+            resultado.push(L.latLng(a.lat + (b.lat - a.lat) * t, a.lng + (b.lng - a.lng) * t));
+        }
+    }
+    return resultado;
+}
+
+function eliminarLineaDelHistorial(linea) {
+    map.removeLayer(linea);
+    if (linea._zonaToque) map.removeLayer(linea._zonaToque);
+    historialAcciones = historialAcciones.filter(item => item.elemento !== linea);
+    if (linea.marcadoresVinculados) {
+        linea.marcadoresVinculados.forEach(m => {
+            if (m.lineasAsociadas) m.lineasAsociadas = m.lineasAsociadas.filter(l => l !== linea);
+        });
+    }
+}
+
+// Quita solo el marcador numérico, sin tocar el trazado que tenga asociado (se usa en la goma de
+// borrar de precisión: borrar un punto no debe borrar la ruta que pasa por él).
+function desvincularYQuitarMarcador(marcador) {
+    map.removeLayer(marcador);
+    historialAcciones = historialAcciones.filter(item => item.elemento !== marcador);
+    if (marcador.lineasAsociadas) {
+        marcador.lineasAsociadas.forEach(linea => {
+            if (linea.marcadoresVinculados) {
+                linea.marcadoresVinculados = linea.marcadoresVinculados.filter(m => m !== marcador);
+            }
+        });
+    }
+}
+
+// Borra con precisión todo lo que quede dentro de "radioMetros" de "latlngCentro", registrando los
+// cambios dentro de "sesion" para que todo el gesto de arrastre se pueda deshacer/rehacer de una vez:
+// - Marcadores: se quita solo el número, el trazado asociado se conserva intacto.
+// - Líneas: se recorta justo el tramo tocado, dividiéndola en varios trozos si hace falta.
+function borrarConPrecision(latlngCentro, radioMetros, sesion) {
+    const marcadoresActuales = historialAcciones.filter(item => item.tipo === 'marcador').map(item => item.elemento);
+    marcadoresActuales.forEach(marcador => {
+        if (marcador.getLatLng().distanceTo(latlngCentro) <= radioMetros) {
+            const entradaMarcador = historialAcciones.find(item => item.tipo === 'marcador' && item.elemento === marcador);
+            desvincularYQuitarMarcador(marcador);
+            sesion.marcadores.push({
+                elemento: marcador,
+                numero: entradaMarcador ? entradaMarcador.numero : null,
+                submodo: entradaMarcador ? entradaMarcador.submodo : 'ruta'
+            });
+        }
+    });
+    if (sesion.marcadores.length) recalcularContadorNumeros();
+
+    const lineasActuales = historialAcciones.filter(item => item.tipo === 'linea').map(item => item.elemento);
+
+    lineasActuales.forEach(linea => {
+        let puntos = linea.getLatLngs();
+        if (!puntos || puntos.length < 2) return;
+
+        const algunoCerca = puntos.some(p => p.distanceTo(latlngCentro) <= radioMetros * 2.5);
+        if (!algunoCerca) return;
+
+        puntos = densificarPuntos(puntos, Math.max(radioMetros / 2, 2));
+
+        let huboCambios = false;
+        let subTramos = [];
+        let actual = [];
+
+        puntos.forEach(p => {
+            if (p.distanceTo(latlngCentro) <= radioMetros) {
+                huboCambios = true;
+                if (actual.length >= 2) subTramos.push(actual);
+                actual = [];
+            } else {
+                actual.push(p);
+            }
+        });
+        if (actual.length >= 2) subTramos.push(actual);
+
+        if (!huboCambios) return;
+
+        // Si esta línea ya es descendiente de un recorte anterior dentro de este mismo gesto, se
+        // reutiliza su registro (para poder deshacer todo el gesto de golpe, restaurando la línea
+        // tal cual estaba antes de empezar a arrastrar la goma de borrar)
+        let registro = linea._registroSesionBorrado;
+        if (!registro) {
+            registro = {
+                coordsOriginal: linea.getLatLngs(),
+                estiloOriginal: { color: linea.options.color, weight: linea.options.weight, opacity: linea.options.opacity },
+                marcadoresVinculadosOriginal: linea.marcadoresVinculados ? linea.marcadoresVinculados.slice() : [],
+                actuales: []
+            };
+            sesion.reemplazosLinea.push(registro);
+        }
+        registro.actuales = registro.actuales.filter(l => l !== linea);
+
+        eliminarLineaDelHistorial(linea);
+
+        subTramos.forEach(sub => {
+            const nuevaLinea = L.polyline(sub, { color: registro.estiloOriginal.color, weight: registro.estiloOriginal.weight, opacity: registro.estiloOriginal.opacity, interactive: true }).addTo(map);
+            anadirZonaDeToque(nuevaLinea, sub, map, "Tramo borrado");
+            nuevaLinea._registroSesionBorrado = registro;
+            historialAcciones.push({ tipo: 'linea', elemento: nuevaLinea });
+            registro.actuales.push(nuevaLinea);
+        });
+    });
+}
+
+let sesionBorradoPrecisoActual = null;
+
+function iniciarBorradoPreciso(latlng) {
+    borradoPrecisoActivo = true;
+    map.dragging.disable();
+    ultimoPuntoBorrado = latlng;
+    sesionBorradoPrecisoActual = { marcadores: [], reemplazosLinea: [] };
+    borrarConPrecision(latlng, RADIO_BORRADO_PRECISO_METROS, sesionBorradoPrecisoActual);
+}
+
+function continuarBorradoPreciso(latlng) {
+    if (!borradoPrecisoActivo || !sesionBorradoPrecisoActual) return;
+    if (ultimoPuntoBorrado) {
+        // Se interpola entre el último punto y el actual, para no dejar huecos sin borrar si el dedo se mueve rápido
+        const distancia = ultimoPuntoBorrado.distanceTo(latlng);
+        const pasos = Math.min(60, Math.max(1, Math.ceil(distancia / (RADIO_BORRADO_PRECISO_METROS / 2))));
+        for (let s = 1; s <= pasos; s++) {
+            const t = s / pasos;
+            const inter = L.latLng(
+                ultimoPuntoBorrado.lat + (latlng.lat - ultimoPuntoBorrado.lat) * t,
+                ultimoPuntoBorrado.lng + (latlng.lng - ultimoPuntoBorrado.lng) * t
+            );
+            borrarConPrecision(inter, RADIO_BORRADO_PRECISO_METROS, sesionBorradoPrecisoActual);
+        }
+    }
+    ultimoPuntoBorrado = latlng;
+}
+
+function finalizarBorradoPreciso() {
+    if (borradoPrecisoActivo) {
+        borradoPrecisoActivo = false;
+        ultimoPuntoBorrado = null;
+        map.dragging.enable();
+
+        const sesion = sesionBorradoPrecisoActual;
+        sesionBorradoPrecisoActual = null;
+
+        if (sesion && (sesion.marcadores.length || sesion.reemplazosLinea.length)) {
+            sesion.reemplazosLinea.forEach(registro => {
+                registro.actuales.forEach(l => { delete l._registroSesionBorrado; });
+            });
+            historialAcciones.push({ tipo: 'borrado', sesionPrecisa: sesion });
+            historialRehacer = [];
+            mostrarToast("Trazo borrado (con precisión)");
+        }
+    }
 }
 
 let estaDibujandoLibre = false;
@@ -317,6 +501,46 @@ function configurarDibujoTactilTablet() {
     });
 
     window.addEventListener('mouseup', finalizarTrazoTablet);
+
+    // --- Goma de borrar de precisión: arrastrar (dedo o ratón) mientras el modo "Borrar" tiene
+    // activado el conmutador "Preciso" recorta justo el trazo por el que se pasa ---
+    mapaContenedor.addEventListener('touchstart', (e) => {
+        if (modoActual !== 'borrar' || !borradoPreciso) return;
+        if (e.touches.length > 1) return;
+        const touch = e.touches[0];
+        const rect = mapaContenedor.getBoundingClientRect();
+        const latlng = map.containerPointToLatLng(L.point(touch.clientX - rect.left, touch.clientY - rect.top));
+        iniciarBorradoPreciso(latlng);
+    }, { passive: true });
+
+    mapaContenedor.addEventListener('touchmove', (e) => {
+        if (!borradoPrecisoActivo) return;
+        if (e.touches.length > 1) return;
+        const touch = e.touches[0];
+        const rect = mapaContenedor.getBoundingClientRect();
+        const latlng = map.containerPointToLatLng(L.point(touch.clientX - rect.left, touch.clientY - rect.top));
+        continuarBorradoPreciso(latlng);
+    }, { passive: true });
+
+    mapaContenedor.addEventListener('touchend', finalizarBorradoPreciso);
+    mapaContenedor.addEventListener('touchcancel', finalizarBorradoPreciso);
+
+    mapaContenedor.addEventListener('mousedown', (e) => {
+        if (Date.now() - ultimoEventoFueTouch < 500) return;
+        if (modoActual !== 'borrar' || !borradoPreciso) return;
+        const rect = mapaContenedor.getBoundingClientRect();
+        const latlng = map.containerPointToLatLng(L.point(e.clientX - rect.left, e.clientY - rect.top));
+        iniciarBorradoPreciso(latlng);
+    });
+
+    mapaContenedor.addEventListener('mousemove', (e) => {
+        if (!borradoPrecisoActivo) return;
+        const rect = mapaContenedor.getBoundingClientRect();
+        const latlng = map.containerPointToLatLng(L.point(e.clientX - rect.left, e.clientY - rect.top));
+        continuarBorradoPreciso(latlng);
+    });
+
+    window.addEventListener('mouseup', finalizarBorradoPreciso);
 }
 
 async function gestionarPulsacion(e) {
@@ -355,7 +579,7 @@ async function gestionarPulsacion(e) {
         const marker = L.marker(latlng, { icon: icon, draggable: true, interactive: true }).addTo(map);
 
         marker.on('click', function(ev) {
-            if (modoActual === 'borrar') {
+            if (modoActual === 'borrar' && !borradoPreciso) {
                 L.DomEvent.stopPropagation(ev);
                 eliminarMarcadorYLineas(this, "Punto borrado");
             }
@@ -478,27 +702,71 @@ function deshacerUltimo() {
         return;
     }
     const accion = historialAcciones.pop();
-    if (accion && accion.elemento) {
-        map.removeLayer(accion.elemento);
-        if (accion.elemento._zonaToque) map.removeLayer(accion.elemento._zonaToque);
-        historialRehacer.push(accion);
+    if (!accion) return;
 
-        if (accion.tipo === 'marcador') {
-            if (accion.elemento.lineasAsociadas && accion.elemento.lineasAsociadas.length) {
-                accion.elemento.lineasAsociadas.forEach(linea => {
-                    map.removeLayer(linea);
-                    if (linea._zonaToque) map.removeLayer(linea._zonaToque);
-                    historialAcciones = historialAcciones.filter(item => item.elemento !== linea);
-                    historialRehacer.push({ tipo: 'linea', elemento: linea });
-                });
-            }
-            recalcularContadorNumeros();
-            const ultimo = historialAcciones.slice().reverse().find(i => i.tipo === 'marcador' && i.submodo === 'ruta');
-            ultimoPuntoTramo = ultimo ? ultimo.elemento.getLatLng() : null;
-            ultimoMarcadorTramo = ultimo ? ultimo.elemento : null;
+    // --- Deshacer un BORRADO (clásico o preciso): se restaura lo que se había quitado ---
+    if (accion.tipo === 'borrado') {
+        if (accion.restaurar) {
+            accion.restaurar.forEach(item => {
+                item.elemento.addTo(map);
+                if (item.elemento._zonaToque) item.elemento._zonaToque.addTo(map);
+                historialAcciones.push(item);
+            });
         }
-        mostrarToast("Deshecho");
+        if (accion.sesionPrecisa) {
+            accion.sesionPrecisa.marcadores.forEach(m => {
+                m.elemento.addTo(map);
+                historialAcciones.push({ tipo: 'marcador', elemento: m.elemento, numero: m.numero, submodo: m.submodo });
+            });
+            accion.sesionPrecisa.reemplazosLinea.forEach(registro => {
+                registro.actuales.forEach(l => {
+                    map.removeLayer(l);
+                    if (l._zonaToque) map.removeLayer(l._zonaToque);
+                    historialAcciones = historialAcciones.filter(item => item.elemento !== l);
+                });
+                const lineaRestaurada = L.polyline(registro.coordsOriginal, { color: registro.estiloOriginal.color, weight: registro.estiloOriginal.weight, opacity: registro.estiloOriginal.opacity, interactive: true }).addTo(map);
+                anadirZonaDeToque(lineaRestaurada, registro.coordsOriginal, map, "Tramo borrado");
+                lineaRestaurada.marcadoresVinculados = registro.marcadoresVinculadosOriginal;
+                registro.marcadoresVinculadosOriginal.forEach(m => {
+                    if (m.lineasAsociadas && !m.lineasAsociadas.includes(lineaRestaurada)) {
+                        m.lineasAsociadas.push(lineaRestaurada);
+                    }
+                });
+                registro.lineaRestaurada = lineaRestaurada;
+                historialAcciones.push({ tipo: 'linea', elemento: lineaRestaurada });
+            });
+        }
+        recalcularContadorNumeros();
+        historialRehacer.push(accion);
+        mostrarToast("Borrado deshecho");
+        return;
     }
+
+    // --- Deshacer un DIBUJO (marcador o línea añadidos): se quita, agrupando marcador+sus líneas
+    // en un solo paso para poder rehacerlo todo junto (antes se deshacían juntos pero se rehacían
+    // por separado, dejando estados intermedios raros) ---
+    if (!accion.elemento) return;
+
+    map.removeLayer(accion.elemento);
+    if (accion.elemento._zonaToque) map.removeLayer(accion.elemento._zonaToque);
+
+    let grupo = [accion];
+
+    if (accion.tipo === 'marcador' && accion.elemento.lineasAsociadas && accion.elemento.lineasAsociadas.length) {
+        accion.elemento.lineasAsociadas.forEach(linea => {
+            map.removeLayer(linea);
+            if (linea._zonaToque) map.removeLayer(linea._zonaToque);
+            historialAcciones = historialAcciones.filter(item => item.elemento !== linea);
+            grupo.push({ tipo: 'linea', elemento: linea });
+        });
+        recalcularContadorNumeros();
+        const ultimo = historialAcciones.slice().reverse().find(i => i.tipo === 'marcador' && i.submodo === 'ruta');
+        ultimoPuntoTramo = ultimo ? ultimo.elemento.getLatLng() : null;
+        ultimoMarcadorTramo = ultimo ? ultimo.elemento : null;
+    }
+
+    historialRehacer.push(grupo);
+    mostrarToast("Deshecho");
 }
 
 function rehacerProximo() {
@@ -506,20 +774,59 @@ function rehacerProximo() {
         mostrarToast("Nada que rehacer");
         return;
     }
-    const accion = historialRehacer.pop();
-    if (accion && accion.elemento) {
+    const item = historialRehacer.pop();
+    if (!item) return;
+
+    // --- Rehacer un BORRADO: se vuelve a quitar lo que se había restaurado con el "Deshacer" anterior ---
+    if (!Array.isArray(item) && item.tipo === 'borrado') {
+        if (item.restaurar) {
+            item.restaurar.forEach(r => {
+                map.removeLayer(r.elemento);
+                if (r.elemento._zonaToque) map.removeLayer(r.elemento._zonaToque);
+                historialAcciones = historialAcciones.filter(x => x.elemento !== r.elemento);
+            });
+        }
+        if (item.sesionPrecisa) {
+            item.sesionPrecisa.marcadores.forEach(m => {
+                map.removeLayer(m.elemento);
+                historialAcciones = historialAcciones.filter(x => x.elemento !== m.elemento);
+            });
+            item.sesionPrecisa.reemplazosLinea.forEach(registro => {
+                if (registro.lineaRestaurada) {
+                    map.removeLayer(registro.lineaRestaurada);
+                    if (registro.lineaRestaurada._zonaToque) map.removeLayer(registro.lineaRestaurada._zonaToque);
+                    historialAcciones = historialAcciones.filter(x => x.elemento !== registro.lineaRestaurada);
+                }
+                registro.actuales.forEach(l => {
+                    l.addTo(map);
+                    if (l._zonaToque) l._zonaToque.addTo(map);
+                    historialAcciones.push({ tipo: 'linea', elemento: l });
+                });
+            });
+        }
+        recalcularContadorNumeros();
+        historialAcciones.push(item);
+        mostrarToast("Rehecho");
+        return;
+    }
+
+    // --- Rehacer un DIBUJO: se restaura el grupo completo (marcador + sus líneas) de una vez ---
+    const grupo = Array.isArray(item) ? item : [item];
+    grupo.forEach(accion => {
         accion.elemento.addTo(map);
         if (accion.elemento._zonaToque) accion.elemento._zonaToque.addTo(map);
         historialAcciones.push(accion);
-        if (accion.tipo === 'marcador') {
-            recalcularContadorNumeros();
-            if (accion.submodo === 'ruta') {
-                ultimoPuntoTramo = accion.elemento.getLatLng();
-                ultimoMarcadorTramo = accion.elemento;
-            }
+    });
+
+    const accionMarcador = grupo.find(a => a.tipo === 'marcador');
+    if (accionMarcador) {
+        recalcularContadorNumeros();
+        if (accionMarcador.submodo === 'ruta') {
+            ultimoPuntoTramo = accionMarcador.elemento.getLatLng();
+            ultimoMarcadorTramo = accionMarcador.elemento;
         }
-        mostrarToast("Rehecho");
     }
+    mostrarToast("Rehecho");
 }
 
 function obtenerToken() {
@@ -658,8 +965,30 @@ async function cargarMapaDesdeGithub(fileName) {
         const res = await fetch(url);
         const geojson = await res.json();
         
-        historialAcciones.forEach(i => map.removeLayer(i.elemento));
-        historialRehacer.forEach(i => map.removeLayer(i.elemento));
+        const quitarSiEsCapa = (capa) => {
+            if (capa && typeof capa.on === 'function') {
+                map.removeLayer(capa);
+                if (capa._zonaToque) map.removeLayer(capa._zonaToque);
+            }
+        };
+        const limpiarEntrada = (i) => {
+            if (!i) return;
+            if (Array.isArray(i)) { i.forEach(limpiarEntrada); return; }
+            if (i.tipo === 'borrado') {
+                if (i.restaurar) i.restaurar.forEach(r => quitarSiEsCapa(r.elemento));
+                if (i.sesionPrecisa) {
+                    i.sesionPrecisa.marcadores.forEach(m => quitarSiEsCapa(m.elemento));
+                    i.sesionPrecisa.reemplazosLinea.forEach(reg => {
+                        quitarSiEsCapa(reg.lineaRestaurada);
+                        reg.actuales.forEach(quitarSiEsCapa);
+                    });
+                }
+                return;
+            }
+            quitarSiEsCapa(i.elemento);
+        };
+        historialAcciones.forEach(limpiarEntrada);
+        historialRehacer.forEach(limpiarEntrada);
         historialAcciones = [];
         historialRehacer = [];
         ultimoPuntoTramo = null;
@@ -708,7 +1037,7 @@ function procesarYAnadirGeoJSON(geojson, mapInstance) {
             }).addTo(mapInstance);
             
             m.on('click', ev => { 
-                if (modoActual === 'borrar') { 
+                if (modoActual === 'borrar' && !borradoPreciso) { 
                     L.DomEvent.stopPropagation(ev); 
                     mapInstance.removeLayer(m); 
                     historialAcciones = historialAcciones.filter(item => item.elemento !== m); 
@@ -768,13 +1097,19 @@ function cargarScriptExterno(src) {
 // Muestra el modal de revisión/edición del texto OCR y devuelve una promesa con las líneas editadas
 // (o null si el usuario cancela). Se reutiliza también cuando el OCR no ha detectado nada, para que
 // el usuario pueda escribir el listado a mano en el mismo cuadro.
-function mostrarModalEdicionOCR(lineasIniciales) {
+function mostrarModalEdicionOCR(lineasIniciales, opciones) {
+    opciones = opciones || {};
     return new Promise((resolve) => {
         const modal = document.getElementById('modal-ocr');
         const textarea = document.getElementById('texto-ocr');
+        const titulo = document.getElementById('titulo-ocr');
+        const mensaje = document.getElementById('mensaje-ocr');
         const btnContinuar = document.getElementById('btn-ocr-continuar');
         const btnCancelar = document.getElementById('btn-ocr-cancelar');
 
+        titulo.innerText = opciones.titulo || 'Revisa el listado de calles';
+        mensaje.innerText = opciones.mensaje || 'Corrige lo que el OCR haya leído mal (una calle por línea) y luego pulsa "Trazar ruta".';
+        btnContinuar.innerText = opciones.textoBoton || 'Trazar ruta';
         textarea.value = lineasIniciales.join('\n');
         modal.style.display = 'flex';
 
@@ -861,6 +1196,83 @@ async function procesarImagenCalles(event) {
 
 // --- Lógica compartida: dado un listado de nombres de calle (venga de un .txt o de una imagen escaneada),
 // los geocodifica en Córdoba y traza la ruta a pie entre ellos ---
+const CORDOBA_CENTRO = L.latLng(37.8882, -4.7794);
+const RADIO_MAXIMO_METROS = 3500; // filtro estricto: 3,5 km desde la PRIMERA calle válida del recorrido (no desde el centro fijo)
+const RADIO_PRIMERA_CALLE_METROS = 12000; // margen amplio, solo para localizar la primera calle en cualquier punto de Córdoba
+
+// Geocodifica un listado de nombres de calle contra el callejero de Córdoba.
+// La primera calle que se localiza correctamente pasa a ser el "centro" del recorrido: todas las
+// demás calles deben quedar a un máximo de 3,5 km de esa primera calle (no del centro de la ciudad),
+// para descartar coincidencias de Nominatim en zonas alejadas que probablemente sean erróneas.
+// "centroInicial" permite reutilizar como referencia el centro ya calculado en una pasada anterior
+// (por ejemplo, al reintentar solo las calles no reconocidas).
+// Devuelve { resultados, centroRuta }, donde resultados es un array paralelo a "nombres":
+// cada elemento es { nombre, latlng } con latlng=null si no se ha podido reconocer.
+async function geocodificarListado(nombres, centroInicial) {
+    const resultados = nombres.map(nombre => ({ nombre, latlng: null }));
+    let centroRuta = centroInicial || null;
+    const cacheLocal = {};
+
+    for (let i = 0; i < resultados.length; i++) {
+        const nombre = resultados[i].nombre;
+        const centroReferencia = centroRuta || CORDOBA_CENTRO;
+        const radioAplicable = centroRuta ? RADIO_MAXIMO_METROS : RADIO_PRIMERA_CALLE_METROS;
+        const claveCache = nombre.toLowerCase();
+
+        let latlng;
+        if (cacheLocal[claveCache] !== undefined) {
+            latlng = cacheLocal[claveCache];
+            if (latlng && latlng.distanceTo(centroReferencia) > radioAplicable) latlng = null;
+        } else {
+            latlng = await geocodificarUnaCalleNominatim(nombre, centroReferencia, radioAplicable);
+            cacheLocal[claveCache] = latlng;
+        }
+
+        resultados[i].latlng = latlng;
+        if (!centroRuta && latlng) centroRuta = latlng; // fija el centro del recorrido con la primera calle válida
+    }
+
+    return { resultados, centroRuta };
+}
+
+async function geocodificarUnaCalleNominatim(nombre, centroReferencia, radioMetros) {
+    let nombreLimpio = nombre
+        .replace(/^(c\/|cl\.|calle)\s*/i, '')
+        .replace(/^(avda\.|av\.|avenida)\s*/i, '')
+        .replace(/^(pza\.|plaza)\s*/i, '')
+        .trim();
+
+    let variantesBusqueda = [
+        `${nombre}, Córdoba, España`,
+        `${nombreLimpio}, Córdoba, España`,
+        `Calle ${nombreLimpio}, Córdoba, España`,
+        `Calle ${nombre}, Córdoba, España`
+    ];
+
+    for (let queryConCiudad of variantesBusqueda) {
+        try {
+            const urlGeo = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(queryConCiudad)}&countrycodes=es&limit=1`;
+            const res = await fetch(urlGeo);
+            const datos = await res.json();
+
+            if (datos && datos.length > 0) {
+                const lat = parseFloat(datos[0].lat);
+                const lon = parseFloat(datos[0].lon);
+                const nuevoPunto = L.latLng(lat, lon);
+
+                if (nuevoPunto.distanceTo(centroReferencia) <= radioMetros) {
+                    return nuevoPunto;
+                }
+            }
+        } catch (err) {
+            console.error("Error en geocodificación:", err);
+        }
+        // Nominatim exige un máximo de 1 petición/segundo; se respeta ese límite entre variantes
+        await new Promise(r => setTimeout(r, 1000));
+    }
+    return null;
+}
+
 async function procesarListadoCalles(lineas, event) {
     if (lineas.length === 0) {
         alert("El listado está vacío o no contiene líneas válidas.");
@@ -868,78 +1280,49 @@ async function procesarListadoCalles(lineas, event) {
         return;
     }
 
-    mostrarToast(`Geocodificando ${lineas.length} calles en Córdoba...`);
-    let grupoCapas = L.featureGroup();
-    let puntosCoordenadas = [];
-    let textosNoReconocidos = [];
-    const cacheGeocodificacion = {}; // evita repetir peticiones para nombres de calle duplicados en el archivo
+    mostrarToast(`Geocodificando ${lineas.length} calles en Córdoba (máx. 3,5 km desde la primera calle)...`);
+    let { resultados: entradas, centroRuta } = await geocodificarListado(lineas);
 
-    for (let nombre of lineas) {
-        let nombreLimpio = nombre
-            .replace(/^(c\/|cl\.|calle)\s*/i, '')
-            .replace(/^(avda\.|av\.|avenida)\s*/i, '')
-            .replace(/^(pza\.|plaza)\s*/i, '')
-            .trim();
+    // Las que no se han reconocido se ofrecen en el mismo cuadro editable, para corregirlas y reintentar
+    let indicesFallidos = entradas.map((e, i) => i).filter(i => entradas[i].latlng === null);
 
-        const claveCache = nombre.toLowerCase();
-        let encontradoValido = false;
+    if (indicesFallidos.length > 0) {
+        const nombresFallidos = indicesFallidos.map(i => entradas[i].nombre);
+        const corregidas = await mostrarModalEdicionOCR(nombresFallidos, {
+            titulo: 'Calles no reconocidas',
+            mensaje: `Estas ${nombresFallidos.length} calles no se han podido localizar en Córdoba (o quedaban a más de 3,5 km de la primera calle del recorrido). Corrígelas y pulsa "Reintentar", o bórralas/cancela para continuar sin ellas.`,
+            textoBoton: 'Reintentar'
+        });
 
-        if (cacheGeocodificacion[claveCache] !== undefined) {
-            const cacheado = cacheGeocodificacion[claveCache];
-            if (cacheado) {
-                if (puntosCoordenadas.length === 0 || puntosCoordenadas[puntosCoordenadas.length - 1].latlng.distanceTo(cacheado) > 20) {
-                    puntosCoordenadas.push({ latlng: cacheado, nombre: nombre });
+        if (corregidas && corregidas.length > 0) {
+            mostrarToast(`Reintentando geocodificar ${corregidas.length} calles corregidas...`);
+            const { resultados: reintento, centroRuta: centroActualizado } = await geocodificarListado(corregidas, centroRuta);
+            centroRuta = centroRuta || centroActualizado;
+            // Se sustituyen en su posición original dentro de la secuencia; si se han añadido líneas
+            // de más al corregir, se colocan al final del listado
+            reintento.forEach((r, idx) => {
+                if (idx < indicesFallidos.length) {
+                    entradas[indicesFallidos[idx]] = r;
+                } else {
+                    entradas.push(r);
                 }
-                encontradoValido = true;
-            }
-        } else {
-            let variantesBusqueda = [
-                `${nombre}, Córdoba, España`,
-                `${nombreLimpio}, Córdoba, España`,
-                `Calle ${nombreLimpio}, Córdoba, España`,
-                `Calle ${nombre}, Córdoba, España`
-            ];
-
-            for (let queryConCiudad of variantesBusqueda) {
-                try {
-                    const urlGeo = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(queryConCiudad)}&countrycodes=es&limit=1`;
-
-                    const res = await fetch(urlGeo);
-                    const datos = await res.json();
-
-                    if (datos && datos.length > 0) {
-                        const lat = parseFloat(datos[0].lat);
-                        const lon = parseFloat(datos[0].lon);
-
-                        if (lat >= 37.80 && lat <= 37.95 && lon >= -4.90 && lon <= -4.60) {
-                            const nuevoPunto = L.latLng(lat, lon);
-                            cacheGeocodificacion[claveCache] = nuevoPunto;
-                            if (puntosCoordenadas.length === 0 || puntosCoordenadas[puntosCoordenadas.length - 1].latlng.distanceTo(nuevoPunto) > 20) {
-                                puntosCoordenadas.push({ latlng: nuevoPunto, nombre: nombre });
-                            }
-                            encontradoValido = true;
-                            break;
-                        }
-                    }
-                } catch (err) {
-                    console.error("Error en geocodificación:", err);
-                }
-                // Nominatim exige un máximo de 1 petición/segundo; se respeta ese límite entre variantes
-                await new Promise(r => setTimeout(r, 1000));
-            }
-
-            if (!encontradoValido) cacheGeocodificacion[claveCache] = null;
-        }
-
-        if (!encontradoValido) {
-            if (!textosNoReconocidos.includes(nombre)) {
-                textosNoReconocidos.push(nombre);
-            }
+            });
+            // Si se han borrado líneas al corregir (menos líneas que fallidos originales), esas posiciones quedan sin resolver
         }
     }
 
-    if (textosNoReconocidos.length > 0) {
-        alert(`⚠️ Atención: Las siguientes calles no se han podido reconocer en Córdoba y han sido descartadas:\n\n- ${textosNoReconocidos.join('\n- ')}`);
+    // Se construye el listado final de puntos, respetando el orden original y evitando puntos duplicados muy próximos
+    let puntosCoordenadas = [];
+    entradas.forEach(e => {
+        if (!e.latlng) return;
+        if (puntosCoordenadas.length === 0 || puntosCoordenadas[puntosCoordenadas.length - 1].latlng.distanceTo(e.latlng) > 20) {
+            puntosCoordenadas.push({ latlng: e.latlng, nombre: e.nombre });
+        }
+    });
+
+    const noReconocidasFinal = entradas.filter(e => !e.latlng).map(e => e.nombre);
+    if (noReconocidasFinal.length > 0) {
+        alert(`⚠️ Estas calles no se han podido localizar y se han descartado de la ruta:\n\n- ${noReconocidasFinal.join('\n- ')}`);
     }
 
     if (puntosCoordenadas.length === 0) {
@@ -948,6 +1331,7 @@ async function procesarListadoCalles(lineas, event) {
         return;
     }
 
+    let grupoCapas = L.featureGroup();
     let ultimoPunto = null;
     let ultimoMarcador = null;
     let tramosSinRuta = [];
@@ -961,7 +1345,7 @@ async function procesarListadoCalles(lineas, event) {
         const marker = L.marker(pt.latlng, { icon: icon, draggable: true, interactive: true }).addTo(map);
         
         marker.on('click', function(ev) {
-            if (modoActual === 'borrar') {
+            if (modoActual === 'borrar' && !borradoPreciso) {
                 L.DomEvent.stopPropagation(ev);
                 eliminarMarcadorYLineas(this, "Punto borrado");
             }
