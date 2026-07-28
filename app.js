@@ -43,7 +43,7 @@ function eliminarMarcadorYLineas(marcador, mensaje) {
     if (marcador.lineasAsociadas && marcador.lineasAsociadas.length) {
         marcador.lineasAsociadas.forEach(linea => {
             map.removeLayer(linea);
-            if (linea._zonaToque) map.removeLayer(linea._zonaToque);
+            quitarCapasExtra(linea);
             historialAcciones = historialAcciones.filter(item => item.elemento !== linea);
             // Quitar también la referencia en el otro marcador vinculado a esa línea
             if (linea.marcadoresVinculados) {
@@ -63,10 +63,69 @@ function eliminarMarcadorYLineas(marcador, mensaje) {
     historialRehacer = [];
 }
 
+// --- Flechas de dirección ---
+// Calcula el rumbo (en grados, 0 = norte) entre dos puntos
+function calcularRumbo(p1, p2) {
+    const lat1 = p1.lat * Math.PI / 180, lat2 = p2.lat * Math.PI / 180;
+    const dLng = (p2.lng - p1.lng) * Math.PI / 180;
+    const y = Math.sin(dLng) * Math.cos(lat2);
+    const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLng);
+    const rumbo = Math.atan2(y, x) * 180 / Math.PI;
+    return (rumbo + 360) % 360;
+}
+
+const DISTANCIA_ENTRE_FLECHAS_METROS = 70;
+
+// Genera pequeñas flechas orientadas a lo largo de una línea, repartidas cada ~70 m, para marcar
+// visualmente el sentido del recorrido. Son marcadores no interactivos (no interfieren con el borrado).
+function crearFlechasDireccion(coordenadas, color) {
+    const flechas = [];
+    if (!coordenadas || coordenadas.length < 2) return flechas;
+
+    let acumulado = 0;
+    let siguienteFlechaEn = DISTANCIA_ENTRE_FLECHAS_METROS / 2;
+
+    for (let i = 1; i < coordenadas.length; i++) {
+        const a = coordenadas[i - 1], b = coordenadas[i];
+        const tramoDist = a.distanceTo(b);
+        if (tramoDist === 0) continue;
+
+        while (acumulado + tramoDist >= siguienteFlechaEn) {
+            const t = Math.max(0, Math.min(1, (siguienteFlechaEn - acumulado) / tramoDist));
+            const punto = L.latLng(a.lat + (b.lat - a.lat) * t, a.lng + (b.lng - a.lng) * t);
+            const rumbo = calcularRumbo(a, b);
+            const icono = L.divIcon({
+                className: 'flecha-direccion',
+                html: `<div style="transform: rotate(${rumbo}deg); color: ${color || '#3388ff'}; font-size: 16px; line-height: 16px; text-shadow: 0 0 2px white, 0 0 2px white;">▲</div>`,
+                iconSize: [16, 16],
+                iconAnchor: [8, 8]
+            });
+            const marcadorFlecha = L.marker(punto, { icon: icono, interactive: false, keyboard: false }).addTo(map);
+            flechas.push(marcadorFlecha);
+            siguienteFlechaEn += DISTANCIA_ENTRE_FLECHAS_METROS;
+        }
+        acumulado += tramoDist;
+    }
+    return flechas;
+}
+
+// Quita/añade juntas la zona de toque y las flechas de dirección de una línea: se usa en todos los
+// puntos donde se elimina/restaura una línea, para no tener que repetir esta lógica en cada sitio.
+function quitarCapasExtra(linea) {
+    if (!linea) return;
+    if (linea._zonaToque) map.removeLayer(linea._zonaToque);
+    if (linea._flechas) linea._flechas.forEach(f => map.removeLayer(f));
+}
+function anadirCapasExtra(linea) {
+    if (!linea) return;
+    if (linea._zonaToque) linea._zonaToque.addTo(map);
+    if (linea._flechas) linea._flechas.forEach(f => f.addTo(map));
+}
+
 // --- Zona de toque ampliada para líneas: en pantalla táctil, tocar exactamente sobre el
 // grosor visual de una línea es difícil incluso con trazos medios/gruesos. Añadimos una línea
 // invisible más ancha por debajo, que comparte el mismo borrado, para que sea mucho más fácil
-// acertar con el dedo al borrar. ---
+// acertar con el dedo al borrar. También se generan aquí las flechas de dirección del tramo. ---
 function anadirZonaDeToque(lineaVisible, coordenadas, mapaInstancia, mensajeBorrado) {
     const pesoToque = Math.max((lineaVisible.options.weight || 4) + 22, 26);
     const zonaToque = L.polyline(coordenadas, {
@@ -78,12 +137,14 @@ function anadirZonaDeToque(lineaVisible, coordenadas, mapaInstancia, mensajeBorr
     }).addTo(mapaInstancia);
 
     lineaVisible._zonaToque = zonaToque;
+    lineaVisible._flechas = crearFlechasDireccion(coordenadas, lineaVisible.options.color);
 
     const manejarClickBorrado = function(ev) {
         if (modoActual === 'borrar' && !borradoPreciso) {
             L.DomEvent.stopPropagation(ev);
             mapaInstancia.removeLayer(lineaVisible);
             mapaInstancia.removeLayer(zonaToque);
+            quitarCapasExtra(lineaVisible);
             historialAcciones = historialAcciones.filter(item => item.elemento !== lineaVisible);
             if (lineaVisible.marcadoresVinculados) {
                 lineaVisible.marcadoresVinculados.forEach(m => {
@@ -121,7 +182,7 @@ function densificarPuntos(puntos, distMaxMetros) {
 
 function eliminarLineaDelHistorial(linea) {
     map.removeLayer(linea);
-    if (linea._zonaToque) map.removeLayer(linea._zonaToque);
+    quitarCapasExtra(linea);
     historialAcciones = historialAcciones.filter(item => item.elemento !== linea);
     if (linea.marcadoresVinculados) {
         linea.marcadoresVinculados.forEach(m => {
@@ -406,8 +467,27 @@ function cortarTramoActual() {
 }
 
 function recalcularContadorNumeros() {
-    const marcadoresRestantes = historialAcciones.filter(item => item.tipo === 'marcador');
-    contadorNumero = marcadoresRestantes.length === 0 ? 1 : Math.max(...marcadoresRestantes.map(m => m.numero)) + 1;
+    // Se reordenan por su número actual (que refleja el orden de creación) y se renumeran de
+    // forma correlativa: si se borra el punto 8, el que era 9 pasa a ser el 8, y así sucesivamente,
+    // para no dejar huecos en la numeración.
+    const entradasMarcador = historialAcciones
+        .filter(item => item.tipo === 'marcador')
+        .sort((a, b) => (a.numero || 0) - (b.numero || 0));
+
+    entradasMarcador.forEach((entrada, indice) => {
+        const nuevoNumero = indice + 1;
+        if (entrada.numero !== nuevoNumero) {
+            entrada.numero = nuevoNumero;
+            entrada.elemento.setIcon(L.divIcon({
+                className: 'number-icon',
+                html: `<span>${nuevoNumero}</span>`,
+                iconSize: [28, 28],
+                iconAnchor: [14, 14]
+            }));
+        }
+    });
+
+    contadorNumero = entradasMarcador.length + 1;
 }
 
 function configurarDibujoTactilTablet() {
@@ -674,13 +754,13 @@ function confirmarBorrarTodo() {
         historialAcciones.forEach(i => {
             if (i && i.elemento) {
                 map.removeLayer(i.elemento);
-                if (i.elemento._zonaToque) map.removeLayer(i.elemento._zonaToque);
+                quitarCapasExtra(i.elemento);
             }
         });
         historialRehacer.forEach(i => {
             if (i && i.elemento) {
                 map.removeLayer(i.elemento);
-                if (i.elemento._zonaToque) map.removeLayer(i.elemento._zonaToque);
+                quitarCapasExtra(i.elemento);
             }
         });
 
@@ -709,7 +789,7 @@ function deshacerUltimo() {
         if (accion.restaurar) {
             accion.restaurar.forEach(item => {
                 item.elemento.addTo(map);
-                if (item.elemento._zonaToque) item.elemento._zonaToque.addTo(map);
+                anadirCapasExtra(item.elemento);
                 historialAcciones.push(item);
             });
         }
@@ -721,7 +801,7 @@ function deshacerUltimo() {
             accion.sesionPrecisa.reemplazosLinea.forEach(registro => {
                 registro.actuales.forEach(l => {
                     map.removeLayer(l);
-                    if (l._zonaToque) map.removeLayer(l._zonaToque);
+                    quitarCapasExtra(l);
                     historialAcciones = historialAcciones.filter(item => item.elemento !== l);
                 });
                 const lineaRestaurada = L.polyline(registro.coordsOriginal, { color: registro.estiloOriginal.color, weight: registro.estiloOriginal.weight, opacity: registro.estiloOriginal.opacity, interactive: true }).addTo(map);
@@ -748,14 +828,14 @@ function deshacerUltimo() {
     if (!accion.elemento) return;
 
     map.removeLayer(accion.elemento);
-    if (accion.elemento._zonaToque) map.removeLayer(accion.elemento._zonaToque);
+    quitarCapasExtra(accion.elemento);
 
     let grupo = [accion];
 
     if (accion.tipo === 'marcador' && accion.elemento.lineasAsociadas && accion.elemento.lineasAsociadas.length) {
         accion.elemento.lineasAsociadas.forEach(linea => {
             map.removeLayer(linea);
-            if (linea._zonaToque) map.removeLayer(linea._zonaToque);
+            quitarCapasExtra(linea);
             historialAcciones = historialAcciones.filter(item => item.elemento !== linea);
             grupo.push({ tipo: 'linea', elemento: linea });
         });
@@ -782,7 +862,7 @@ function rehacerProximo() {
         if (item.restaurar) {
             item.restaurar.forEach(r => {
                 map.removeLayer(r.elemento);
-                if (r.elemento._zonaToque) map.removeLayer(r.elemento._zonaToque);
+                quitarCapasExtra(r.elemento);
                 historialAcciones = historialAcciones.filter(x => x.elemento !== r.elemento);
             });
         }
@@ -794,12 +874,12 @@ function rehacerProximo() {
             item.sesionPrecisa.reemplazosLinea.forEach(registro => {
                 if (registro.lineaRestaurada) {
                     map.removeLayer(registro.lineaRestaurada);
-                    if (registro.lineaRestaurada._zonaToque) map.removeLayer(registro.lineaRestaurada._zonaToque);
+                    quitarCapasExtra(registro.lineaRestaurada);
                     historialAcciones = historialAcciones.filter(x => x.elemento !== registro.lineaRestaurada);
                 }
                 registro.actuales.forEach(l => {
                     l.addTo(map);
-                    if (l._zonaToque) l._zonaToque.addTo(map);
+                    anadirCapasExtra(l);
                     historialAcciones.push({ tipo: 'linea', elemento: l });
                 });
             });
@@ -814,7 +894,7 @@ function rehacerProximo() {
     const grupo = Array.isArray(item) ? item : [item];
     grupo.forEach(accion => {
         accion.elemento.addTo(map);
-        if (accion.elemento._zonaToque) accion.elemento._zonaToque.addTo(map);
+        anadirCapasExtra(accion.elemento);
         historialAcciones.push(accion);
     });
 
@@ -968,7 +1048,7 @@ async function cargarMapaDesdeGithub(fileName) {
         const quitarSiEsCapa = (capa) => {
             if (capa && typeof capa.on === 'function') {
                 map.removeLayer(capa);
-                if (capa._zonaToque) map.removeLayer(capa._zonaToque);
+                quitarCapasExtra(capa);
             }
         };
         const limpiarEntrada = (i) => {
