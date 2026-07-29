@@ -269,9 +269,12 @@ function borrarConPrecision(latlngCentro, radioMetros, sesion) {
 
         eliminarLineaDelHistorial(linea);
 
+        // Rendimiento: durante el arrastre solo se crea la línea visible (barata). La zona de toque
+        // ampliada y las flechas de dirección (más costosas: crean capas nuevas en el mapa) se
+        // añaden una única vez al final del gesto completo, en finalizarBorradoPreciso, en vez de
+        // recalcularlas en cada micro-paso del arrastre.
         subTramos.forEach(sub => {
             const nuevaLinea = L.polyline(sub, { color: registro.estiloOriginal.color, weight: registro.estiloOriginal.weight, opacity: registro.estiloOriginal.opacity, interactive: true }).addTo(map);
-            anadirZonaDeToque(nuevaLinea, sub, map, "Tramo borrado");
             nuevaLinea._registroSesionBorrado = registro;
             historialAcciones.push({ tipo: 'linea', elemento: nuevaLinea });
             registro.actuales.push(nuevaLinea);
@@ -292,9 +295,12 @@ function iniciarBorradoPreciso(latlng) {
 function continuarBorradoPreciso(latlng) {
     if (!borradoPrecisoActivo || !sesionBorradoPrecisoActual) return;
     if (ultimoPuntoBorrado) {
-        // Se interpola entre el último punto y el actual, para no dejar huecos sin borrar si el dedo se mueve rápido
+        // Se interpola entre el último punto y el actual, para no dejar huecos sin borrar si el dedo
+        // se mueve rápido. Se limita a pocos pasos: valores altos aquí son la causa principal de que
+        // el borrado preciso fuera lento en rutas largas (recorría y recortaba todas las líneas
+        // cercanas muchas veces por cada milímetro de arrastre).
         const distancia = ultimoPuntoBorrado.distanceTo(latlng);
-        const pasos = Math.min(60, Math.max(1, Math.ceil(distancia / (RADIO_BORRADO_PRECISO_METROS / 2))));
+        const pasos = Math.min(8, Math.max(1, Math.ceil(distancia / (RADIO_BORRADO_PRECISO_METROS * 0.8))));
         for (let s = 1; s <= pasos; s++) {
             const t = s / pasos;
             const inter = L.latLng(
@@ -317,9 +323,15 @@ function finalizarBorradoPreciso() {
         sesionBorradoPrecisoActual = null;
 
         if (sesion && (sesion.marcadores.length || sesion.reemplazosLinea.length)) {
+            // Ahora sí: se añade la zona de toque ampliada y las flechas de dirección a los trozos
+            // finales que han sobrevivido a todo el gesto (una sola vez, no en cada micro-paso)
             sesion.reemplazosLinea.forEach(registro => {
-                registro.actuales.forEach(l => { delete l._registroSesionBorrado; });
+                registro.actuales.forEach(l => {
+                    delete l._registroSesionBorrado;
+                    anadirZonaDeToque(l, l.getLatLngs(), map, "Tramo borrado");
+                });
             });
+
             historialAcciones.push({ tipo: 'borrado', sesionPrecisa: sesion });
             historialRehacer = [];
             mostrarToast("Trazo borrado (con precisión)");
@@ -1119,14 +1131,11 @@ function procesarYAnadirGeoJSON(geojson, mapInstance) {
             m.on('click', ev => { 
                 if (modoActual === 'borrar' && !borradoPreciso) { 
                     L.DomEvent.stopPropagation(ev); 
-                    mapInstance.removeLayer(m); 
-                    historialAcciones = historialAcciones.filter(item => item.elemento !== m); 
-                    recalcularContadorNumeros(); 
-                    mostrarToast("Punto borrado"); 
+                    eliminarMarcadorYLineas(m, "Punto borrado");
                 } 
             });
             
-            historialAcciones.push({ tipo: 'marcador', elemento: m, numero: f.properties.numero });
+            historialAcciones.push({ tipo: 'marcador', elemento: m, numero: f.properties.numero, submodo: 'ruta' });
             grupoCapas.addLayer(m);
         }
     });
