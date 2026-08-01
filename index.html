@@ -131,11 +131,58 @@
             text-align: center;
             box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
-
         .number-icon span {
             display: block;
             line-height: 24px;
             font-size: 12px;
+        }
+
+        .comentario-icon {
+            background: #ffdd57;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            text-align: center;
+            line-height: 26px;
+            font-size: 18px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        /* Modal de búsqueda */
+        .modal-buscar {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-buscar-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 340px;
+            max-width: 90vw;
+        }
+        .modal-buscar-content input {
+            width: 100%;
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+        .modal-buscar-content .btn-group {
+            display: flex;
+            gap: 8px;
+        }
+        .modal-buscar-content .btn-group .btn {
+            flex: 1;
+            justify-content: center;
         }
     </style>
 </head>
@@ -150,6 +197,8 @@
         <button id="btn-puntos-rectos" class="btn" onclick="setModo('dibujar_puntos')">Rectos</button>
         <button id="btn-continuo" class="btn" onclick="setModo('continuo')">Mano Alzada</button>
         <button id="btn-borrar" class="btn" onclick="setModo('borrar')">Borrar</button>
+        <button id="btn-comentario" class="btn" onclick="setModo('comentario')">💬 Comentario</button>
+
         <label class="btn" style="cursor:pointer;" title="Con el modo Borrar activado: desmarcado = borra el elemento completo al tocarlo; marcado = goma de borrar de mano libre, recorta solo el trazo exacto por el que pasas">
             <input type="checkbox" id="switch-borrado-preciso" style="margin:0; touch-action: manipulation;" onchange="borradoPreciso = this.checked; mostrarToast(this.checked ? '🧹 Borrado preciso (mano libre)' : '🧹 Borrado por elemento completo');">
             Preciso
@@ -173,6 +222,9 @@
             </select>
         </div>
 
+        <!-- Búsqueda de calles -->
+        <button class="btn btn-blue" onclick="mostrarModalBuscar()">🔍 Buscar Calle</button>
+
         <button class="btn btn-blue" onclick="document.getElementById('input-archivo-texto').click()">📁 Cargar Calles (.txt)</button>
         <input type="file" id="input-archivo-texto" accept=".txt" style="display: none;" onchange="procesarArchivoTextoRuta(event)">
 
@@ -194,6 +246,19 @@
         <button class="btn btn-yellow" onclick="abrirModalGithub('compartir')">🔗 Compartir</button>
     </div>
 
+    <!-- Modal de búsqueda de calles -->
+    <div id="modal-buscar" class="modal-buscar">
+        <div class="modal-buscar-content">
+            <h3>Buscar calle</h3>
+            <input type="text" id="input-buscar-calle" placeholder="Nombre de la calle (ej. Gran Vía)" />
+            <div class="btn-group">
+                <button class="btn" onclick="cerrarModalBuscar()">Cancelar</button>
+                <button class="btn btn-blue" onclick="buscarCalle()">Buscar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de GitHub -->
     <div id="modal-load" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center;">
         <div style="background:white; padding:20px; border-radius:8px; width:300px; max-height:80vh; overflow-y:auto;">
             <h3 id="modal-titulo">Mapas en GitHub</h3>
@@ -202,6 +267,7 @@
         </div>
     </div>
 
+    <!-- Modal de OCR -->
     <div id="modal-ocr" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center;">
         <div style="background:white; padding:20px; border-radius:8px; width:340px; max-width:90vw; max-height:85vh; display:flex; flex-direction:column;">
             <h3 id="titulo-ocr" style="margin-top:0;">Revisa el listado de calles</h3>

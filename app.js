@@ -102,6 +102,22 @@ function eliminarMarcadorYLineas(marcador, mensaje) {
     historialRehacer = [];
 }
 
+// ---- Eliminar comentario (similar a marcador) ----
+function eliminarComentario(comentario, mensaje) {
+    const entradaComentario = historialAcciones.find(item => item.tipo === 'comentario' && item.elemento === comentario);
+    const restaurar = [{
+        tipo: 'comentario',
+        elemento: comentario,
+        texto: entradaComentario ? entradaComentario.texto : ''
+    }];
+
+    map.removeLayer(comentario);
+    historialAcciones = historialAcciones.filter(item => item.elemento !== comentario);
+    mostrarToast(mensaje || "Comentario borrado");
+    historialAcciones.push({ tipo: 'borrado', restaurar });
+    historialRehacer = [];
+}
+
 // --- Flechas de dirección ---
 function calcularRumbo(p1, p2) {
     const lat1 = p1.lat * Math.PI / 180, lat2 = p2.lat * Math.PI / 180;
@@ -235,6 +251,7 @@ function desvincularYQuitarMarcador(marcador) {
 }
 
 function borrarConPrecision(latlngCentro, radioMetros, sesion) {
+    // Borrar marcadores
     const marcadoresActuales = historialAcciones.filter(item => item.tipo === 'marcador').map(item => item.elemento);
     marcadoresActuales.forEach(marcador => {
         if (marcador.getLatLng().distanceTo(latlngCentro) <= radioMetros) {
@@ -248,6 +265,21 @@ function borrarConPrecision(latlngCentro, radioMetros, sesion) {
         }
     });
 
+    // Borrar comentarios
+    const comentariosActuales = historialAcciones.filter(item => item.tipo === 'comentario').map(item => item.elemento);
+    comentariosActuales.forEach(comentario => {
+        if (comentario.getLatLng().distanceTo(latlngCentro) <= radioMetros) {
+            const entradaComentario = historialAcciones.find(item => item.tipo === 'comentario' && item.elemento === comentario);
+            map.removeLayer(comentario);
+            historialAcciones = historialAcciones.filter(item => item.elemento !== comentario);
+            sesion.comentarios.push({
+                elemento: comentario,
+                texto: entradaComentario ? entradaComentario.texto : ''
+            });
+        }
+    });
+
+    // Borrar líneas (código existente)
     const lineasActuales = historialAcciones.filter(item => item.tipo === 'linea').map(item => item.elemento);
 
     lineasActuales.forEach(linea => {
@@ -305,7 +337,7 @@ function iniciarBorradoPreciso(latlng) {
     borradoPrecisoActivo = true;
     map.dragging.disable();
     ultimoPuntoBorrado = latlng;
-    sesionBorradoPrecisoActual = { marcadores: [], reemplazosLinea: [] };
+    sesionBorradoPrecisoActual = { marcadores: [], comentarios: [], reemplazosLinea: [] };
     borrarConPrecision(latlng, RADIO_BORRADO_PRECISO_METROS, sesionBorradoPrecisoActual);
 }
 
@@ -335,7 +367,7 @@ function finalizarBorradoPreciso() {
         const sesion = sesionBorradoPrecisoActual;
         sesionBorradoPrecisoActual = null;
 
-        if (sesion && (sesion.marcadores.length || sesion.reemplazosLinea.length)) {
+        if (sesion && (sesion.marcadores.length || sesion.comentarios.length || sesion.reemplazosLinea.length)) {
             sesion.reemplazosLinea.forEach(registro => {
                 registro.actuales.forEach(l => {
                     delete l._registroSesionBorrado;
@@ -381,6 +413,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (grosorInput) grosorInput.addEventListener('input', manejarCambioEstiloDinamico);
     if (opacidadInput) opacidadInput.addEventListener('input', manejarCambioEstiloDinamico);
 
+    // Cargar mapa compartido
     const urlParams = new URLSearchParams(window.location.search);
     const mapaCompartido = urlParams.get('mapa');
     if (mapaCompartido) cargarMapaDesdeGithub(mapaCompartido);
@@ -395,7 +428,8 @@ function setModo(modo) {
         'aislado': 'btn-aislado',
         'dibujar_puntos': 'btn-puntos-rectos',
         'continuo': 'btn-continuo',
-        'borrar': 'btn-borrar'
+        'borrar': 'btn-borrar',
+        'comentario': 'btn-comentario'
     };
 
     for (let [m, id] of Object.entries(botones)) {
@@ -412,6 +446,7 @@ function setModo(modo) {
         ultimoPuntoTramo = null;
     }
 
+    // Desactivar arrastre de marcadores en modo borrar (mejor para táctil)
     historialAcciones.forEach(item => {
         if (item.tipo === 'marcador' && item.elemento && item.elemento.dragging) {
             if (modoActual === 'borrar') item.elemento.dragging.disable();
@@ -424,7 +459,8 @@ function setModo(modo) {
         'aislado': "Modo: Puntos Aislados",
         'dibujar_puntos': "Modo: Punto a punto rectos",
         'continuo': "Modo: Mano alzada continua",
-        'borrar': "Modo: Borrar elementos"
+        'borrar': "Modo: Borrar elementos",
+        'comentario': "Modo: Añadir comentario (pulsa en el mapa)"
     };
     mostrarToast(mensajes[modo] || "");
 }
@@ -483,6 +519,74 @@ function cortarTramoActual() {
     mostrarToast("Segmento cortado");
 }
 
+// ---- Búsqueda de calles ----
+function mostrarModalBuscar() {
+    document.getElementById('modal-buscar').style.display = 'flex';
+    document.getElementById('input-buscar-calle').focus();
+}
+
+function cerrarModalBuscar() {
+    document.getElementById('modal-buscar').style.display = 'none';
+}
+
+async function buscarCalle() {
+    const input = document.getElementById('input-buscar-calle');
+    const query = input.value.trim();
+    if (!query) {
+        mostrarToast("Escribe el nombre de una calle");
+        return;
+    }
+
+    mostrarToast("Buscando...");
+    try {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', Córdoba, España')}&countrycodes=es&limit=1`;
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data && data.length > 0) {
+            const lat = parseFloat(data[0].lat);
+            const lon = parseFloat(data[0].lon);
+            map.setView([lat, lon], 17);
+            // Marcador temporal
+            if (window._marcadorBusqueda) map.removeLayer(window._marcadorBusqueda);
+            window._marcadorBusqueda = L.marker([lat, lon], {
+                icon: L.divIcon({ className: 'number-icon', html: '📍', iconSize: [28,28], iconAnchor:[14,14] })
+            }).addTo(map);
+            mostrarToast(`Encontrado: ${data[0].display_name}`);
+            cerrarModalBuscar();
+        } else {
+            mostrarToast("No se encontró la calle");
+        }
+    } catch (e) {
+        mostrarToast("Error en la búsqueda");
+        console.error(e);
+    }
+}
+
+// ---- Añadir comentario ----
+function crearComentario(latlng, texto) {
+    const icon = L.divIcon({
+        className: 'comentario-icon',
+        html: '💬',
+        iconSize: [30, 30],
+        iconAnchor: [15, 30]
+    });
+    const marker = L.marker(latlng, { icon: icon, interactive: true }).addTo(map);
+    marker.bindPopup(`<b>Comentario:</b><br>${texto}`);
+
+    // Evento para borrar con modo borrar (no preciso)
+    marker.on('click', function(ev) {
+        if (modoActual === 'borrar' && !borradoPreciso) {
+            L.DomEvent.stopPropagation(ev);
+            eliminarComentario(this, "Comentario borrado");
+        }
+    });
+
+    historialAcciones.push({ tipo: 'comentario', elemento: marker, texto: texto });
+    historialRehacer = [];
+    mostrarToast("Comentario añadido");
+}
+
+// ---- Configuración de eventos táctiles y ratón (continuación) ----
 function configurarDibujoTactilTablet() {
     const mapaContenedor = map.getContainer();
 
@@ -617,6 +721,16 @@ function configurarDibujoTactilTablet() {
 
 async function gestionarPulsacion(e) {
     if (modoActual === 'continuo') return; 
+    if (modoActual === 'comentario') {
+        const latlng = e.latlng;
+        const texto = prompt("Escribe tu comentario:", "");
+        if (texto !== null && texto.trim() !== "") {
+            crearComentario(latlng, texto.trim());
+        } else {
+            mostrarToast("Comentario cancelado o vacío");
+        }
+        return;
+    }
 
     const latlng = e.latlng;
     const estilos = obtenerEstilosActuales();
@@ -646,7 +760,7 @@ async function gestionarPulsacion(e) {
     }
 
     if (modoActual === 'ruta' || modoActual === 'aislado') {
-        const num = obtenerSiguienteNumeroDisponible(); // <-- Asigna el número libre más bajo
+        const num = obtenerSiguienteNumeroDisponible();
         const icon = L.divIcon({ className: 'number-icon', html: `<span>${num}</span>`, iconSize: [28, 28], iconAnchor: [14, 14] });
         const marker = L.marker(latlng, { icon: icon, draggable: true, interactive: true }).addTo(map);
 
@@ -741,7 +855,7 @@ function manejarArchivoGPX(event) {
 }
 
 function confirmarBorrarTodo() {
-    if (confirm("¿Estás seguro de que quieres borrar todo el mapa? Se perderán todos los puntos y trazos actuales.")) {
+    if (confirm("¿Estás seguro de que quieres borrar todo el mapa? Se perderán todos los puntos, líneas y comentarios actuales.")) {
         const capasAQuitar = [];
         map.eachLayer(function(capa) {
             if (!(capa instanceof L.TileLayer)) {
@@ -772,19 +886,17 @@ function deshacerUltimo() {
     if (accion.tipo === 'borrado') {
         if (accion.restaurar) {
             accion.restaurar.forEach(item => {
-                // Si es un marcador y su número ya está en uso, le asignamos uno nuevo (caso raro)
                 if (item.tipo === 'marcador' && item.elemento) {
+                    // Reasignar número si está ocupado
                     const numActual = item.numero;
                     const numerosUsados = new Set();
                     historialAcciones.forEach(i => {
                         if (i.tipo === 'marcador' && i.numero) numerosUsados.add(i.numero);
                     });
                     if (numerosUsados.has(numActual)) {
-                        // El número ya está ocupado, asignamos el siguiente libre
                         let nuevoNum = 1;
                         while (numerosUsados.has(nuevoNum)) nuevoNum++;
                         item.numero = nuevoNum;
-                        // Actualizar el icono
                         item.elemento.setIcon(L.divIcon({
                             className: 'number-icon',
                             html: `<span>${nuevoNum}</span>`,
@@ -799,8 +911,8 @@ function deshacerUltimo() {
             });
         }
         if (accion.sesionPrecisa) {
+            // Restaurar marcadores
             accion.sesionPrecisa.marcadores.forEach(m => {
-                // Similar: si el número está ocupado, reasignar
                 const numActual = m.numero;
                 const numerosUsados = new Set();
                 historialAcciones.forEach(i => {
@@ -820,6 +932,12 @@ function deshacerUltimo() {
                 m.elemento.addTo(map);
                 historialAcciones.push({ tipo: 'marcador', elemento: m.elemento, numero: m.numero, submodo: m.submodo });
             });
+            // Restaurar comentarios
+            accion.sesionPrecisa.comentarios.forEach(c => {
+                c.elemento.addTo(map);
+                historialAcciones.push({ tipo: 'comentario', elemento: c.elemento, texto: c.texto });
+            });
+            // Restaurar líneas
             accion.sesionPrecisa.reemplazosLinea.forEach(registro => {
                 registro.actuales.forEach(l => {
                     map.removeLayer(l);
@@ -887,6 +1005,10 @@ function rehacerProximo() {
                 map.removeLayer(m.elemento);
                 historialAcciones = historialAcciones.filter(x => x.elemento !== m.elemento);
             });
+            item.sesionPrecisa.comentarios.forEach(c => {
+                map.removeLayer(c.elemento);
+                historialAcciones = historialAcciones.filter(x => x.elemento !== c.elemento);
+            });
             item.sesionPrecisa.reemplazosLinea.forEach(registro => {
                 if (registro.lineaRestaurada) {
                     map.removeLayer(registro.lineaRestaurada);
@@ -948,6 +1070,13 @@ function exportarGPX() {
         gpx += `  <wpt lat="${ll.lat}" lon="${ll.lng}">\n    <name>${item.numero}</name>\n  </wpt>\n`;
     });
 
+    // Comentarios como waypoints con descripción
+    const comentarios = historialAcciones.filter(item => item.tipo === 'comentario');
+    comentarios.forEach(item => {
+        const ll = item.elemento.getLatLng();
+        gpx += `  <wpt lat="${ll.lat}" lon="${ll.lng}">\n    <name>Comentario</name>\n    <desc>${item.texto}</desc>\n  </wpt>\n`;
+    });
+
     gpx += '</gpx>';
 
     const blob = new Blob([gpx], { type: 'application/gpx+xml' });
@@ -1002,6 +1131,13 @@ function exportarDatosMapa() {
                 type: "Feature",
                 geometry: { type: "Point", coordinates: [ll.lng, ll.lat] },
                 properties: { tipo: "marcador", numero: item.numero, submodo: item.submodo }
+            });
+        } else if (item.tipo === 'comentario') {
+            const ll = item.elemento.getLatLng();
+            elementos.push({
+                type: "Feature",
+                geometry: { type: "Point", coordinates: [ll.lng, ll.lat] },
+                properties: { tipo: "comentario", texto: item.texto }
             });
         }
     });
@@ -1216,6 +1352,23 @@ function procesarYAnadirGeoJSON(geojson, mapInstance) {
             
             historialAcciones.push({ tipo: 'marcador', elemento: m, numero: f.properties.numero, submodo: f.properties.submodo || 'ruta' });
             marcadoresPorNumero[f.properties.numero] = m;
+        } else if (f.properties.tipo === 'comentario') {
+            const latlng = [f.geometry.coordinates[1], f.geometry.coordinates[0]];
+            const icon = L.divIcon({
+                className: 'comentario-icon',
+                html: '💬',
+                iconSize: [30, 30],
+                iconAnchor: [15, 30]
+            });
+            const m = L.marker(latlng, { icon: icon, interactive: true }).addTo(mapInstance);
+            m.bindPopup(`<b>Comentario:</b><br>${f.properties.texto || ''}`);
+            m.on('click', function(ev) {
+                if (modoActual === 'borrar' && !borradoPreciso) {
+                    L.DomEvent.stopPropagation(ev);
+                    eliminarComentario(this, "Comentario borrado");
+                }
+            });
+            historialAcciones.push({ tipo: 'comentario', elemento: m, texto: f.properties.texto || '' });
         }
     });
 
@@ -1246,6 +1399,7 @@ function enfocarMapaEnGrupo(grupoCapas, mapInstance) {
     }
 }
 
+// ---- Procesar archivo de texto con calles (OCR y geocodificación) ----
 async function procesarArchivoTextoRuta(event) {
     const archivo = event.target.files[0];
     if (!archivo) return;
@@ -1507,7 +1661,7 @@ async function procesarListadoCalles(lineas, event) {
 
     for (let i = 0; i < puntosCoordenadas.length; i++) {
         const pt = puntosCoordenadas[i];
-        const num = obtenerSiguienteNumeroDisponible(); // <-- reutiliza el número más bajo libre
+        const num = obtenerSiguienteNumeroDisponible();
         
         const icon = L.divIcon({ className: 'number-icon', html: `<span>${num}</span>`, iconSize: [28, 28], iconAnchor: [14, 14] });
         const marker = L.marker(pt.latlng, { icon: icon, draggable: true, interactive: true }).addTo(map);
