@@ -2,6 +2,22 @@ const GITHUB_USER = "viferor";
 const GITHUB_REPO = "Mapas"; 
 const GITHUB_FOLDER = "mapas"; 
 
+// Captura global de errores: si algo inesperado falla en el código, se avisa en pantalla con el
+// motivo exacto en vez de fallar en silencio (antes, un error dentro de un manejador de clic podía
+// dejar una acción a medias sin ninguna indicación de qué había pasado).
+window.addEventListener('error', function(ev) {
+    console.error('Error no capturado:', ev.error || ev.message);
+    if (typeof mostrarToast === 'function') {
+        mostrarToast('⚠️ Error: ' + (ev.message || 'algo ha fallado, revisa la consola'));
+    }
+});
+window.addEventListener('unhandledrejection', function(ev) {
+    console.error('Promesa rechazada sin capturar:', ev.reason);
+    if (typeof mostrarToast === 'function') {
+        mostrarToast('⚠️ Error: ' + (ev.reason && ev.reason.message ? ev.reason.message : 'algo ha fallado, revisa la consola'));
+    }
+});
+
 let map;
 let modoActual = 'ruta'; // 'ruta', 'aislado', 'dibujar_puntos', 'continuo', 'borrar'
 let contadorNumero = 1;
@@ -82,11 +98,18 @@ function crearFlechasDireccion(coordenadas, color) {
     const flechas = [];
     if (!coordenadas || coordenadas.length < 2) return flechas;
 
+    // Normaliza a objetos L.LatLng reales: las rutas OSRM y las líneas cargadas desde un mapa
+    // guardado llegan como arrays planos [lat, lng], que no tienen el método .distanceTo() y
+    // hacían fallar toda la función (con el error "a.distanceTo is not a function"), lo que a su
+    // vez interrumpía a media ejecución quien la llamaba (rompiendo el registro en el historial,
+    // la numeración de puntos, y por tanto el borrado y el cambio de estilo de esas líneas).
+    const puntos = coordenadas.map(p => (p instanceof L.LatLng) ? p : L.latLng(p));
+
     let acumulado = 0;
     let siguienteFlechaEn = DISTANCIA_ENTRE_FLECHAS_METROS / 2;
 
-    for (let i = 1; i < coordenadas.length; i++) {
-        const a = coordenadas[i - 1], b = coordenadas[i];
+    for (let i = 1; i < puntos.length; i++) {
+        const a = puntos[i - 1], b = puntos[i];
         const tramoDist = a.distanceTo(b);
         if (tramoDist === 0) continue;
 
@@ -763,18 +786,17 @@ function manejarArchivoGPX(event) {
 
 function confirmarBorrarTodo() {
     if (confirm("¿Estás seguro de que quieres borrar todo el mapa? Se perderán todos los puntos y trazos actuales.")) {
-        historialAcciones.forEach(i => {
-            if (i && i.elemento) {
-                map.removeLayer(i.elemento);
-                quitarCapasExtra(i.elemento);
+        // Se recorre y quita CUALQUIER capa que no sea el mapa base (tiles), directamente del mapa
+        // de Leaflet, en vez de fiarse solo del registro interno (historialAcciones/historialRehacer).
+        // Así "Borrar Todo" limpia de verdad el mapa incluso si algo se hubiera quedado mal
+        // sincronizado en el historial (p. ej. una flecha de dirección huérfana).
+        const capasAQuitar = [];
+        map.eachLayer(function(capa) {
+            if (!(capa instanceof L.TileLayer)) {
+                capasAQuitar.push(capa);
             }
         });
-        historialRehacer.forEach(i => {
-            if (i && i.elemento) {
-                map.removeLayer(i.elemento);
-                quitarCapasExtra(i.elemento);
-            }
-        });
+        capasAQuitar.forEach(capa => map.removeLayer(capa));
 
         historialAcciones = [];
         historialRehacer = [];
@@ -1052,35 +1074,41 @@ function promptGuardarNuevo() {
 function cerrarModal() { document.getElementById('modal-load').style.display = 'none'; }
 
 async function cargarMapaDesdeGithub(fileName) {
-    const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${GITHUB_FOLDER}/${fileName}`;
+    // Se añade un parámetro para evitar la caché de 5 min de la CDN de GitHub: si el mapa se acaba
+    // de guardar, sin esto podía devolver todavía un 404 "viejo" durante un rato.
+    const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${GITHUB_FOLDER}/${fileName}?t=${Date.now()}`;
     try {
-        const res = await fetch(url);
-        const geojson = await res.json();
-        
-        const quitarSiEsCapa = (capa) => {
-            if (capa && typeof capa.on === 'function') {
-                map.removeLayer(capa);
-                quitarCapasExtra(capa);
+        const res = await fetch(url, { cache: 'no-store' });
+
+        if (!res.ok) {
+            if (res.status === 404) {
+                alert("No se ha encontrado ese mapa. Si lo acabas de guardar, espera unos segundos (GitHub tarda un poco en publicarlo) y vuelve a intentarlo.");
+            } else {
+                alert(`No se ha podido cargar el mapa (error ${res.status}).`);
             }
-        };
-        const limpiarEntrada = (i) => {
-            if (!i) return;
-            if (Array.isArray(i)) { i.forEach(limpiarEntrada); return; }
-            if (i.tipo === 'borrado') {
-                if (i.restaurar) i.restaurar.forEach(r => quitarSiEsCapa(r.elemento));
-                if (i.sesionPrecisa) {
-                    i.sesionPrecisa.marcadores.forEach(m => quitarSiEsCapa(m.elemento));
-                    i.sesionPrecisa.reemplazosLinea.forEach(reg => {
-                        quitarSiEsCapa(reg.lineaRestaurada);
-                        reg.actuales.forEach(quitarSiEsCapa);
-                    });
-                }
-                return;
-            }
-            quitarSiEsCapa(i.elemento);
-        };
-        historialAcciones.forEach(limpiarEntrada);
-        historialRehacer.forEach(limpiarEntrada);
+            return;
+        }
+
+        let geojson;
+        try {
+            geojson = await res.json();
+        } catch (errorParseo) {
+            alert("El archivo del mapa no tiene un formato válido (no es un JSON legible) y no se ha podido leer.");
+            return;
+        }
+
+        if (!geojson || !Array.isArray(geojson.features)) {
+            alert("El archivo del mapa no contiene datos reconocibles.");
+            return;
+        }
+
+        // Se limpia el mapa actual por completo antes de cargar el nuevo (mismo método robusto que "Borrar Todo")
+        const capasAQuitar = [];
+        map.eachLayer(function(capa) {
+            if (!(capa instanceof L.TileLayer)) capasAQuitar.push(capa);
+        });
+        capasAQuitar.forEach(capa => map.removeLayer(capa));
+
         historialAcciones = [];
         historialRehacer = [];
         ultimoPuntoTramo = null;
@@ -1090,7 +1118,7 @@ async function cargarMapaDesdeGithub(fileName) {
         procesarYAnadirGeoJSON(geojson, map);
         cerrarModal();
         mostrarToast("¡Mapa cargado!");
-    } catch (e) { alert("Error al cargar el mapa"); }
+    } catch (e) { alert("Error al cargar el mapa: " + e.message); }
 }
 
 async function compartirMapaEspecifico(fileName) {
