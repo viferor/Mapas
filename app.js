@@ -34,7 +34,6 @@ window.addEventListener('unhandledrejection', function(ev) {
 
 let map;
 let modoActual = 'ruta';
-let contadorNumero = 1;
 
 let historialAcciones = [];
 let historialRehacer = [];
@@ -47,6 +46,19 @@ let borradoPreciso = false;
 let borradoPrecisoActivo = false;
 let ultimoPuntoBorrado = null;
 const RADIO_BORRADO_PRECISO_METROS = 6;
+
+// --- Función para obtener el menor número libre (reutiliza huecos) ---
+function obtenerSiguienteNumeroDisponible() {
+    const numerosUsados = new Set();
+    historialAcciones.forEach(item => {
+        if (item.tipo === 'marcador' && item.numero) {
+            numerosUsados.add(item.numero);
+        }
+    });
+    let i = 1;
+    while (numerosUsados.has(i)) i++;
+    return i;
+}
 
 // --- Helpers de vínculo marcador<->línea ---
 function vincularLineaEntreMarcadores(marcadorAnterior, marcadorNuevo, linea) {
@@ -85,7 +97,6 @@ function eliminarMarcadorYLineas(marcador, mensaje) {
         });
     }
 
-    recalcularContadorNumeros();
     mostrarToast(mensaje || "Punto borrado");
     historialAcciones.push({ tipo: 'borrado', restaurar });
     historialRehacer = [];
@@ -236,7 +247,6 @@ function borrarConPrecision(latlngCentro, radioMetros, sesion) {
             });
         }
     });
-    if (sesion.marcadores.length) recalcularContadorNumeros();
 
     const lineasActuales = historialAcciones.filter(item => item.tipo === 'linea').map(item => item.elemento);
 
@@ -473,27 +483,6 @@ function cortarTramoActual() {
     mostrarToast("Segmento cortado");
 }
 
-function recalcularContadorNumeros() {
-    const entradasMarcador = historialAcciones
-        .filter(item => item.tipo === 'marcador')
-        .sort((a, b) => (a.numero || 0) - (b.numero || 0));
-
-    entradasMarcador.forEach((entrada, indice) => {
-        const nuevoNumero = indice + 1;
-        if (entrada.numero !== nuevoNumero) {
-            entrada.numero = nuevoNumero;
-            entrada.elemento.setIcon(L.divIcon({
-                className: 'number-icon',
-                html: `<span>${nuevoNumero}</span>`,
-                iconSize: [28, 28],
-                iconAnchor: [14, 14]
-            }));
-        }
-    });
-
-    contadorNumero = entradasMarcador.length + 1;
-}
-
 function configurarDibujoTactilTablet() {
     const mapaContenedor = map.getContainer();
 
@@ -657,7 +646,7 @@ async function gestionarPulsacion(e) {
     }
 
     if (modoActual === 'ruta' || modoActual === 'aislado') {
-        const num = contadorNumero;
+        const num = obtenerSiguienteNumeroDisponible(); // <-- Asigna el número libre más bajo
         const icon = L.divIcon({ className: 'number-icon', html: `<span>${num}</span>`, iconSize: [28, 28], iconAnchor: [14, 14] });
         const marker = L.marker(latlng, { icon: icon, draggable: true, interactive: true }).addTo(map);
 
@@ -684,7 +673,6 @@ async function gestionarPulsacion(e) {
         ultimoMarcadorTramo = (modoActual === 'ruta') ? marker : null;
         historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: num, submodo: modoActual });
         historialRehacer = [];
-        contadorNumero++;
         if (avisoSinRuta) mostrarToast("⚠️ No se encontró ruta a pie entre estos dos puntos: no se ha trazado nada");
     }
 }
@@ -766,7 +754,6 @@ function confirmarBorrarTodo() {
         historialRehacer = [];
         ultimoPuntoTramo = null;
         ultimoMarcadorTramo = null;
-        contadorNumero = 1;
         window.puntosDibujoLibre = [];
         trazoLibreActivo = false;
 
@@ -785,6 +772,27 @@ function deshacerUltimo() {
     if (accion.tipo === 'borrado') {
         if (accion.restaurar) {
             accion.restaurar.forEach(item => {
+                // Si es un marcador y su número ya está en uso, le asignamos uno nuevo (caso raro)
+                if (item.tipo === 'marcador' && item.elemento) {
+                    const numActual = item.numero;
+                    const numerosUsados = new Set();
+                    historialAcciones.forEach(i => {
+                        if (i.tipo === 'marcador' && i.numero) numerosUsados.add(i.numero);
+                    });
+                    if (numerosUsados.has(numActual)) {
+                        // El número ya está ocupado, asignamos el siguiente libre
+                        let nuevoNum = 1;
+                        while (numerosUsados.has(nuevoNum)) nuevoNum++;
+                        item.numero = nuevoNum;
+                        // Actualizar el icono
+                        item.elemento.setIcon(L.divIcon({
+                            className: 'number-icon',
+                            html: `<span>${nuevoNum}</span>`,
+                            iconSize: [28, 28],
+                            iconAnchor: [14, 14]
+                        }));
+                    }
+                }
                 item.elemento.addTo(map);
                 anadirCapasExtra(item.elemento);
                 historialAcciones.push(item);
@@ -792,6 +800,23 @@ function deshacerUltimo() {
         }
         if (accion.sesionPrecisa) {
             accion.sesionPrecisa.marcadores.forEach(m => {
+                // Similar: si el número está ocupado, reasignar
+                const numActual = m.numero;
+                const numerosUsados = new Set();
+                historialAcciones.forEach(i => {
+                    if (i.tipo === 'marcador' && i.numero) numerosUsados.add(i.numero);
+                });
+                if (numerosUsados.has(numActual)) {
+                    let nuevoNum = 1;
+                    while (numerosUsados.has(nuevoNum)) nuevoNum++;
+                    m.numero = nuevoNum;
+                    m.elemento.setIcon(L.divIcon({
+                        className: 'number-icon',
+                        html: `<span>${nuevoNum}</span>`,
+                        iconSize: [28, 28],
+                        iconAnchor: [14, 14]
+                    }));
+                }
                 m.elemento.addTo(map);
                 historialAcciones.push({ tipo: 'marcador', elemento: m.elemento, numero: m.numero, submodo: m.submodo });
             });
@@ -813,7 +838,6 @@ function deshacerUltimo() {
                 historialAcciones.push({ tipo: 'linea', elemento: lineaRestaurada });
             });
         }
-        recalcularContadorNumeros();
         historialRehacer.push(accion);
         mostrarToast("Borrado deshecho");
         return;
@@ -833,7 +857,6 @@ function deshacerUltimo() {
             historialAcciones = historialAcciones.filter(item => item.elemento !== linea);
             grupo.push({ tipo: 'linea', elemento: linea });
         });
-        recalcularContadorNumeros();
         const ultimo = historialAcciones.slice().reverse().find(i => i.tipo === 'marcador' && i.submodo === 'ruta');
         ultimoPuntoTramo = ultimo ? ultimo.elemento.getLatLng() : null;
         ultimoMarcadorTramo = ultimo ? ultimo.elemento : null;
@@ -877,7 +900,6 @@ function rehacerProximo() {
                 });
             });
         }
-        recalcularContadorNumeros();
         historialAcciones.push(item);
         mostrarToast("Rehecho");
         return;
@@ -892,7 +914,6 @@ function rehacerProximo() {
 
     const accionMarcador = grupo.find(a => a.tipo === 'marcador');
     if (accionMarcador) {
-        recalcularContadorNumeros();
         if (accionMarcador.submodo === 'ruta') {
             ultimoPuntoTramo = accionMarcador.elemento.getLatLng();
             ultimoMarcadorTramo = accionMarcador.elemento;
@@ -1138,7 +1159,6 @@ async function cargarMapaDesdeGithub(fileName) {
         historialRehacer = [];
         ultimoPuntoTramo = null;
         ultimoMarcadorTramo = null;
-        contadorNumero = 1;
 
         procesarYAnadirGeoJSON(geojson, map);
         cerrarModal();
@@ -1199,6 +1219,7 @@ function procesarYAnadirGeoJSON(geojson, mapInstance) {
         }
     });
 
+    // Vincular líneas
     lineasConConecta.forEach(({ linea, conecta }) => {
         const m1 = marcadoresPorNumero[conecta[0]];
         const m2 = marcadoresPorNumero[conecta[1]];
@@ -1207,7 +1228,7 @@ function procesarYAnadirGeoJSON(geojson, mapInstance) {
         }
     });
 
-    recalcularContadorNumeros();
+    // Enfocar mapa
     const grupo = L.featureGroup();
     historialAcciones.forEach(item => {
         if (item.elemento) grupo.addLayer(item.elemento);
@@ -1486,7 +1507,7 @@ async function procesarListadoCalles(lineas, event) {
 
     for (let i = 0; i < puntosCoordenadas.length; i++) {
         const pt = puntosCoordenadas[i];
-        const num = contadorNumero;
+        const num = obtenerSiguienteNumeroDisponible(); // <-- reutiliza el número más bajo libre
         
         const icon = L.divIcon({ className: 'number-icon', html: `<span>${num}</span>`, iconSize: [28, 28], iconAnchor: [14, 14] });
         const marker = L.marker(pt.latlng, { icon: icon, draggable: true, interactive: true }).addTo(map);
@@ -1517,7 +1538,6 @@ async function procesarListadoCalles(lineas, event) {
         ultimoPunto = pt.latlng;
         ultimoMarcador = marker;
         historialAcciones.push({ tipo: 'marcador', elemento: marker, numero: num, submodo: 'ruta' });
-        contadorNumero++;
     }
 
     historialRehacer = [];
