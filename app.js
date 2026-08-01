@@ -4,13 +4,11 @@ const GITHUB_FOLDER = "mapas";
 
 // ---- Funciones de utilidad ----
 
-// Sanitiza nombres de archivo para evitar path traversal
 function sanitizarNombreArchivo(nombre) {
     if (!nombre) return '';
     return nombre.replace(/\.\./g, '').replace(/[\/\\]/g, '').trim();
 }
 
-// Convierte un string UTF-8 a Base64 de forma segura (sin usar unescape)
 function utf8ToBase64(str) {
     const bytes = new TextEncoder().encode(str);
     let binary = '';
@@ -35,7 +33,7 @@ window.addEventListener('unhandledrejection', function(ev) {
 });
 
 let map;
-let modoActual = 'ruta'; // 'ruta', 'aislado', 'dibujar_puntos', 'continuo', 'borrar'
+let modoActual = 'ruta';
 let contadorNumero = 1;
 
 let historialAcciones = [];
@@ -45,7 +43,6 @@ let ultimoPuntoTramo = null;
 let ultimoMarcadorTramo = null;
 let trazoLibreActivo = false;
 
-// --- Goma de borrar de precisión ---
 let borradoPreciso = false;
 let borradoPrecisoActivo = false;
 let ultimoPuntoBorrado = null;
@@ -109,7 +106,6 @@ const DISTANCIA_ENTRE_FLECHAS_METROS = 70;
 function crearFlechasDireccion(coordenadas, color) {
     const flechas = [];
     if (!coordenadas || coordenadas.length < 2) return flechas;
-
     const puntos = coordenadas.map(p => (p instanceof L.LatLng) ? p : L.latLng(p));
     let acumulado = 0;
     let siguienteFlechaEn = DISTANCIA_ENTRE_FLECHAS_METROS / 2;
@@ -165,6 +161,10 @@ function anadirZonaDeToque(lineaVisible, coordenadas, mapaInstancia, mensajeBorr
     const manejarClickBorrado = function(ev) {
         if (modoActual === 'borrar' && !borradoPreciso) {
             L.DomEvent.stopPropagation(ev);
+            if (ev.originalEvent) {
+                ev.originalEvent.preventDefault && ev.originalEvent.preventDefault();
+                ev.originalEvent.stopPropagation && ev.originalEvent.stopPropagation();
+            }
             mapaInstancia.removeLayer(lineaVisible);
             mapaInstancia.removeLayer(zonaToque);
             quitarCapasExtra(lineaVisible);
@@ -901,6 +901,47 @@ function rehacerProximo() {
     mostrarToast("Rehecho");
 }
 
+// ---- EXPORTAR GPX ----
+function exportarGPX() {
+    let gpx = '<?xml version="1.0" encoding="UTF-8"?>\n';
+    gpx += '<gpx version="1.1" creator="MapasApp" xmlns="http://www.topografix.com/GPX/1/1">\n';
+
+    const lineas = historialAcciones.filter(item => item.tipo === 'linea');
+    if (lineas.length) {
+        gpx += '  <trk>\n    <name>Rutas</name>\n';
+        lineas.forEach((item) => {
+            const coords = item.elemento.getLatLngs();
+            if (!coords || coords.length < 2) return;
+            gpx += `    <trkseg>\n`;
+            coords.forEach(ll => {
+                gpx += `      <trkpt lat="${ll.lat}" lon="${ll.lng}"></trkpt>\n`;
+            });
+            gpx += `    </trkseg>\n`;
+        });
+        gpx += '  </trk>\n';
+    }
+
+    const marcadores = historialAcciones.filter(item => item.tipo === 'marcador');
+    marcadores.forEach(item => {
+        const ll = item.elemento.getLatLng();
+        gpx += `  <wpt lat="${ll.lat}" lon="${ll.lng}">\n    <name>${item.numero}</name>\n  </wpt>\n`;
+    });
+
+    gpx += '</gpx>';
+
+    const blob = new Blob([gpx], { type: 'application/gpx+xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'mapa.gpx';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    mostrarToast('GPX exportado');
+}
+
+// ---- Funciones de GitHub ----
 function obtenerToken() {
     let token = localStorage.getItem('github_token');
     if (!token) {
@@ -916,7 +957,6 @@ function exportarDatosMapa() {
     historialAcciones.forEach(item => {
         if (!item || !item.elemento) return;
         if (item.tipo === 'linea') {
-            // Guardar también los números de los marcadores vinculados para restaurar la conexión
             const conecta = [];
             if (item.elemento.marcadoresVinculados) {
                 item.elemento.marcadoresVinculados.forEach(m => {
@@ -932,7 +972,7 @@ function exportarDatosMapa() {
                     color: item.elemento.options.color, 
                     weight: item.elemento.options.weight, 
                     opacity: item.elemento.options.opacity,
-                    conecta: conecta.length === 2 ? conecta : [] // solo si tiene dos extremos
+                    conecta: conecta.length === 2 ? conecta : []
                 }
             });
         } else if (item.tipo === 'marcador') {
@@ -1088,7 +1128,6 @@ async function cargarMapaDesdeGithub(fileName) {
             return;
         }
 
-        // Limpiar mapa
         const capasAQuitar = [];
         map.eachLayer(function(capa) {
             if (!(capa instanceof L.TileLayer)) capasAQuitar.push(capa);
@@ -1122,7 +1161,6 @@ async function compartirMapaEspecifico(fileName) {
 }
 
 function procesarYAnadirGeoJSON(geojson, mapInstance) {
-    // Primera pasada: crear marcadores y líneas, y almacenar referencias
     const marcadoresPorNumero = {};
     const lineasConConecta = [];
 
@@ -1161,7 +1199,6 @@ function procesarYAnadirGeoJSON(geojson, mapInstance) {
         }
     });
 
-    // Segunda pasada: vincular líneas con sus marcadores
     lineasConConecta.forEach(({ linea, conecta }) => {
         const m1 = marcadoresPorNumero[conecta[0]];
         const m2 = marcadoresPorNumero[conecta[1]];
@@ -1171,7 +1208,6 @@ function procesarYAnadirGeoJSON(geojson, mapInstance) {
     });
 
     recalcularContadorNumeros();
-    // Enfocar mapa
     const grupo = L.featureGroup();
     historialAcciones.forEach(item => {
         if (item.elemento) grupo.addLayer(item.elemento);
@@ -1361,7 +1397,6 @@ async function geocodificarUnaCalleNominatim(nombre, centroReferencia, radioMetr
                 const res = await fetch(urlGeo);
                 if (!res.ok) {
                     if (res.status === 429) {
-                        // Demasiadas peticiones, esperar y reintentar
                         await new Promise(r => setTimeout(r, 2000 * intento));
                         continue;
                     }
@@ -1376,17 +1411,15 @@ async function geocodificarUnaCalleNominatim(nombre, centroReferencia, radioMetr
                         return nuevoPunto;
                     }
                 }
-                break; // si la petición fue exitosa, pasar a la siguiente variante
+                break;
             } catch (err) {
                 console.error(`Error en geocodificación (intento ${intento}):`, err);
                 if (intento === intentos) {
-                    // último intento, seguir con la siguiente variante
                 } else {
                     await new Promise(r => setTimeout(r, 1000 * intento));
                 }
             }
         }
-        // Pequeña pausa entre variantes
         await new Promise(r => setTimeout(r, 1000));
     }
     return null;

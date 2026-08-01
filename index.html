@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mapas y Rutas - Córdoba</title>
-    <!-- Leaflet CSS (con Subresource Integrity para evitar código modificado si el CDN se viera comprometido) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <style>
@@ -141,8 +140,6 @@
     </style>
 </head>
 <body>
-    <!-- VERSION-BOTONERA-TRANSPARENTE-V3 -->
-
     <div id="map"></div>
 
     <div id="toast-aviso" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 10px 20px; border-radius: 20px; z-index: 1000; opacity: 0; transition: opacity 0.3s; pointer-events: none; font-size: 14px;"></div>
@@ -184,6 +181,9 @@
 
         <button class="btn" onclick="document.getElementById('input-gpx').click()">Cargar GPX</button>
         <input type="file" id="input-gpx" accept=".gpx" style="display: none;" onchange="manejarArchivoGPX(event)">
+
+        <!-- NUEVO BOTÓN EXPORTAR GPX -->
+        <button class="btn" onclick="exportarGPX()">📤 GPX</button>
 
         <button class="btn" onclick="deshacerUltimo()">↩️ Deshacer</button>
         <button class="btn" onclick="rehacerProximo()">🔁 Rehacer</button>
