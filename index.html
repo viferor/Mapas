@@ -21,10 +21,9 @@
             width: 100%;
             height: 100%;
             z-index: 1;
-            touch-action: none; /* deja que Leaflet gestione pellizco/doble-toque sin que el navegador haga zoom de página a la vez */
+            touch-action: none;
         }
 
-        /* Panel de controles abajo, totalmente transparente, sin fondo ni desenfoque */
         .panel-controles {
             position: absolute;
             bottom: 15px;
@@ -144,14 +143,10 @@
 <body>
     <!-- VERSION-BOTONERA-TRANSPARENTE-V3 -->
 
-
-    <!-- Contenedor del Mapa -->
     <div id="map"></div>
 
-    <!-- Toast de avisos flotantes -->
     <div id="toast-aviso" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 10px 20px; border-radius: 20px; z-index: 1000; opacity: 0; transition: opacity 0.3s; pointer-events: none; font-size: 14px;"></div>
 
-    <!-- Barra de Herramientas Inferior / Controles (2 líneas con scroll) -->
     <div class="panel-controles">
         <button id="btn-ruta" class="btn" onclick="setModo('ruta')">Ruta OSRM</button>
         <button id="btn-aislado" class="btn" onclick="setModo('aislado')">Puntos Aislados</button>
@@ -163,7 +158,6 @@
             Preciso
         </label>
         
-        <!-- Controles de Estilo Integrados (Color, Grosor y Opacidad) -->
         <div class="btn" style="cursor: default;">
             <label for="color-trazo">🎨 <span style="position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0);">Color del trazo</span></label>
             <input type="color" id="color-trazo" value="#3388ff" style="border:none; width:26px; height:22px; background:transparent; cursor:pointer; touch-action: manipulation;" title="Color del trazo" aria-label="Color del trazo">
@@ -182,15 +176,12 @@
             </select>
         </div>
 
-        <!-- Botón para importar listado de calles en texto plano -->
         <button class="btn btn-blue" onclick="document.getElementById('input-archivo-texto').click()">📁 Cargar Calles (.txt)</button>
         <input type="file" id="input-archivo-texto" accept=".txt" style="display: none;" onchange="procesarArchivoTextoRuta(event)">
 
-        <!-- Botón para importar una foto/imagen del listado de calles (se lee con OCR en el propio navegador) -->
         <button class="btn btn-blue" onclick="document.getElementById('input-imagen-calles').click()">📷 Escanear Imagen</button>
         <input type="file" id="input-imagen-calles" accept="image/*" multiple style="display: none;" onchange="procesarImagenCalles(event)">
 
-        <!-- Opciones de Archivos GPX y Gestión -->
         <button class="btn" onclick="document.getElementById('input-gpx').click()">Cargar GPX</button>
         <input type="file" id="input-gpx" accept=".gpx" style="display: none;" onchange="manejarArchivoGPX(event)">
 
@@ -199,13 +190,11 @@
         <button class="btn" onclick="cortarTramoActual()">✂️ Cortar Tramo</button>
         <button class="btn btn-red" onclick="confirmarBorrarTodo()">🗑️ Borrar Todo</button>
         
-        <!-- GitHub Sync -->
         <button class="btn btn-green" onclick="abrirModalGithub('guardar')">☁️ Guardar</button>
         <button class="btn btn-green" onclick="abrirModalGithub('cargar')">📂 Abrir</button>
         <button class="btn btn-yellow" onclick="abrirModalGithub('compartir')">🔗 Compartir</button>
     </div>
 
-    <!-- Modal para GitHub -->
     <div id="modal-load" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center;">
         <div style="background:white; padding:20px; border-radius:8px; width:300px; max-height:80vh; overflow-y:auto;">
             <h3 id="modal-titulo">Mapas en GitHub</h3>
@@ -214,7 +203,6 @@
         </div>
     </div>
 
-    <!-- Modal para revisar/editar el texto detectado por OCR antes de trazar la ruta -->
     <div id="modal-ocr" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center;">
         <div style="background:white; padding:20px; border-radius:8px; width:340px; max-width:90vw; max-height:85vh; display:flex; flex-direction:column;">
             <h3 id="titulo-ocr" style="margin-top:0;">Revisa el listado de calles</h3>
@@ -227,11 +215,8 @@
         </div>
     </div>
 
-    <!-- Leaflet JS (con Subresource Integrity) -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <!-- Lógica de la Aplicación -->
     <script src="app.js"></script>
 </body>
 </html>
-
