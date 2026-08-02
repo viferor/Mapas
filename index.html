@@ -7,113 +7,97 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         /* Reset y Mapa */
-        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        #map { width: 100%; height: 100%; z-index: 1; touch-action: none; }
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f0f0f0; }
+        #map { width: 100%; height: 100%; z-index: 1; touch-action: none; transform: translateZ(0); }
 
         .leaflet-top.leaflet-right .leaflet-control-layers { margin-top: 65px !important; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
         .leaflet-control-zoom { margin-bottom: 90px !important; }
 
         /* BARRA SUPERIOR FLOTANTE */
         #top-bar {
-            position: absolute; top: 12px; left: 12px; right: 12px; z-index: 1000;
-            background: rgba(255, 255, 255, 0.95); border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: flex; align-items: center;
-            padding: 6px 8px; box-sizing: border-box; gap: 4px; backdrop-filter: blur(4px);
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            border-radius: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            padding: 6px 12px;
+            gap: 6px;
+            max-width: 92%;
+            width: auto;
+            box-sizing: border-box;
         }
-        .search-wrapper { display: flex; flex: 1; align-items: center; background: #f1f3f4; border-radius: 8px; margin-right: 4px; }
-        #search-input { flex: 1; border: none; background: transparent; padding: 8px 10px; font-size: 14px; outline: none; min-width: 50px; }
-        .search-btn { background: transparent; border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 14px; cursor: pointer; touch-action: manipulation; display: flex; align-items: center; justify-content: center; }
-        .search-btn:active { background: #e0e0e0; }
-        
-        .top-btn { background: transparent; border: none; width: 34px; height: 34px; border-radius: 50%; font-size: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; touch-action: manipulation; color: #333; flex-shrink: 0; }
-        .top-btn:active { background: #f0f0f0; }
+        #top-bar .search-wrapper { display: flex; align-items: center; background: rgba(255, 255, 255, 0.4); border-radius: 20px; padding: 0 10px; flex: 0 1 auto; max-width: 120px; }
+        #top-bar #search-input { border: none; background: transparent; padding: 6px 4px; font-size: 13px; outline: none; width: 70px; }
+        #top-bar .search-btn { background: transparent; border: none; width: 28px; height: 28px; border-radius: 50%; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        #top-bar .top-btn { background: transparent; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 15px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #333; flex-shrink: 0; transition: background 0.2s; touch-action: manipulation; }
+        #top-bar .top-btn:active, .search-btn:active { background: rgba(255, 255, 255, 0.9); }
 
         /* BARRA LATERAL IZQUIERDA */
         #left-tools {
-            position: absolute; top: 80px; left: 12px; z-index: 1000;
-            background: rgba(255, 255, 255, 0.95); border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: flex; flex-direction: column;
-            padding: 6px; gap: 4px; backdrop-filter: blur(4px);
+            position: absolute; top: 80px; left: 15px; z-index: 1000;
+            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(8px); border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; padding: 6px; gap: 4px;
         }
         .btn {
             -webkit-appearance: none; -moz-appearance: none; appearance: none;
-            background: rgba(255, 255, 255, 0.88); border: 1px solid rgba(0, 0, 0, 0.12);
-            color: #212529; padding: 5px 9px; min-height: 28px; border-radius: 6px;
-            font-size: 11px; font-weight: 600; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-            transition: background 0.15s; user-select: none; white-space: nowrap;
-            -webkit-tap-highlight-color: transparent; touch-action: manipulation;
-            display: flex; align-items: center; gap: 3px; box-sizing: border-box;
+            background: transparent; border: none; width: 38px; height: 38px; border-radius: 8px; font-size: 16px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; color: #444; touch-action: manipulation;
         }
-        .btn:active { background: rgba(220, 220, 220, 0.95); }
-        .btn-active-blue { background: #0056b3 !important; color: white !important; border-color: #004085 !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
-        .btn-active-red { background: #bd2130 !important; color: white !important; border-color: #961c27 !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+        .btn:active { background: rgba(255, 255, 255, 0.9); }
+        .btn-active-blue { background: #007bff !important; color: white !important; }
+        .btn-active-red { background: #dc3545 !important; color: white !important; }
 
         /* MENÚ FLOTANTE FAB */
         #fab-container { position: absolute; bottom: 20px; right: 20px; z-index: 1000; display: flex; flex-direction: column; align-items: flex-end; }
-        #fab-main-btn { width: 56px; height: 56px; border-radius: 50%; background: #007bff; color: white; border: none; font-size: 28px; box-shadow: 0 4px 12px rgba(0,0,0,0.25); cursor: pointer; touch-action: manipulation; transition: transform 0.2s; display: flex; align-items: center; justify-content: center; }
+        #fab-main-btn { width: 50px; height: 50px; border-radius: 50%; background: #007bff; color: white; border: none; font-size: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.25); cursor: pointer; transition: transform 0.2s; display: flex; align-items: center; justify-content: center; }
         #fab-main-btn:active { transform: scale(0.9); background: #0056b3; }
-        #fab-menu { display: none; flex-direction: column; background: rgba(255, 255, 255, 0.98); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); padding: 12px; margin-bottom: 16px; min-width: 210px; max-height: 70vh; overflow-y: auto; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); }
+        #fab-menu { display: none; flex-direction: column; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); padding: 12px; margin-bottom: 16px; min-width: 180px; max-height: 70vh; overflow-y: auto; border: 1px solid rgba(255,255,255,0.3); }
         #fab-menu.active { display: flex; }
         .fab-option { display: flex; align-items: center; justify-content: space-between; padding: 8px 6px; border-radius: 8px; font-size: 13px; width: 100%; box-sizing: border-box; gap: 8px; background: transparent; border: none; cursor: pointer; touch-action: manipulation; }
-        .fab-option:active { background: #f0f0f0; }
+        .fab-option:active { background: rgba(0,0,0,0.05); }
         .fab-label { display: flex; align-items: center; gap: 8px; }
         .fab-input { width: 50px; height: 24px; border: none; background: transparent; cursor: pointer; touch-action: manipulation; }
         .fab-select { border: 1px solid #ccc; border-radius: 4px; padding: 2px 4px; font-size: 12px; background: transparent; }
 
         /* MODALES */
-        .modal-buscar { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-buscar-content { background: white; padding: 20px; border-radius: 8px; width: 340px; max-width: 90vw; }
-        .modal-buscar-content input { width: 100%; padding: 8px; font-size: 16px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; margin-bottom: 10px; }
-        .modal-buscar-content .btn-group { display: flex; gap: 8px; }
-        .modal-buscar-content .btn-group .btn { flex: 1; justify-content: center; }
-        
-        #modal-load { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
-        #modal-load > div { background:white; padding:20px; border-radius:8px; width:300px; max-height:80vh; overflow-y:auto; }
-        
-        #modal-ocr { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
-        #modal-ocr > div { background:white; padding:20px; border-radius:8px; width:340px; max-width:90vw; max-height:85vh; display:flex; flex-direction:column; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 3000; justify-content: center; align-items: center; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: white; border-radius: 16px; padding: 20px; width: 340px; max-width: 90vw; box-shadow: 0 10px 40px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 10px; }
+        .modal-content h3 { margin: 0 0 10px 0; font-size: 16px; }
+        .export-option, .import-option { display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px; border: none; background: transparent; border-radius: 8px; font-size: 14px; cursor: pointer; transition: background 0.2s; color: #333; }
+        .export-option:active, .import-option:active { background: #f0f0f0; }
+        .modal-btn-group { display: flex; gap: 8px; margin-top: 10px; }
+        .modal-btn-group .btn { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .modal-btn-group .btn-cancel { background: #f1f3f4; }
+        .modal-btn-group .btn-cancel:active { background: #e0e0e0; }
+        .modal-btn-group .btn-primary { background: #007bff; color: white; }
 
-        /* Iconos y estilos heredados */
+        /* TOAST */
+        #toast-aviso { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.85); color: white; padding: 10px 20px; border-radius: 20px; z-index: 9999; opacity: 0; transition: opacity 0.3s; pointer-events: none; font-size: 14px; }
+
+        /* ESTILOS DE MARCADORES HEREDADOS */
         .number-icon { background: #007bff; border: 2px solid white; border-radius: 50%; color: white; font-weight: bold; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
         .number-icon span { display: block; line-height: 24px; font-size: 12px; }
         .comentario-icon { background: #ffdd57; border-radius: 50%; border: 2px solid #fff; text-align: center; line-height: 26px; font-size: 18px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
         
-        #toast-aviso { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 10px 20px; border-radius: 20px; z-index: 1000; opacity: 0; transition: opacity 0.3s; pointer-events: none; font-size: 14px; }
-
-        /* --- CORRECCIÓN DE INTERFAZ PARA MÓVILES --- */
         @media (max-width: 768px) {
-            #top-bar {
-                padding: 4px 6px;
-                gap: 2px;
-                flex-wrap: nowrap; /* Permite el desplazamiento horizontal si es necesario */
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                scrollbar-width: none; /* Firefox */
-            }
-            #top-bar::-webkit-scrollbar {
-                display: none; /* Chrome/Safari */
-            }
-            .search-wrapper {
-                flex: 0 0 auto; /* Evita que el buscador se estire */
-                max-width: 100px;
-                margin-right: 2px;
-            }
-            #search-input {
-                width: 70px;
-                font-size: 12px;
-                padding: 6px 8px;
-                min-width: 50px;
-            }
-            .search-btn {
-                width: 24px;
-                height: 24px;
-                font-size: 12px;
-            }
-            .top-btn {
-                width: 28px;
-                height: 28px;
-                font-size: 13px;
-            }
+            #top-bar { padding: 4px 8px; gap: 4px; max-width: 96%; border-radius: 16px; top: 10px; }
+            #top-bar .top-btn { width: 28px; height: 28px; font-size: 13px; }
+            #top-bar .search-wrapper { max-width: 80px; padding: 0 6px; }
+            #top-bar #search-input { width: 50px; font-size: 11px; padding: 4px 2px; }
+            #top-bar .search-btn { width: 22px; height: 22px; font-size: 11px; }
+            #left-tools { top: 70px; padding: 4px; gap: 2px; }
+            .btn { width: 32px; height: 32px; font-size: 14px; }
+            #fab-main-btn { width: 44px; height: 44px; font-size: 20px; }
+            #fab-menu { min-width: 150px; padding: 8px; }
+            .fab-option { font-size: 12px; padding: 6px 4px; }
+            .modal-content { width: 300px; }
         }
     </style>
 </head>
@@ -124,20 +108,14 @@
     <!-- BARRA SUPERIOR FLOTANTE -->
     <div id="top-bar">
         <div class="search-wrapper">
-            <input type="text" id="search-input" placeholder="Ej: Calle Juan de Mena">
-            <button class="search-btn" onclick="ejecutarBusquedaCalle()" title="Buscar">🔍</button>
+            <input type="text" id="search-input" placeholder="Buscar...">
+            <button class="search-btn" id="btn-search-lupa" title="Buscar">🔍</button>
         </div>
         <button class="top-btn" onclick="deshacerUltimo()" title="Deshacer">↩</button>
         <button class="top-btn" onclick="rehacerProximo()" title="Rehacer">↪</button>
         <button class="top-btn" onclick="cortarTramoActual()" title="Cortar tramo">✂</button>
-        
-        <button class="top-btn" onclick="capturarPNG()" title="Capturar Pantalla PNG">📸</button>
-        <button class="top-btn" onclick="exportarPDF()" title="Exportar PDF">📄</button>
-        
-        <button class="top-btn" id="btn-share" title="Copiar datos al portapapeles">📋</button>
-        <button class="top-btn" onclick="abrirModalGithub('guardar')" title="Guardar en GitHub">☁️</button>
-        <button class="top-btn" onclick="abrirModalGithub('cargar')" title="Abrir desde GitHub">📂</button>
-        <button class="top-btn" onclick="abrirModalGithub('compartir')" title="Compartir enlace">🔗</button>
+        <button class="top-btn" onclick="mostrarModalImportar()" title="Abrir / Cargar">📂</button>
+        <button class="top-btn" id="btn-export" title="Exportar">⬇</button>
     </div>
 
     <!-- BARRA LATERAL IZQUIERDA -->
@@ -146,14 +124,13 @@
         <button class="btn" id="btn-aislado" onclick="setModo('aislado')" title="Puntos Aislados">📍</button>
         <button class="btn" id="btn-puntos-rectos" onclick="setModo('dibujar_puntos')" title="Dibujo Recto">📏</button>
         <button class="btn" id="btn-continuo" onclick="setModo('continuo')" title="Mano Alzada">✍️</button>
-        <button class="btn" id="btn-borrar" onclick="setModo('borrar')" title="Borrar">🧹</button>
+        <button class="btn" id="btn-borrar" onclick="alternarBorrado()" title="Modo Borrar">🧹</button>
         <button class="btn" id="btn-comentario" onclick="setModo('comentario')" title="Añadir Comentario">💬</button>
     </div>
 
     <!-- MENÚ FLOTANTE FAB -->
     <div id="fab-container">
         <div id="fab-menu">
-            <!-- Controles de estilo -->
             <div class="fab-option">
                 <span class="fab-label">🎨 Color</span>
                 <input type="color" id="color-trazo" value="#3388ff" class="fab-input">
@@ -174,75 +151,84 @@
                 </select>
             </div>
             <div style="border-top: 1px solid #eee; margin: 6px 0;"></div>
-
-            <!-- Opciones de precisión y archivos -->
-            <div class="fab-option" style="justify-content: flex-start;">
-                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; width:100%;">
-                    <input type="checkbox" id="switch-borrado-preciso" style="margin:0;"> Borrado Preciso
-                </label>
-            </div>
-            
-            <button class="fab-option" onclick="document.getElementById('input-archivo-texto').click()">📁 Cargar Calles (.txt)</button>
-            <button class="fab-option" onclick="document.getElementById('input-imagen-calles').click()">📷 Escanear Imagen</button>
-            <button class="fab-option" onclick="document.getElementById('input-gpx').click()">📂 Cargar GPX</button>
-            <button class="fab-option" onclick="exportarGPX()">📤 Exportar GPX</button>
-            
-            <!-- DESCARGAR GEOJSON (ID btn-save) -->
-            <button class="fab-option" id="btn-save" style="border-top:1px solid #eee; padding-top: 6px; margin-top: 6px;">📦 Exportar GeoJSON</button>
-            
+            <button class="fab-option" onclick="abrirModalGithub('guardar')">💾 Guardar en GitHub</button>
             <button class="fab-option" style="color:#dc3545; font-weight:bold; border-top:1px solid #eee; margin-top:4px;" onclick="confirmarBorrarTodo()">🗑️ Borrar Todo</button>
+            <button id="btn-save" style="display: none;"></button>
         </div>
         <button id="fab-main-btn">+</button>
     </div>
 
-    <!-- Inputs ocultos -->
-    <input type="file" id="input-archivo-texto" accept=".txt" style="display: none;" onchange="procesarArchivoTextoRuta(event)">
-    <input type="file" id="input-imagen-calles" accept="image/*" multiple style="display: none;" onchange="procesarImagenCalles(event)">
-    <input type="file" id="input-gpx" accept=".gpx" style="display: none;" onchange="manejarArchivoGPX(event)">
+    <!-- INPUTS OCULTOS -->
+    <input type="file" id="input-archivo-texto" accept=".txt" style="display:none;" onchange="procesarArchivoTextoRuta(event)">
+    <input type="file" id="input-imagen-calles" accept="image/*" multiple style="display:none;" onchange="procesarImagenCalles(event)">
+    <input type="file" id="input-gpx" accept=".gpx" style="display:none;" onchange="manejarArchivoGPX(event)">
 
-    <!-- MODALES -->
-    <div id="modal-buscar" class="modal-buscar">
-        <div class="modal-buscar-content">
-            <h3>Buscar calle</h3>
-            <input type="text" id="input-buscar-calle" placeholder="Nombre de la calle (ej. Gran Vía)" />
-            <div class="btn-group">
-                <button class="btn" onclick="cerrarModalBuscar()">Cancelar</button>
-                <button class="btn btn-blue" onclick="buscarCalle()">Buscar</button>
+    <!-- MODAL DE IMPORTACIÓN -->
+    <div id="modal-import" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Abrir / Cargar</h3>
+            <button class="import-option" onclick="document.getElementById('input-archivo-texto').click(); cerrarModalImport();"><span style="font-size:18px;">📁</span> Cargar Calles (.txt)</button>
+            <button class="import-option" onclick="document.getElementById('input-imagen-calles').click(); cerrarModalImport();"><span style="font-size:18px;">📷</span> Escanear Imagen (OCR)</button>
+            <button class="import-option" onclick="document.getElementById('input-gpx').click(); cerrarModalImport();"><span style="font-size:18px;">📂</span> Cargar GPX</button>
+            <button class="import-option" onclick="abrirModalGithub('cargar'); cerrarModalImport();"><span style="font-size:18px;">📂</span> Abrir de GitHub</button>
+            <div class="modal-btn-group">
+                <button class="btn btn-cancel" onclick="cerrarModalImport()">Cancelar</button>
             </div>
         </div>
     </div>
 
-    <div id="modal-load" style="display:none;">
-        <div>
+    <!-- MODAL DE EXPORTACIÓN -->
+    <div id="modal-export" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Exportar / Guardar Mapa</h3>
+            <button class="export-option" onclick="exportarPDF()"><span style="font-size:18px;">📄</span> PDF</button>
+            <button class="export-option" onclick="capturarPNG()"><span style="font-size:18px;">🖼️</span> PNG</button>
+            <button class="export-option" onclick="document.getElementById('btn-save').click(); cerrarModalExport();"><span style="font-size:18px;">📦</span> GeoJSON</button>
+            <button class="export-option" onclick="exportarGPX()"><span style="font-size:18px;">📤</span> Exportar GPX</button>
+            <button class="export-option" onclick="abrirModalGithub('guardar'); cerrarModalExport();"><span style="font-size:18px;">☁️</span> Guardar en GitHub</button>
+            <div class="modal-btn-group">
+                <button class="btn btn-cancel" onclick="cerrarModalExport()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALES DE BÚSQUEDA, GITHUB Y OCR -->
+    <div id="modal-buscar" class="modal-overlay">
+        <div class="modal-content">
+            <h3>🔍 Buscar calle</h3>
+            <input type="text" id="input-buscar-calle" placeholder="Nombre de la calle" style="width:100%; padding:8px; font-size:16px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box; margin-bottom:10px;" />
+            <div class="modal-btn-group">
+                <button class="btn btn-cancel" onclick="cerrarModalBuscar()">Cancelar</button>
+                <button class="btn btn-primary" onclick="buscarCalle()">Buscar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-load" class="modal-overlay">
+        <div class="modal-content">
             <h3 id="modal-titulo">Mapas en GitHub</h3>
-            <div id="lista-mapas" style="margin: 15px 0;"></div>
-            <button class="btn" style="width:100%; background:#ccc;" onclick="cerrarModal()">Cerrar</button>
+            <div id="lista-mapas" style="margin: 10px 0; max-height: 200px; overflow-y: auto;"></div>
+            <div class="modal-btn-group"><button class="btn btn-cancel" onclick="cerrarModal()">Cerrar</button></div>
         </div>
     </div>
 
-    <div id="modal-ocr" style="display:none;">
-        <div>
-            <h3 id="titulo-ocr" style="margin-top:0;">Revisa el listado de calles</h3>
-            <p id="mensaje-ocr" style="font-size:13px; color:#555; margin-top:-8px;">Corrige lo que el OCR haya leído mal (una calle por línea) y luego pulsa "Trazar ruta".</p>
-            <textarea id="texto-ocr" placeholder="Una calle por línea..." style="flex:1; min-height:220px; width:100%; box-sizing:border-box; font-size:14px; padding:8px; border:1px solid #ccc; border-radius:6px; resize:vertical;"></textarea>
-            <div style="display:flex; gap:8px; margin-top:12px;">
-                <button id="btn-ocr-cancelar" class="btn" style="flex:1; background:#ccc; justify-content:center;">Cancelar</button>
-                <button id="btn-ocr-continuar" class="btn btn-blue" style="flex:1; justify-content:center;">Trazar ruta</button>
+    <div id="modal-ocr" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="titulo-ocr">Revisa el listado de calles</h3>
+            <p id="mensaje-ocr" style="font-size:13px; color:#555;">Corrige lo que el OCR haya leído mal.</p>
+            <textarea id="texto-ocr" style="width:100%; min-height:150px; box-sizing:border-box; padding:8px; border:1px solid #ccc; border-radius:6px; resize:vertical;"></textarea>
+            <div class="modal-btn-group">
+                <button id="btn-ocr-cancelar" class="btn btn-cancel">Cancelar</button>
+                <button id="btn-ocr-continuar" class="btn btn-primary">Trazar ruta</button>
             </div>
         </div>
     </div>
 
-    <!-- Lógica del Mapa -->
+    <!-- SCRIPTS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="app.js"></script>
 
-    <!-- Pequeño script para el menú FAB y la búsqueda -->
     <script>
-        function ejecutarBusquedaCalle() {
-            var input = document.getElementById('search-input');
-            var evt = new KeyboardEvent('keydown', {'key':'Enter'});
-            input.dispatchEvent(evt);
-        }
         document.getElementById('fab-main-btn').addEventListener('click', function(e) {
             e.stopPropagation();
             document.getElementById('fab-menu').classList.toggle('active');
@@ -253,6 +239,33 @@
             if (menu.classList.contains('active') && !menu.contains(e.target) && e.target !== fab) {
                 menu.classList.remove('active');
             }
+        });
+
+        document.getElementById('btn-export').addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.getElementById('modal-export').classList.add('active');
+        });
+        function cerrarModalExport() { document.getElementById('modal-export').classList.remove('active'); }
+        document.getElementById('modal-export').addEventListener('click', function(e) { if(e.target === this) cerrarModalExport(); });
+
+        function mostrarModalImportar() {
+            document.getElementById('modal-import').classList.add('active');
+        }
+        function cerrarModalImport() {
+            document.getElementById('modal-import').classList.remove('active');
+        }
+        document.getElementById('modal-import').addEventListener('click', function(e) {
+            if(e.target === this) cerrarModalImport();
+        });
+
+        document.getElementById('modal-buscar').addEventListener('click', function(e) { if(e.target === this) this.classList.remove('active'); });
+        document.getElementById('modal-load').addEventListener('click', function(e) { if(e.target === this) this.classList.remove('active'); });
+        document.getElementById('modal-ocr').addEventListener('click', function(e) { if(e.target === this) this.classList.remove('active'); });
+
+        document.getElementById('btn-search-lupa').addEventListener('click', function() {
+            const input = document.getElementById('search-input');
+            const evt = new KeyboardEvent('keydown', {'key':'Enter'});
+            input.dispatchEvent(evt);
         });
     </script>
 </body>
