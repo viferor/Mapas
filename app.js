@@ -34,6 +34,7 @@ window.addEventListener('unhandledrejection', function(ev) {
 
 let map;
 let modoActual = 'ruta';
+let drawnItems; // <--- AÑADIDO para que funcionen Guardar/Compartir
 
 let historialAcciones = [];
 let historialRehacer = [];
@@ -336,6 +337,11 @@ let sesionBorradoPrecisoActual = null;
 function iniciarBorradoPreciso(latlng) {
     borradoPrecisoActivo = true;
     map.dragging.disable();
+    // También desactivamos otros controles táctiles para evitar que interfieran
+    map.touchZoom.disable();
+    map.doubleClickZoom.disable();
+    map.boxZoom.disable();
+    
     ultimoPuntoBorrado = latlng;
     sesionBorradoPrecisoActual = { marcadores: [], comentarios: [], reemplazosLinea: [] };
     borrarConPrecision(latlng, RADIO_BORRADO_PRECISO_METROS, sesionBorradoPrecisoActual);
@@ -363,6 +369,9 @@ function finalizarBorradoPreciso() {
         borradoPrecisoActivo = false;
         ultimoPuntoBorrado = null;
         map.dragging.enable();
+        map.touchZoom.enable();
+        map.doubleClickZoom.enable();
+        map.boxZoom.enable();
 
         const sesion = sesionBorradoPrecisoActual;
         sesionBorradoPrecisoActual = null;
@@ -394,6 +403,9 @@ document.addEventListener("DOMContentLoaded", function () {
         tap: false 
     }).setView([37.8882, -4.7794], 13);
 
+    // --- AÑADIDO PARA QUE FUNCIONE EL GUARDADO Y COMPARTIR ---
+    drawnItems = L.featureGroup().addTo(map);
+
     const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' });
     const cartoClaro = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 20, attribution: '&copy; CARTO' });
     const googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', { maxZoom: 20, subdomains: ['mt0', 'mt1', 'mt2', 'mt3'], attribution: '&copy; Google Maps' });
@@ -412,6 +424,63 @@ document.addEventListener("DOMContentLoaded", function () {
     if (colorInput) colorInput.addEventListener('input', manejarCambioEstiloDinamico);
     if (grosorInput) grosorInput.addEventListener('input', manejarCambioEstiloDinamico);
     if (opacidadInput) opacidadInput.addEventListener('input', manejarCambioEstiloDinamico);
+
+    // --- CORRECCIÓN DE BÚSQUEDA: USAR KEYDOWN EN LUGAR DE KEYPRESS ---
+    document.getElementById('search-input').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            const query = this.value.trim();
+            if (!query) {
+                mostrarToast("Escribe el nombre de una calle");
+                return;
+            }
+            mostrarToast("Buscando...");
+            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', Córdoba, España')}&countrycodes=es&limit=1`;
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        const lat = parseFloat(data[0].lat);
+                        const lon = parseFloat(data[0].lon);
+                        map.setView([lat, lon], 17);
+                        if (window._marcadorBusqueda) map.removeLayer(window._marcadorBusqueda);
+                        window._marcadorBusqueda = L.marker([lat, lon], {
+                            icon: L.divIcon({ className: 'number-icon', html: '📍', iconSize: [28,28], iconAnchor:[14,14] })
+                        }).addTo(map);
+                        mostrarToast(`Encontrado: ${data[0].display_name}`);
+                    } else {
+                        mostrarToast("No se encontró la calle");
+                    }
+                })
+                .catch(() => mostrarToast("Error en la búsqueda"));
+        }
+    });
+
+    // --- AÑADIDO: LISTENER PARA DESCARGAR GEOJSON ---
+    document.getElementById('btn-save').addEventListener('click', function() {
+        var data = drawnItems.toGeoJSON();
+        var blob = new Blob([JSON.stringify(data)], {type: 'application/json'});
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url; a.download = 'mis_rutas.geojson';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        mostrarToast('💾 GeoJSON descargado');
+    });
+
+    // --- AÑADIDO: LISTENER PARA COMPARTIR (PORTAPAPELES) ---
+    document.getElementById('btn-share').addEventListener('click', function() {
+        var data = drawnItems.toGeoJSON();
+        var jsonStr = JSON.stringify(data);
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(jsonStr).then(function() {
+                mostrarToast('📋 Datos copiados al portapapeles');
+            }, function(err) {
+                mostrarToast('❌ No se pudo copiar');
+                console.log(jsonStr);
+            });
+        } else {
+            mostrarToast('❌ Portapapeles no soportado');
+        }
+    });
 
     // Cargar mapa compartido
     const urlParams = new URLSearchParams(window.location.search);
@@ -519,7 +588,7 @@ function cortarTramoActual() {
     mostrarToast("Segmento cortado");
 }
 
-// ---- Búsqueda de calles ----
+// ---- Búsqueda de calles (modal) ----
 function mostrarModalBuscar() {
     document.getElementById('modal-buscar').style.display = 'flex';
     document.getElementById('input-buscar-calle').focus();
@@ -586,10 +655,11 @@ function crearComentario(latlng, texto) {
     mostrarToast("Comentario añadido");
 }
 
-// ---- Configuración de eventos táctiles y ratón (continuación) ----
+// ---- Configuración de eventos táctiles y ratón (CORREGIDA PARA EVITAR ARRASTRE) ----
 function configurarDibujoTactilTablet() {
     const mapaContenedor = map.getContainer();
 
+    // Eventos para dibujo a mano alzada (continuo)
     mapaContenedor.addEventListener('touchstart', (e) => {
         if (modoActual !== 'continuo') return;
         if (e.touches.length > 1) { estaDibujandoLibre = false; return; }
@@ -679,28 +749,35 @@ function configurarDibujoTactilTablet() {
 
     window.addEventListener('mouseup', finalizarTrazoTablet);
 
-    // Borrado preciso con ratón/touch
+    // ---- BORRADO PRECISO: EVENTOS CORREGIDOS PARA BLOQUEAR EL ARRASTRE ----
+    // Usamos 'passive: false' y L.DomEvent.preventDefault para evitar que el mapa se mueva
     mapaContenedor.addEventListener('touchstart', (e) => {
         if (modoActual !== 'borrar' || !borradoPreciso) return;
         if (e.touches.length > 1) return;
+        // PREVENIR EL COMPORTAMIENTO POR DEFECTO (ARRASTRE)
+        e.preventDefault();
+        L.DomEvent.stopPropagation(e);
         const touch = e.touches[0];
         const rect = mapaContenedor.getBoundingClientRect();
         const latlng = map.containerPointToLatLng(L.point(touch.clientX - rect.left, touch.clientY - rect.top));
         iniciarBorradoPreciso(latlng);
-    }, { passive: true });
+    }, { passive: false });
 
     mapaContenedor.addEventListener('touchmove', (e) => {
         if (!borradoPrecisoActivo) return;
         if (e.touches.length > 1) return;
+        e.preventDefault();
+        L.DomEvent.stopPropagation(e);
         const touch = e.touches[0];
         const rect = mapaContenedor.getBoundingClientRect();
         const latlng = map.containerPointToLatLng(L.point(touch.clientX - rect.left, touch.clientY - rect.top));
         continuarBorradoPreciso(latlng);
-    }, { passive: true });
+    }, { passive: false });
 
     mapaContenedor.addEventListener('touchend', finalizarBorradoPreciso);
     mapaContenedor.addEventListener('touchcancel', finalizarBorradoPreciso);
 
+    // Ratón para borrado preciso
     mapaContenedor.addEventListener('mousedown', (e) => {
         if (Date.now() - ultimoEventoFueTouch < 500) return;
         if (modoActual !== 'borrar' || !borradoPreciso) return;
@@ -1091,6 +1168,66 @@ function exportarGPX() {
     mostrarToast('GPX exportado');
 }
 
+// ---- NUEVAS FUNCIONES: EXPORTAR PNG Y PDF ----
+function cargarScriptExterno(src) {
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error("No se pudo cargar la librería."));
+        document.head.appendChild(script);
+    });
+}
+
+async function capturarPNG() {
+    mostrarToast("Capturando pantalla...");
+    try {
+        if (typeof html2canvas === 'undefined') {
+            mostrarToast("Cargando librería de imágenes...");
+            await cargarScriptExterno('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js');
+        }
+        // Pequeña pausa para que Leaflet termine de renderizar (evita desfases)
+        await new Promise(r => setTimeout(r, 250));
+        const canvas = await html2canvas(document.getElementById('map'), { useCORS: true, scale: 2, backgroundColor: null });
+        const link = document.createElement('a');
+        link.download = 'mapa.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        mostrarToast("✅ PNG descargado");
+    } catch (error) {
+        mostrarToast("❌ Error al capturar PNG");
+        console.error(error);
+    }
+}
+
+async function exportarPDF() {
+    mostrarToast("Generando PDF...");
+    try {
+        if (typeof html2canvas === 'undefined') {
+            mostrarToast("Cargando librería de imágenes...");
+            await cargarScriptExterno('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js');
+        }
+        if (typeof window.jspdf === 'undefined') {
+            mostrarToast("Cargando librería de PDF...");
+            await cargarScriptExterno('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+        }
+        // Pequeña pausa para que Leaflet termine de renderizar (evita desfases)
+        await new Promise(r => setTimeout(r, 250));
+        const canvas = await html2canvas(document.getElementById('map'), { useCORS: true, scale: 2, backgroundColor: null });
+        const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const pdfWidth = doc.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        doc.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        doc.save('mapa.pdf');
+        mostrarToast("✅ PDF descargado");
+    } catch (error) {
+        mostrarToast("❌ Error al generar PDF");
+        console.error(error);
+    }
+}
+
 // ---- Funciones de GitHub ----
 function obtenerToken() {
     let token = localStorage.getItem('github_token');
@@ -1414,16 +1551,6 @@ async function procesarArchivoTextoRuta(event) {
     };
 
     lector.readAsText(archivo);
-}
-
-function cargarScriptExterno(src) {
-    return new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = src;
-        script.onload = () => resolve();
-        script.onerror = () => reject(new Error("No se pudo cargar la librería de OCR. Comprueba tu conexión a internet."));
-        document.head.appendChild(script);
-    });
 }
 
 function mostrarModalEdicionOCR(lineasIniciales, opciones) {

@@ -2,251 +2,170 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Mapas y Rutas - Córdoba</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
+        /* Reset y Mapa */
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        #map { width: 100%; height: 100%; z-index: 1; touch-action: none; }
 
-        #map {
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            touch-action: none;
-        }
+        .leaflet-top.leaflet-right .leaflet-control-layers { margin-top: 65px !important; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        .leaflet-control-zoom { margin-bottom: 90px !important; }
 
-        .panel-controles {
-            position: absolute;
-            bottom: 15px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            background: transparent;
-            padding: 6px 10px;
-            display: grid;
-            grid-template-rows: repeat(2, auto);
-            grid-auto-flow: column;
-            grid-auto-columns: max-content;
-            gap: 5px;
-            align-items: center;
-            max-width: 95vw;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: thin;
+        /* BARRA SUPERIOR FLOTANTE */
+        #top-bar {
+            position: absolute; top: 12px; left: 12px; right: 12px; z-index: 1000;
+            background: rgba(255, 255, 255, 0.95); border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: flex; align-items: center;
+            padding: 6px 8px; box-sizing: border-box; gap: 4px; backdrop-filter: blur(4px);
         }
+        .search-wrapper { display: flex; flex: 1; align-items: center; background: #f1f3f4; border-radius: 8px; margin-right: 4px; }
+        #search-input { flex: 1; border: none; background: transparent; padding: 8px 10px; font-size: 14px; outline: none; min-width: 50px; }
+        .search-btn { background: transparent; border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 14px; cursor: pointer; touch-action: manipulation; display: flex; align-items: center; justify-content: center; }
+        .search-btn:active { background: #e0e0e0; }
+        
+        .top-btn { background: transparent; border: none; width: 34px; height: 34px; border-radius: 50%; font-size: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; touch-action: manipulation; color: #333; flex-shrink: 0; }
+        .top-btn:active { background: #f0f0f0; }
 
-        .panel-controles::-webkit-scrollbar {
-            height: 4px;
+        /* BARRA LATERAL IZQUIERDA (Usando la clase 'btn' y estilos de tu app.js) */
+        #left-tools {
+            position: absolute; top: 80px; left: 12px; z-index: 1000;
+            background: rgba(255, 255, 255, 0.95); border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: flex; flex-direction: column;
+            padding: 6px; gap: 4px; backdrop-filter: blur(4px);
         }
-
-        .panel-controles::-webkit-scrollbar-thumb {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 2px;
-        }
-
         .btn {
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            background: rgba(255, 255, 255, 0.88);
-            border: 1px solid rgba(0, 0, 0, 0.12);
-            color: #212529;
-            padding: 5px 9px;
-            min-height: 28px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-            transition: background 0.15s;
-            user-select: none;
-            white-space: nowrap;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-            display: flex;
-            align-items: center;
-            gap: 3px;
-            box-sizing: border-box;
+            -webkit-appearance: none; -moz-appearance: none; appearance: none;
+            background: rgba(255, 255, 255, 0.88); border: 1px solid rgba(0, 0, 0, 0.12);
+            color: #212529; padding: 5px 9px; min-height: 28px; border-radius: 6px;
+            font-size: 11px; font-weight: 600; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+            transition: background 0.15s; user-select: none; white-space: nowrap;
+            -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+            display: flex; align-items: center; gap: 3px; box-sizing: border-box;
         }
+        .btn:active { background: rgba(220, 220, 220, 0.95); }
+        .btn-active-blue { background: #0056b3 !important; color: white !important; border-color: #004085 !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+        .btn-active-red { background: #bd2130 !important; color: white !important; border-color: #961c27 !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
 
-        .btn:active {
-            background: rgba(220, 220, 220, 0.95);
-        }
+        /* MENÚ FLOTANTE FAB */
+        #fab-container { position: absolute; bottom: 20px; right: 20px; z-index: 1000; display: flex; flex-direction: column; align-items: flex-end; }
+        #fab-main-btn { width: 56px; height: 56px; border-radius: 50%; background: #007bff; color: white; border: none; font-size: 28px; box-shadow: 0 4px 12px rgba(0,0,0,0.25); cursor: pointer; touch-action: manipulation; transition: transform 0.2s; display: flex; align-items: center; justify-content: center; }
+        #fab-main-btn:active { transform: scale(0.9); background: #0056b3; }
+        #fab-menu { display: none; flex-direction: column; background: rgba(255, 255, 255, 0.98); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); padding: 12px; margin-bottom: 16px; min-width: 210px; max-height: 70vh; overflow-y: auto; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); }
+        #fab-menu.active { display: flex; }
+        .fab-option { display: flex; align-items: center; justify-content: space-between; padding: 8px 6px; border-radius: 8px; font-size: 13px; width: 100%; box-sizing: border-box; gap: 8px; background: transparent; border: none; cursor: pointer; touch-action: manipulation; }
+        .fab-option:active { background: #f0f0f0; }
+        .fab-label { display: flex; align-items: center; gap: 8px; }
+        .fab-input { width: 50px; height: 24px; border: none; background: transparent; cursor: pointer; touch-action: manipulation; }
+        .fab-select { border: 1px solid #ccc; border-radius: 4px; padding: 2px 4px; font-size: 12px; background: transparent; }
 
-        .btn-blue {
-            background: #007bff;
-            color: white;
-            border-color: #006fe6;
-        }
-        .btn-blue:active {
-            background: #0056b3;
-        }
+        /* MODALES */
+        .modal-buscar { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-buscar-content { background: white; padding: 20px; border-radius: 8px; width: 340px; max-width: 90vw; }
+        .modal-buscar-content input { width: 100%; padding: 8px; font-size: 16px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; margin-bottom: 10px; }
+        .modal-buscar-content .btn-group { display: flex; gap: 8px; }
+        .modal-buscar-content .btn-group .btn { flex: 1; justify-content: center; }
+        
+        #modal-load { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+        #modal-load > div { background:white; padding:20px; border-radius:8px; width:300px; max-height:80vh; overflow-y:auto; }
+        
+        #modal-ocr { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+        #modal-ocr > div { background:white; padding:20px; border-radius:8px; width:340px; max-width:90vw; max-height:85vh; display:flex; flex-direction:column; }
 
-        .btn-green {
-            background: #28a745;
-            color: white;
-            border-color: #218838;
-        }
-
-        .btn-yellow {
-            background: #ffc107;
-            color: #212529;
-            border-color: #e0a800;
-        }
-
-        .btn-red {
-            background: #dc3545;
-            color: white;
-            border-color: #bd2130;
-        }
-
-        .btn-active-blue {
-            background: #0056b3 !important;
-            color: white !important;
-            border-color: #004085 !important;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .btn-active-red {
-            background: #bd2130 !important;
-            color: white !important;
-            border-color: #961c27 !important;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .number-icon {
-            background: #007bff;
-            border: 2px solid white;
-            border-radius: 50%;
-            color: white;
-            font-weight: bold;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        }
-        .number-icon span {
-            display: block;
-            line-height: 24px;
-            font-size: 12px;
-        }
-
-        .comentario-icon {
-            background: #ffdd57;
-            border-radius: 50%;
-            border: 2px solid #fff;
-            text-align: center;
-            line-height: 26px;
-            font-size: 18px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        }
-
-        /* Modal de búsqueda */
-        .modal-buscar {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-buscar-content {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            width: 340px;
-            max-width: 90vw;
-        }
-        .modal-buscar-content input {
-            width: 100%;
-            padding: 8px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            box-sizing: border-box;
-            margin-bottom: 10px;
-        }
-        .modal-buscar-content .btn-group {
-            display: flex;
-            gap: 8px;
-        }
-        .modal-buscar-content .btn-group .btn {
-            flex: 1;
-            justify-content: center;
-        }
+        /* Iconos y estilos heredados */
+        .number-icon { background: #007bff; border: 2px solid white; border-radius: 50%; color: white; font-weight: bold; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .number-icon span { display: block; line-height: 24px; font-size: 12px; }
+        .comentario-icon { background: #ffdd57; border-radius: 50%; border: 2px solid #fff; text-align: center; line-height: 26px; font-size: 18px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        
+        #toast-aviso { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 10px 20px; border-radius: 20px; z-index: 1000; opacity: 0; transition: opacity 0.3s; pointer-events: none; font-size: 14px; }
     </style>
 </head>
 <body>
     <div id="map"></div>
+    <div id="toast-aviso"></div>
 
-    <div id="toast-aviso" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 10px 20px; border-radius: 20px; z-index: 1000; opacity: 0; transition: opacity 0.3s; pointer-events: none; font-size: 14px;"></div>
-
-    <div class="panel-controles">
-        <button id="btn-ruta" class="btn" onclick="setModo('ruta')">Ruta OSRM</button>
-        <button id="btn-aislado" class="btn" onclick="setModo('aislado')">Puntos Aislados</button>
-        <button id="btn-puntos-rectos" class="btn" onclick="setModo('dibujar_puntos')">Rectos</button>
-        <button id="btn-continuo" class="btn" onclick="setModo('continuo')">Mano Alzada</button>
-        <button id="btn-borrar" class="btn" onclick="setModo('borrar')">Borrar</button>
-        <button id="btn-comentario" class="btn" onclick="setModo('comentario')">💬 Comentario</button>
-
-        <label class="btn" style="cursor:pointer;" title="Con el modo Borrar activado: desmarcado = borra el elemento completo al tocarlo; marcado = goma de borrar de mano libre, recorta solo el trazo exacto por el que pasas">
-            <input type="checkbox" id="switch-borrado-preciso" style="margin:0; touch-action: manipulation;" onchange="borradoPreciso = this.checked; mostrarToast(this.checked ? '🧹 Borrado preciso (mano libre)' : '🧹 Borrado por elemento completo');">
-            Preciso
-        </label>
+    <!-- BARRA SUPERIOR FLOTANTE -->
+    <div id="top-bar">
+        <div class="search-wrapper">
+            <input type="text" id="search-input" placeholder="Ej: Calle Juan de Mena, Córdoba">
+            <button class="search-btn" onclick="ejecutarBusquedaCalle()" title="Buscar">🔍</button>
+        </div>
+        <button class="top-btn" onclick="deshacerUltimo()" title="Deshacer">↩</button>
+        <button class="top-btn" onclick="rehacerProximo()" title="Rehacer">↪</button>
+        <button class="top-btn" onclick="cortarTramoActual()" title="Cortar tramo">✂</button>
         
-        <div class="btn" style="cursor: default;">
-            <label for="color-trazo">🎨 <span style="position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0);">Color del trazo</span></label>
-            <input type="color" id="color-trazo" value="#3388ff" style="border:none; width:26px; height:22px; background:transparent; cursor:pointer; touch-action: manipulation;" title="Color del trazo" aria-label="Color del trazo">
-        </div>
-        <div class="btn" style="cursor: default;">
-            <label for="grosor-trazo">Grosor:</label> <input type="range" id="grosor-trazo" min="1" max="10" value="4" style="width: 55px; height: 24px; cursor: pointer; touch-action: manipulation;" aria-label="Grosor del trazo">
-        </div>
-        <div class="btn" style="cursor: default;">
-            <label for="opacidad-trazo">Opacidad:</label> <input type="range" id="opacidad-trazo" min="0.1" max="1" step="0.1" value="1" style="width: 55px; height: 24px; cursor: pointer; touch-action: manipulation;" aria-label="Opacidad del trazo">
-        </div>
-        <div class="btn" style="cursor: default;">
-            <label for="ambito-estilo">Aplicar a:</label>
-            <select id="ambito-estilo" style="border:none; background:transparent; font-size:12px; cursor:pointer; min-height: 26px; touch-action: manipulation;" aria-label="Ámbito del cambio de estilo">
-                <option value="todos">Todos</option>
-                <option value="ultimo">Último</option>
-            </select>
-        </div>
-
-        <!-- Búsqueda de calles -->
-        <button class="btn btn-blue" onclick="mostrarModalBuscar()">🔍 Buscar Calle</button>
-
-        <button class="btn btn-blue" onclick="document.getElementById('input-archivo-texto').click()">📁 Cargar Calles (.txt)</button>
-        <input type="file" id="input-archivo-texto" accept=".txt" style="display: none;" onchange="procesarArchivoTextoRuta(event)">
-
-        <button class="btn btn-blue" onclick="document.getElementById('input-imagen-calles').click()">📷 Escanear Imagen</button>
-        <input type="file" id="input-imagen-calles" accept="image/*" multiple style="display: none;" onchange="procesarImagenCalles(event)">
-
-        <button class="btn" onclick="document.getElementById('input-gpx').click()">Cargar GPX</button>
-        <input type="file" id="input-gpx" accept=".gpx" style="display: none;" onchange="manejarArchivoGPX(event)">
-
-        <button class="btn" onclick="exportarGPX()">📤 GPX</button>
-
-        <button class="btn" onclick="deshacerUltimo()">↩️ Deshacer</button>
-        <button class="btn" onclick="rehacerProximo()">🔁 Rehacer</button>
-        <button class="btn" onclick="cortarTramoActual()">✂️ Cortar Tramo</button>
-        <button class="btn btn-red" onclick="confirmarBorrarTodo()">🗑️ Borrar Todo</button>
+        <!-- NUEVAS FUNCIONES DE EXPORTACIÓN -->
+        <button class="top-btn" onclick="capturarPNG()" title="Capturar Pantalla PNG">📸</button>
+        <button class="top-btn" onclick="exportarPDF()" title="Exportar PDF">📄</button>
         
-        <button class="btn btn-green" onclick="abrirModalGithub('guardar')">☁️ Guardar</button>
-        <button class="btn btn-green" onclick="abrirModalGithub('cargar')">📂 Abrir</button>
-        <button class="btn btn-yellow" onclick="abrirModalGithub('compartir')">🔗 Compartir</button>
+        <button class="top-btn" id="btn-share" title="Copiar datos al portapapeles">📋</button>
+        <button class="top-btn" onclick="abrirModalGithub('guardar')" title="Guardar en GitHub">☁️</button>
+        <button class="top-btn" onclick="abrirModalGithub('cargar')" title="Abrir desde GitHub">📂</button>
+        <button class="top-btn" onclick="abrirModalGithub('compartir')" title="Compartir enlace">🔗</button>
     </div>
 
-    <!-- Modal de búsqueda de calles -->
+    <!-- BARRA LATERAL IZQUIERDA (Se usa class="btn" para que tu app.js detecte los estilos) -->
+    <div id="left-tools">
+        <button class="btn" id="btn-ruta" onclick="setModo('ruta')" title="Ruta OSRM">🚶</button>
+        <button class="btn" id="btn-aislado" onclick="setModo('aislado')" title="Puntos Aislados">📍</button>
+        <button class="btn" id="btn-puntos-rectos" onclick="setModo('dibujar_puntos')" title="Dibujo Recto">📏</button>
+        <button class="btn" id="btn-continuo" onclick="setModo('continuo')" title="Mano Alzada">✍️</button>
+        <button class="btn" id="btn-borrar" onclick="setModo('borrar')" title="Borrar">🧹</button>
+        <button class="btn" id="btn-comentario" onclick="setModo('comentario')" title="Añadir Comentario">💬</button>
+    </div>
+
+    <!-- MENÚ FLOTANTE FAB (Opciones de estilo y archivos) -->
+    <div id="fab-container">
+        <div id="fab-menu">
+            <!-- Controles de estilo -->
+            <div class="fab-option">
+                <span class="fab-label">🎨 Color</span>
+                <input type="color" id="color-trazo" value="#3388ff" class="fab-input">
+            </div>
+            <div class="fab-option">
+                <span class="fab-label">📏 Grosor</span>
+                <input type="range" id="grosor-trazo" min="1" max="10" value="4" style="width: 70px;">
+            </div>
+            <div class="fab-option">
+                <span class="fab-label">🌀 Opacidad</span>
+                <input type="range" id="opacidad-trazo" min="0.1" max="1" step="0.1" value="1" style="width: 70px;">
+            </div>
+            <div class="fab-option">
+                <span class="fab-label">🎯 Aplicar a</span>
+                <select id="ambito-estilo" class="fab-select">
+                    <option value="todos">Todos</option>
+                    <option value="ultimo">Último</option>
+                </select>
+            </div>
+            <div style="border-top: 1px solid #eee; margin: 6px 0;"></div>
+
+            <!-- Opciones de precisión y archivos -->
+            <div class="fab-option" style="justify-content: flex-start;">
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; width:100%;">
+                    <input type="checkbox" id="switch-borrado-preciso" style="margin:0;"> Borrado Preciso
+                </label>
+            </div>
+            
+            <button class="fab-option" onclick="document.getElementById('input-archivo-texto').click()">📁 Cargar Calles (.txt)</button>
+            <button class="fab-option" onclick="document.getElementById('input-imagen-calles').click()">📷 Escanear Imagen</button>
+            <button class="fab-option" onclick="document.getElementById('input-gpx').click()">📂 Cargar GPX</button>
+            <button class="fab-option" onclick="exportarGPX()">📤 Exportar GPX</button>
+            
+            <!-- DESCARGAR GEOJSON (ID btn-save) -->
+            <button class="fab-option" id="btn-save" style="border-top:1px solid #eee; padding-top: 6px; margin-top: 6px;">📦 Exportar GeoJSON</button>
+            
+            <button class="fab-option" style="color:#dc3545; font-weight:bold; border-top:1px solid #eee; margin-top:4px;" onclick="confirmarBorrarTodo()">🗑️ Borrar Todo</button>
+        </div>
+        <button id="fab-main-btn">+</button>
+    </div>
+
+    <!-- Inputs ocultos -->
+    <input type="file" id="input-archivo-texto" accept=".txt" style="display: none;" onchange="procesarArchivoTextoRuta(event)">
+    <input type="file" id="input-imagen-calles" accept="image/*" multiple style="display: none;" onchange="procesarImagenCalles(event)">
+    <input type="file" id="input-gpx" accept=".gpx" style="display: none;" onchange="manejarArchivoGPX(event)">
+
+    <!-- MODALES -->
     <div id="modal-buscar" class="modal-buscar">
         <div class="modal-buscar-content">
             <h3>Buscar calle</h3>
@@ -258,18 +177,16 @@
         </div>
     </div>
 
-    <!-- Modal de GitHub -->
-    <div id="modal-load" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center;">
-        <div style="background:white; padding:20px; border-radius:8px; width:300px; max-height:80vh; overflow-y:auto;">
+    <div id="modal-load" style="display:none;">
+        <div>
             <h3 id="modal-titulo">Mapas en GitHub</h3>
             <div id="lista-mapas" style="margin: 15px 0;"></div>
             <button class="btn" style="width:100%; background:#ccc;" onclick="cerrarModal()">Cerrar</button>
         </div>
     </div>
 
-    <!-- Modal de OCR -->
-    <div id="modal-ocr" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center;">
-        <div style="background:white; padding:20px; border-radius:8px; width:340px; max-width:90vw; max-height:85vh; display:flex; flex-direction:column;">
+    <div id="modal-ocr" style="display:none;">
+        <div>
             <h3 id="titulo-ocr" style="margin-top:0;">Revisa el listado de calles</h3>
             <p id="mensaje-ocr" style="font-size:13px; color:#555; margin-top:-8px;">Corrige lo que el OCR haya leído mal (una calle por línea) y luego pulsa "Trazar ruta".</p>
             <textarea id="texto-ocr" placeholder="Una calle por línea..." style="flex:1; min-height:220px; width:100%; box-sizing:border-box; font-size:14px; padding:8px; border:1px solid #ccc; border-radius:6px; resize:vertical;"></textarea>
@@ -280,8 +197,28 @@
         </div>
     </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Lógica del Mapa -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="app.js"></script>
+
+    <!-- Pequeño script para el menú FAB y la búsqueda (Solo UI, no toca app.js) -->
+    <script>
+        function ejecutarBusquedaCalle() {
+            var input = document.getElementById('search-input');
+            var evt = new KeyboardEvent('keydown', {'key':'Enter'});
+            input.dispatchEvent(evt);
+        }
+        document.getElementById('fab-main-btn').addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.getElementById('fab-menu').classList.toggle('active');
+        });
+        document.addEventListener('click', function(e) {
+            const menu = document.getElementById('fab-menu');
+            const fab = document.getElementById('fab-main-btn');
+            if (menu.classList.contains('active') && !menu.contains(e.target) && e.target !== fab) {
+                menu.classList.remove('active');
+            }
+        });
+    </script>
 </body>
 </html>
