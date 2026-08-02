@@ -368,7 +368,9 @@ function finalizarBorradoPreciso() {
     if (borradoPrecisoActivo) {
         borradoPrecisoActivo = false;
         ultimoPuntoBorrado = null;
-        map.dragging.enable();
+        if (!(modoActual === 'borrar' && borradoPreciso)) {
+            map.dragging.enable();
+        }
         map.touchZoom.enable();
         map.doubleClickZoom.enable();
         map.boxZoom.enable();
@@ -424,6 +426,25 @@ document.addEventListener("DOMContentLoaded", function () {
     if (colorInput) colorInput.addEventListener('input', manejarCambioEstiloDinamico);
     if (grosorInput) grosorInput.addEventListener('input', manejarCambioEstiloDinamico);
     if (opacidadInput) opacidadInput.addEventListener('input', manejarCambioEstiloDinamico);
+
+    // Conecta el interruptor "Borrado Preciso" con la variable que usa el borrador de mano libre.
+    // (Si este enlace falta, el interruptor no hace nada y al tocar la pantalla el mapa simplemente
+    // se desplaza en vez de borrar, porque el borrador nunca llega a activarse.)
+    const borradoPrecisoInput = document.getElementById('switch-borrado-preciso');
+    if (borradoPrecisoInput) {
+        borradoPrecisoInput.addEventListener('change', function() {
+            borradoPreciso = this.checked;
+            // Se desactiva el arrastre del mapa en cuanto se activa el interruptor (no solo al
+            // empezar a tocar), para evitar que un gesto que empieza justo antes de que el
+            // borrador tome el control acabe moviendo el mapa en lugar de borrar.
+            if (modoActual === 'borrar' && borradoPreciso) {
+                map.dragging.disable();
+            } else if (modoActual !== 'borrar' || !borradoPreciso) {
+                if (!borradoPrecisoActivo) map.dragging.enable();
+            }
+            mostrarToast(borradoPreciso ? '🧹 Borrado preciso (mano libre)' : '🧹 Borrado por elemento completo');
+        });
+    }
 
     // --- CORRECCIÓN DE BÚSQUEDA: USAR KEYDOWN EN LUGAR DE KEYPRESS ---
     document.getElementById('search-input').addEventListener('keydown', function(e) {
@@ -490,7 +511,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function setModo(modo) {
     modoActual = modo;
-    map.dragging.enable();
     
     const botones = {
         'ruta': 'btn-ruta',
@@ -522,6 +542,15 @@ function setModo(modo) {
             else item.elemento.dragging.enable();
         }
     });
+
+    // El arrastre del mapa se desactiva solo si estamos en modo "Borrar" con el borrado preciso
+    // activado (para que el gesto de arrastre borre en vez de mover el mapa); en cualquier otro
+    // caso se reactiva con normalidad.
+    if (modoActual === 'borrar' && borradoPreciso) {
+        map.dragging.disable();
+    } else if (!borradoPrecisoActivo) {
+        map.dragging.enable();
+    }
 
     const mensajes = {
         'ruta': "Modo: Callejero OSRM",

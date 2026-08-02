@@ -28,7 +28,7 @@
         .top-btn { background: transparent; border: none; width: 34px; height: 34px; border-radius: 50%; font-size: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; touch-action: manipulation; color: #333; flex-shrink: 0; }
         .top-btn:active { background: #f0f0f0; }
 
-        /* BARRA LATERAL IZQUIERDA (Usando la clase 'btn' y estilos de tu app.js) */
+        /* BARRA LATERAL IZQUIERDA */
         #left-tools {
             position: absolute; top: 80px; left: 12px; z-index: 1000;
             background: rgba(255, 255, 255, 0.95); border-radius: 12px;
@@ -79,6 +79,42 @@
         .comentario-icon { background: #ffdd57; border-radius: 50%; border: 2px solid #fff; text-align: center; line-height: 26px; font-size: 18px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
         
         #toast-aviso { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 10px 20px; border-radius: 20px; z-index: 1000; opacity: 0; transition: opacity 0.3s; pointer-events: none; font-size: 14px; }
+
+        /* --- CORRECCIÓN DE INTERFAZ PARA MÓVILES --- */
+        @media (max-width: 768px) {
+            #top-bar {
+                padding: 4px 6px;
+                gap: 2px;
+                flex-wrap: nowrap; /* Permite el desplazamiento horizontal si es necesario */
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none; /* Firefox */
+            }
+            #top-bar::-webkit-scrollbar {
+                display: none; /* Chrome/Safari */
+            }
+            .search-wrapper {
+                flex: 0 0 auto; /* Evita que el buscador se estire */
+                max-width: 100px;
+                margin-right: 2px;
+            }
+            #search-input {
+                width: 70px;
+                font-size: 12px;
+                padding: 6px 8px;
+                min-width: 50px;
+            }
+            .search-btn {
+                width: 24px;
+                height: 24px;
+                font-size: 12px;
+            }
+            .top-btn {
+                width: 28px;
+                height: 28px;
+                font-size: 13px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -88,14 +124,13 @@
     <!-- BARRA SUPERIOR FLOTANTE -->
     <div id="top-bar">
         <div class="search-wrapper">
-            <input type="text" id="search-input" placeholder="Ej: Calle Juan de Mena, Córdoba">
+            <input type="text" id="search-input" placeholder="Ej: Calle Juan de Mena">
             <button class="search-btn" onclick="ejecutarBusquedaCalle()" title="Buscar">🔍</button>
         </div>
         <button class="top-btn" onclick="deshacerUltimo()" title="Deshacer">↩</button>
         <button class="top-btn" onclick="rehacerProximo()" title="Rehacer">↪</button>
         <button class="top-btn" onclick="cortarTramoActual()" title="Cortar tramo">✂</button>
         
-        <!-- NUEVAS FUNCIONES DE EXPORTACIÓN -->
         <button class="top-btn" onclick="capturarPNG()" title="Capturar Pantalla PNG">📸</button>
         <button class="top-btn" onclick="exportarPDF()" title="Exportar PDF">📄</button>
         
@@ -105,7 +140,7 @@
         <button class="top-btn" onclick="abrirModalGithub('compartir')" title="Compartir enlace">🔗</button>
     </div>
 
-    <!-- BARRA LATERAL IZQUIERDA (Se usa class="btn" para que tu app.js detecte los estilos) -->
+    <!-- BARRA LATERAL IZQUIERDA -->
     <div id="left-tools">
         <button class="btn" id="btn-ruta" onclick="setModo('ruta')" title="Ruta OSRM">🚶</button>
         <button class="btn" id="btn-aislado" onclick="setModo('aislado')" title="Puntos Aislados">📍</button>
@@ -115,7 +150,7 @@
         <button class="btn" id="btn-comentario" onclick="setModo('comentario')" title="Añadir Comentario">💬</button>
     </div>
 
-    <!-- MENÚ FLOTANTE FAB (Opciones de estilo y archivos) -->
+    <!-- MENÚ FLOTANTE FAB -->
     <div id="fab-container">
         <div id="fab-menu">
             <!-- Controles de estilo -->
@@ -201,7 +236,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="app.js"></script>
 
-    <!-- Pequeño script para el menú FAB y la búsqueda (Solo UI, no toca app.js) -->
+    <!-- Pequeño script para el menú FAB y la búsqueda -->
     <script>
         function ejecutarBusquedaCalle() {
             var input = document.getElementById('search-input');
