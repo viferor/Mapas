@@ -22,19 +22,13 @@ window.procesarArchivoTextoRuta = async function(event) {
     lector.readAsText(archivo);
 };
 
-// Conjunto de caracteres esperable en un nombre de calle español (letras con tildes/ñ, números,
-// espacios y puntuación habitual). Se usa tanto para limitar lo que reconoce Tesseract como para
-// limpiar el texto después, y así evitar que se cuelen símbolos raros del ruido de la imagen.
+// Conjunto de caracteres esperable en un nombre de calle español
 const CARACTERES_CALLE_REGEX = /[^A-Za-zÁÉÍÓÚÑÜáéíóúñü0-9 .,ºª/\-']/g;
 
 function limpiarLineaOCR(linea) {
     return linea.replace(CARACTERES_CALLE_REGEX, '').replace(/\s{2,}/g, ' ').trim();
 }
 
-// Preprocesa la imagen antes de pasarla al OCR: la pasa a escala de grises, aumenta el contraste,
-// y la amplía si es pequeña. Una foto de móvil normal (con sombras, poco contraste, texto pequeño)
-// mejora mucho su reconocimiento con esto — es la causa más habitual de que el OCR meta símbolos
-// que no existen en la imagen original.
 function preprocesarImagenParaOCR(archivo) {
     return new Promise((resolve, reject) => {
         const img = new Image();
@@ -80,7 +74,6 @@ window.procesarImagenCalles = async function(event) {
             await cargarScriptExterno('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js');
         }
         
-        // Configuración PSM 6: Ideal para listas y bloques de texto uniforme
         const worker = await Tesseract.createWorker('spa', 1, {
             logger: m => {
                 if (m.status === 'recognizing text' && typeof m.progress === 'number') {
@@ -90,8 +83,6 @@ window.procesarImagenCalles = async function(event) {
         });
         await worker.setParameters({
             tessedit_pageseg_mode: '6',
-            // Restringe el reconocimiento a los caracteres que puede tener un nombre de calle:
-            // así el OCR ya no "inventa" símbolos raros para trazos de tinta, sombras o ruido.
             tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZÁÉÍÓÚÑÜabcdefghijklmnopqrstuvwxyzáéíóúñü0123456789 .,ºª/-\'',
             preserve_interword_spaces: '1'
         });
@@ -580,23 +571,42 @@ document.addEventListener("DOMContentLoaded", function () {
         if (grosorInput) grosorInput.addEventListener('input', manejarCambioEstiloDinamico);
         if (opacidadInput) opacidadInput.addEventListener('input', manejarCambioEstiloDinamico);
 
-        // ---- Búsqueda en la barra superior ----
+        // ---- Búsqueda en la barra superior (ACTUALIZADA) ----
         function realizarBusqueda(query) {
             if (!query) { mostrarToast("Escribe el nombre de una calle"); return; }
-            mostrarToast("Buscando...");
-            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', Córdoba, España')}&countrycodes=es&limit=1`;
+            mostrarToast("Buscando en un radio de 5 km...");
+
+            // 1. Obtener el centro actual del mapa
+            const center = map.getCenter();
+            const lat = center.lat;
+            const lng = center.lng;
+
+            // 2. Calcular una caja delimitadora de 5 km alrededor del centro (viewbox de Nominatim: left,bottom,right,top)
+            const kmPerDegLat = 111.32;
+            const kmPerDegLon = 111.32 * Math.cos(lat * Math.PI / 180);
+            const deltaLat = 5 / kmPerDegLat;
+            const deltaLon = 5 / kmPerDegLon;
+
+            const latMin = lat - deltaLat;
+            const latMax = lat + deltaLat;
+            const lngMin = lng - deltaLon;
+            const lngMax = lng + deltaLon;
+
+            // 3. Petición a Nominatim limitada a Córdoba y a la caja delimitadora
+            const url = `https://nominatim.openstreetmap.org/search?format=json&street=${encodeURIComponent(query)}&city=Córdoba&country=España&countrycodes=es&viewbox=${lngMin},${latMin},${lngMax},${latMax}&bounded=1&limit=1`;
+
             fetch(url)
                 .then(res => res.json())
                 .then(data => {
                     if (data && data.length > 0) {
-                        const lat = parseFloat(data[0].lat);
-                        const lon = parseFloat(data[0].lon);
-                        map.setView([lat, lon], 17);
+                        const latFound = parseFloat(data[0].lat);
+                        const lonFound = parseFloat(data[0].lon);
+                        map.setView([latFound, lonFound], 17);
                         if (window._marcadorBusqueda) map.removeLayer(window._marcadorBusqueda);
-                        window._marcadorBusqueda = L.marker([lat, lon], { icon: L.divIcon({ className: 'number-icon', html: '📍', iconSize: [28,28], iconAnchor:[14,14] }) }).addTo(map);
+                        window._marcadorBusqueda = L.marker([latFound, lonFound], { icon: L.divIcon({ className: 'number-icon', html: '📍', iconSize: [28,28], iconAnchor:[14,14] }) }).addTo(map);
                         mostrarToast(`Encontrado: ${data[0].display_name}`);
                     } else {
-                        mostrarToast("No se encontró la calle");
+                        mostrarToast("No se encontró la calle en un radio de 5 km del centro del mapa");
                     }
                 })
                 .catch(() => mostrarToast("Error en la búsqueda"));
@@ -1288,17 +1298,14 @@ async function geocodificarListado(nombres, centroInicial) {
         const claveCache = nombre.toLowerCase();
         let latlng = null;
 
-        // Mostrar progreso cada 5 calles
         if (procesadas % 5 === 0 && procesadas > 0) {
             mostrarToast(`Geocodificando... ${procesadas}/${total}`);
         }
 
         if (cacheLocal[claveCache] !== undefined) {
-            // Ya se buscó este mismo nombre antes en este listado: se reutiliza sin volver a pedirlo
             latlng = cacheLocal[claveCache];
             if (latlng && latlng.distanceTo(centroReferencia) > radioAplicable) latlng = null;
         } else {
-            // Timeout de 6 segundos para cada búsqueda (más generoso en móvil)
             try {
                 latlng = await Promise.race([
                     geocodificarUnaCalleNominatim(nombre, centroReferencia, radioAplicable),
@@ -1317,7 +1324,6 @@ async function geocodificarListado(nombres, centroInicial) {
         if (!centroRuta && latlng) centroRuta = latlng;
 
         procesadas++;
-        // Pequeña pausa para no saturar la API
         await new Promise(r => setTimeout(r, 100));
     }
     return { resultados, centroRuta };
@@ -1328,18 +1334,15 @@ async function geocodificarUnaCalleNominatim(nombre, centroReferencia, radioMetr
     const variantesNombre = generarVariantesNombreCalle(nombreLimpio);
 
     for (const variante of variantesNombre) {
-        // 1) Consulta ESTRUCTURADA: se le dice a Nominatim explícitamente qué es la calle y qué la
-        // ciudad, en vez de una frase libre — mucho más precisa para encontrar la calle exacta.
         const url1 = `https://nominatim.openstreetmap.org/search?format=json&street=${encodeURIComponent(variante)}&city=Córdoba&country=España&countrycodes=es&limit=5`;
         const punto1 = await intentarGeocodificar(url1, centroReferencia, radioMetros, intentos);
         if (punto1) return punto1;
 
-        // 2) Consulta libre, como red de seguridad si la estructurada no encuentra nada
         const url2 = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(variante + ', Córdoba, España')}&countrycodes=es&limit=5`;
         const punto2 = await intentarGeocodificar(url2, centroReferencia, radioMetros, intentos);
         if (punto2) return punto2;
 
-        await new Promise(r => setTimeout(r, 300)); // pausa entre variantes, para no saturar Nominatim
+        await new Promise(r => setTimeout(r, 300));
     }
     return null;
 }
@@ -1355,9 +1358,6 @@ async function intentarGeocodificar(url, centroReferencia, radioMetros, intentos
             if (!res.ok) return null;
             const data = await res.json();
             if (data && data.length > 0) {
-                // Se revisan TODOS los candidatos que devuelve Nominatim (antes solo se miraba el
-                // primero): si el primero cae fuera del radio permitido pero el segundo o tercero
-                // sí encaja, ahora se encuentra igualmente.
                 for (const candidato of data) {
                     const punto = L.latLng(parseFloat(candidato.lat), parseFloat(candidato.lon));
                     if (punto.distanceTo(centroReferencia) <= radioMetros) {
@@ -1373,10 +1373,6 @@ async function intentarGeocodificar(url, centroReferencia, radioMetros, intentos
     return null;
 }
 
-// Genera variantes razonables del nombre de una calle: sin prefijo, con "Calle" delante, y con
-// abreviaturas típicas (Avda., Pza., Po., Ctra., Trav., C/) expandidas a su forma completa —
-// Nominatim reconoce mucho mejor "Avenida" que "Avda." en muchos casos, y viceversa en otros,
-// así que se prueban ambas formas.
 function generarVariantesNombreCalle(nombreLimpio) {
     const sinPrefijo = nombreLimpio
         .replace(/^(c\/|cl\.?|calle)\s*/i, '')
@@ -1437,7 +1433,6 @@ async function procesarListadoCalles(lineas, event) {
     
     const noReconocidasFinal = entradas.filter(e => !e.latlng).map(e => e.nombre);
     
-    // AVISO VISIBLE DE CALLES FALLIDAS
     if (noReconocidasFinal.length > 0) { 
         console.log("[Debug] Calles descartadas:", noReconocidasFinal);
         mostrarToast(`⚠️ ${noReconocidasFinal.length} calles no se han podido localizar. Revisa el listado.`);
@@ -1533,3 +1528,90 @@ function mostrarModalEdicionOCR(lineasIniciales, opciones) {
 }
 
 function cerrarModalExport() { document.getElementById('modal-export').classList.remove('active'); }
+
+// ============================================
+//   NUEVAS FUNCIONALIDADES DE INTERFAZ (ARRASTRE Y ZOOM)
+// ============================================
+
+// 1. Añadir control de zoom (+ / -)
+document.addEventListener("DOMContentLoaded", function () {
+    if (typeof map !== 'undefined') {
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+    }
+});
+
+// 2. Sistema de arrastre sencillo y robusto para los paneles flotantes
+(function() {
+    const draggables = document.querySelectorAll('#top-bar, #left-tools, #fab-container');
+    let activeElement = null;
+    let startX = 0, startY = 0;
+    let origLeft = 0, origTop = 0;
+
+    const onStart = function(e) {
+        // Si tocamos un botón o input, no arrastramos
+        if (e.target.closest('input, button, select, .search-wrapper, .btn, .top-btn, .fab-option, .fab-input, .fab-select, .fab-label')) {
+            return;
+        }
+        e.preventDefault();
+        e.stopPropagation(); // Evita que el mapa reciba el evento
+
+        const touch = e.touches ? e.touches[0] : e;
+        const rect = this.getBoundingClientRect();
+        
+        activeElement = this;
+        startX = touch.clientX;
+        startY = touch.clientY;
+        origLeft = rect.left;
+        origTop = rect.top;
+
+        this.style.cursor = 'grabbing';
+        this.style.touchAction = 'none';
+        
+        // Eliminar transform si es la barra superior (estaba centrada)
+        if (this.id === 'top-bar') {
+            this.style.transform = 'none';
+        }
+    };
+
+    const onMove = function(e) {
+        if (!activeElement) return;
+        e.preventDefault();
+        e.stopPropagation();
+
+        const touch = e.touches ? e.touches[0] : e;
+        const deltaX = touch.clientX - startX;
+        const deltaY = touch.clientY - startY;
+
+        let newX = origLeft + deltaX;
+        let newY = origTop + deltaY;
+
+        // Limitar a los bordes de la ventana
+        const maxX = window.innerWidth - activeElement.offsetWidth;
+        const maxY = window.innerHeight - activeElement.offsetHeight;
+        newX = Math.max(0, Math.min(maxX, newX));
+        newY = Math.max(0, Math.min(maxY, newY));
+
+        activeElement.style.left = newX + 'px';
+        activeElement.style.top = newY + 'px';
+        activeElement.style.right = 'auto';
+        activeElement.style.bottom = 'auto';
+    };
+
+    const onEnd = function(e) {
+        if (!activeElement) return;
+        activeElement.style.cursor = 'grab';
+        activeElement.style.touchAction = 'auto';
+        activeElement = null;
+    };
+
+    // Asignar eventos
+    draggables.forEach(el => {
+        el.addEventListener('mousedown', onStart);
+        el.addEventListener('touchstart', onStart, { passive: false });
+    });
+
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('touchmove', onMove, { passive: false });
+    document.addEventListener('mouseup', onEnd);
+    document.addEventListener('touchend', onEnd);
+})();
