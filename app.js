@@ -16,7 +16,6 @@ window.procesarArchivoTextoRuta = async function(event) {
             mostrarToast("El archivo está vacío");
             return;
         }
-        console.log(`[Debug] Se han leído ${lineas.length} líneas.`);
         await procesarListadoCalles(lineas, event);
     };
     lector.readAsText(archivo);
@@ -29,41 +28,182 @@ function limpiarLineaOCR(linea) {
     return linea.replace(CARACTERES_CALLE_REGEX, '').replace(/\s{2,}/g, ' ').trim();
 }
 
-function preprocesarImagenParaOCR(archivo) {
+// ---- Funciones de carga de imagen y recorte ----
+function cargarImagenDesdeArchivo(archivo) {
     return new Promise((resolve, reject) => {
         const img = new Image();
-        img.onload = () => {
-            const anchoObjetivo = 1600;
-            const factor = img.width < anchoObjetivo ? anchoObjetivo / img.width : 1;
-            const ancho = Math.round(img.width * factor);
-            const alto = Math.round(img.height * factor);
-
-            const canvas = document.createElement('canvas');
-            canvas.width = ancho;
-            canvas.height = alto;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, ancho, alto);
-
-            const imageData = ctx.getImageData(0, 0, ancho, alto);
-            const datos = imageData.data;
-            const contraste = 1.35;
-            for (let i = 0; i < datos.length; i += 4) {
-                const gris = datos[i] * 0.299 + datos[i + 1] * 0.587 + datos[i + 2] * 0.114;
-                let valor = (gris - 128) * contraste + 128;
-                valor = Math.max(0, Math.min(255, valor));
-                datos[i] = datos[i + 1] = datos[i + 2] = valor;
-            }
-            ctx.putImageData(imageData, 0, 0);
-
-            URL.revokeObjectURL(img.src);
-            resolve(canvas);
-        };
+        img.onload = () => resolve(img);
         img.onerror = () => reject(new Error("No se pudo leer la imagen"));
         img.src = URL.createObjectURL(archivo);
     });
 }
 
-// ---- Escanear Imagen (OCR) ----
+function mostrarModalRecorte(imagenOriginal) {
+    return new Promise((resolve) => {
+        const modal = document.getElementById('modal-crop');
+        const canvas = document.getElementById('crop-canvas');
+        const ctx = canvas.getContext('2d');
+        const rotacionInput = document.getElementById('crop-rotacion');
+        const rotacionValor = document.getElementById('crop-rotacion-valor');
+        const btnConfirmar = document.getElementById('btn-crop-confirmar');
+        const btnCancelar = document.getElementById('btn-crop-cancelar');
+
+        modal.classList.add('active');
+
+        const maxAncho = Math.min(window.innerWidth * 0.85, 700);
+        const maxAlto = Math.min(window.innerHeight * 0.5, 700);
+        const factor = Math.min(maxAncho / imagenOriginal.width, maxAlto / imagenOriginal.height, 1);
+        const anchoDisplay = Math.round(imagenOriginal.width * factor);
+        const altoDisplay = Math.round(imagenOriginal.height * factor);
+
+        canvas.width = anchoDisplay;
+        canvas.height = altoDisplay;
+
+        let rotacionGrados = 0;
+        let rect = { x: anchoDisplay * 0.05, y: altoDisplay * 0.05, w: anchoDisplay * 0.9, h: altoDisplay * 0.9 };
+
+        function dibujar() {
+            ctx.save();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.translate(anchoDisplay / 2, altoDisplay / 2);
+            ctx.rotate(rotacionGrados * Math.PI / 180);
+            ctx.drawImage(imagenOriginal, -anchoDisplay / 2, -altoDisplay / 2, anchoDisplay, altoDisplay);
+            ctx.restore();
+
+            ctx.fillStyle = 'rgba(0,0,0,0.55)';
+            ctx.fillRect(0, 0, canvas.width, rect.y);
+            ctx.fillRect(0, rect.y + rect.h, canvas.width, canvas.height - rect.y - rect.h);
+            ctx.fillRect(0, rect.y, rect.x, rect.h);
+            ctx.fillRect(rect.x + rect.w, rect.y, canvas.width - rect.x - rect.w, rect.h);
+
+            ctx.strokeStyle = '#00b8d4';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
+
+            ctx.fillStyle = '#00b8d4';
+            [[rect.x, rect.y], [rect.x + rect.w, rect.y], [rect.x, rect.y + rect.h], [rect.x + rect.w, rect.y + rect.h]].forEach(([cx, cy]) => {
+                ctx.beginPath();
+                ctx.arc(cx, cy, 11, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+        dibujar();
+
+        rotacionInput.value = 0;
+        rotacionValor.textContent = '0°';
+        const onRotacion = () => {
+            rotacionGrados = parseInt(rotacionInput.value, 10);
+            rotacionValor.textContent = rotacionGrados + '°';
+            dibujar();
+        };
+        rotacionInput.addEventListener('input', onRotacion);
+
+        let esquinaActiva = null;
+        const obtenerPos = (ev) => {
+            const r = canvas.getBoundingClientRect();
+            const punto = ev.touches ? ev.touches[0] : ev;
+            return { x: (punto.clientX - r.left) * (canvas.width / r.width), y: (punto.clientY - r.top) * (canvas.height / r.height) };
+        };
+        const distancia = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+
+        const onDown = (ev) => {
+            const p = obtenerPos(ev);
+            const esquinas = {
+                tl: { x: rect.x, y: rect.y }, tr: { x: rect.x + rect.w, y: rect.y },
+                bl: { x: rect.x, y: rect.y + rect.h }, br: { x: rect.x + rect.w, y: rect.y + rect.h }
+            };
+            let masCercana = null, menorDist = 30;
+            Object.keys(esquinas).forEach(k => {
+                const d = distancia(p, esquinas[k]);
+                if (d < menorDist) { menorDist = d; masCercana = k; }
+            });
+            esquinaActiva = masCercana;
+        };
+        const onMove = (ev) => {
+            if (!esquinaActiva) return;
+            if (ev.cancelable) ev.preventDefault();
+            const p = obtenerPos(ev);
+            if (esquinaActiva === 'tl') { rect.w += rect.x - p.x; rect.h += rect.y - p.y; rect.x = p.x; rect.y = p.y; }
+            if (esquinaActiva === 'tr') { rect.w = p.x - rect.x; rect.h += rect.y - p.y; rect.y = p.y; }
+            if (esquinaActiva === 'bl') { rect.w += rect.x - p.x; rect.x = p.x; rect.h = p.y - rect.y; }
+            if (esquinaActiva === 'br') { rect.w = p.x - rect.x; rect.h = p.y - rect.y; }
+            dibujar();
+        };
+        const onUp = () => { esquinaActiva = null; };
+
+        canvas.addEventListener('mousedown', onDown);
+        canvas.addEventListener('mousemove', onMove);
+        window.addEventListener('mouseup', onUp);
+        canvas.addEventListener('touchstart', onDown, { passive: true });
+        canvas.addEventListener('touchmove', onMove, { passive: false });
+        canvas.addEventListener('touchend', onUp);
+
+        const limpiar = () => {
+            modal.classList.remove('active');
+            rotacionInput.removeEventListener('input', onRotacion);
+            canvas.removeEventListener('mousedown', onDown);
+            canvas.removeEventListener('mousemove', onMove);
+            window.removeEventListener('mouseup', onUp);
+            canvas.removeEventListener('touchstart', onDown);
+            canvas.removeEventListener('touchmove', onMove);
+            canvas.removeEventListener('touchend', onUp);
+            btnConfirmar.removeEventListener('click', onConfirmar);
+            btnCancelar.removeEventListener('click', onCancelar);
+        };
+
+        const onConfirmar = () => {
+            const escalaReal = imagenOriginal.width / anchoDisplay;
+
+            const canvasRotado = document.createElement('canvas');
+            canvasRotado.width = imagenOriginal.width;
+            canvasRotado.height = imagenOriginal.height;
+            const ctxRot = canvasRotado.getContext('2d');
+            ctxRot.translate(canvasRotado.width / 2, canvasRotado.height / 2);
+            ctxRot.rotate(rotacionGrados * Math.PI / 180);
+            ctxRot.drawImage(imagenOriginal, -canvasRotado.width / 2, -canvasRotado.height / 2);
+
+            const canvasFinal = document.createElement('canvas');
+            canvasFinal.width = Math.max(1, Math.round(rect.w * escalaReal));
+            canvasFinal.height = Math.max(1, Math.round(rect.h * escalaReal));
+            const ctxFinal = canvasFinal.getContext('2d');
+            ctxFinal.drawImage(canvasRotado, rect.x * escalaReal, rect.y * escalaReal, rect.w * escalaReal, rect.h * escalaReal, 0, 0, canvasFinal.width, canvasFinal.height);
+
+            limpiar();
+            resolve(canvasFinal);
+        };
+        const onCancelar = () => { limpiar(); resolve(null); };
+
+        btnConfirmar.addEventListener('click', onConfirmar);
+        btnCancelar.addEventListener('click', onCancelar);
+    });
+}
+
+function aplicarGrisYContraste(canvasOrigen) {
+    const anchoObjetivo = 1600;
+    const factor = canvasOrigen.width < anchoObjetivo ? anchoObjetivo / canvasOrigen.width : 1;
+    const ancho = Math.round(canvasOrigen.width * factor);
+    const alto = Math.round(canvasOrigen.height * factor);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = ancho;
+    canvas.height = alto;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(canvasOrigen, 0, 0, ancho, alto);
+
+    const imageData = ctx.getImageData(0, 0, ancho, alto);
+    const datos = imageData.data;
+    const contraste = 1.35;
+    for (let i = 0; i < datos.length; i += 4) {
+        const gris = datos[i] * 0.299 + datos[i + 1] * 0.587 + datos[i + 2] * 0.114;
+        let valor = (gris - 128) * contraste + 128;
+        valor = Math.max(0, Math.min(255, valor));
+        datos[i] = datos[i + 1] = datos[i + 2] = valor;
+    }
+    ctx.putImageData(imageData, 0, 0);
+    return canvas;
+}
+
+// ---- Escanear Imagen (OCR) con recorte ----
 window.procesarImagenCalles = async function(event) {
     const archivos = Array.from(event.target.files || []);
     if (archivos.length === 0) return;
@@ -89,8 +229,18 @@ window.procesarImagenCalles = async function(event) {
 
         let todasLasLineas = [];
         for (const archivo of archivos) {
+            let imagenOriginal;
+            try {
+                imagenOriginal = await cargarImagenDesdeArchivo(archivo);
+            } catch (e) {
+                continue;
+            }
+
+            const canvasRecortado = await mostrarModalRecorte(imagenOriginal);
+            if (!canvasRecortado) continue;
+
             mostrarToast(`Escaneando imagen...`);
-            const imagenPreparada = await preprocesarImagenParaOCR(archivo).catch(() => archivo);
+            const imagenPreparada = aplicarGrisYContraste(canvasRecortado);
             const { data: { text } } = await worker.recognize(imagenPreparada);
             const lineasImagen = text.split('\n')
                 .map(l => limpiarLineaOCR(l))
@@ -103,7 +253,6 @@ window.procesarImagenCalles = async function(event) {
             event.target.value = '';
             return;
         }
-        console.log(`[Debug] OCR detectó ${todasLasLineas.length} líneas.`);
         const lineasEditadas = await mostrarModalEdicionOCR(todasLasLineas);
         if (!lineasEditadas || lineasEditadas.length === 0) {
             event.target.value = '';
@@ -262,6 +411,7 @@ function vincularLineaEntreMarcadores(marcadorAnterior, marcadorNuevo, linea) {
     linea.marcadoresVinculados = [marcadorAnterior, marcadorNuevo];
 }
 
+// Borra solo el marcador (número), sin eliminar las líneas asociadas.
 function eliminarMarcadorYLineas(marcador, mensaje) {
     const entradaMarcador = historialAcciones.find(item => item.tipo === 'marcador' && item.elemento === marcador);
     const restaurar = [{
@@ -272,20 +422,13 @@ function eliminarMarcadorYLineas(marcador, mensaje) {
     }];
     map.removeLayer(marcador);
     historialAcciones = historialAcciones.filter(item => item.elemento !== marcador);
-    if (marcador.lineasAsociadas && marcador.lineasAsociadas.length) {
+    if (marcador.lineasAsociadas) {
         marcador.lineasAsociadas.forEach(linea => {
-            map.removeLayer(linea);
-            quitarCapasExtra(linea);
-            historialAcciones = historialAcciones.filter(item => item.elemento !== linea);
             if (linea.marcadoresVinculados) {
-                linea.marcadoresVinculados.forEach(m => {
-                    if (m !== marcador && m.lineasAsociadas) {
-                        m.lineasAsociadas = m.lineasAsociadas.filter(l => l !== linea);
-                    }
-                });
+                linea.marcadoresVinculados = linea.marcadoresVinculados.filter(m => m !== marcador);
             }
-            restaurar.push({ tipo: 'linea', elemento: linea });
         });
+        marcador.lineasAsociadas = [];
     }
     mostrarToast(mensaje || "Punto borrado");
     historialAcciones.push({ tipo: 'borrado', restaurar });
@@ -363,6 +506,10 @@ function anadirZonaDeToque(lineaVisible, coordenadas, mapaInstancia, mensajeBorr
     lineaVisible._flechas = crearFlechasDireccion(coordenadas, lineaVisible.options.color);
     const manejarClickBorrado = function(ev) {
         if (modoActual === 'borrar' && !borradoPreciso) {
+            const target = ev.originalEvent?.target;
+            if (target && target.closest && target.closest('.leaflet-marker-icon')) {
+                return;
+            }
             L.DomEvent.stopPropagation(ev);
             if (ev.originalEvent) {
                 ev.originalEvent.preventDefault && ev.originalEvent.preventDefault();
@@ -571,31 +718,31 @@ document.addEventListener("DOMContentLoaded", function () {
         if (grosorInput) grosorInput.addEventListener('input', manejarCambioEstiloDinamico);
         if (opacidadInput) opacidadInput.addEventListener('input', manejarCambioEstiloDinamico);
 
-        // ---- Búsqueda en la barra superior (ACTUALIZADA) ----
+        // ---- Búsqueda en la barra superior (mejorada) ----
         function realizarBusqueda(query) {
             if (!query) { mostrarToast("Escribe el nombre de una calle"); return; }
-            mostrarToast("Buscando en un radio de 5 km...");
+            mostrarToast("Buscando en un radio de 8 km...");
 
-            // 1. Obtener el centro actual del mapa
             const center = map.getCenter();
             const lat = center.lat;
             const lng = center.lng;
 
-            // 2. Calcular una caja delimitadora de 5 km alrededor del centro (viewbox de Nominatim: left,bottom,right,top)
             const kmPerDegLat = 111.32;
             const kmPerDegLon = 111.32 * Math.cos(lat * Math.PI / 180);
-            const deltaLat = 5 / kmPerDegLat;
-            const deltaLon = 5 / kmPerDegLon;
+            const deltaLat = 8 / kmPerDegLat;
+            const deltaLon = 8 / kmPerDegLon;
 
             const latMin = lat - deltaLat;
             const latMax = lat + deltaLat;
             const lngMin = lng - deltaLon;
             const lngMax = lng + deltaLon;
 
-            // 3. Petición a Nominatim limitada a Córdoba y a la caja delimitadora
-            const url = `https://nominatim.openstreetmap.org/search?format=json&street=${encodeURIComponent(query)}&city=Córdoba&country=España&countrycodes=es&viewbox=${lngMin},${latMin},${lngMax},${latMax}&bounded=1&limit=1`;
+            // Primero intentamos con búsqueda libre (más tolerante)
+            const urlLibre = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', Córdoba, España')}&countrycodes=es&viewbox=${lngMin},${latMin},${lngMax},${latMax}&bounded=1&limit=1`;
+            // Si falla, probamos con estructurada
+            const urlEstructurada = `https://nominatim.openstreetmap.org/search?format=json&street=${encodeURIComponent(query)}&city=Córdoba&country=España&countrycodes=es&viewbox=${lngMin},${latMin},${lngMax},${latMax}&bounded=1&limit=1`;
 
-            fetch(url)
+            fetch(urlLibre)
                 .then(res => res.json())
                 .then(data => {
                     if (data && data.length > 0) {
@@ -606,10 +753,42 @@ document.addEventListener("DOMContentLoaded", function () {
                         window._marcadorBusqueda = L.marker([latFound, lonFound], { icon: L.divIcon({ className: 'number-icon', html: '📍', iconSize: [28,28], iconAnchor:[14,14] }) }).addTo(map);
                         mostrarToast(`Encontrado: ${data[0].display_name}`);
                     } else {
-                        mostrarToast("No se encontró la calle en un radio de 5 km del centro del mapa");
+                        // Si no, intentamos con estructurada
+                        fetch(urlEstructurada)
+                            .then(res2 => res2.json())
+                            .then(data2 => {
+                                if (data2 && data2.length > 0) {
+                                    const latFound = parseFloat(data2[0].lat);
+                                    const lonFound = parseFloat(data2[0].lon);
+                                    map.setView([latFound, lonFound], 17);
+                                    if (window._marcadorBusqueda) map.removeLayer(window._marcadorBusqueda);
+                                    window._marcadorBusqueda = L.marker([latFound, lonFound], { icon: L.divIcon({ className: 'number-icon', html: '📍', iconSize: [28,28], iconAnchor:[14,14] }) }).addTo(map);
+                                    mostrarToast(`Encontrado: ${data2[0].display_name}`);
+                                } else {
+                                    mostrarToast(`No se encontró "${query}" en un radio de 8 km. ¿Has escrito bien el nombre?`);
+                                }
+                            })
+                            .catch(() => mostrarToast("Error en la búsqueda estructurada"));
                     }
                 })
-                .catch(() => mostrarToast("Error en la búsqueda"));
+                .catch(() => {
+                    // Si falla la libre, probamos estructurada directamente
+                    fetch(urlEstructurada)
+                        .then(res2 => res2.json())
+                        .then(data2 => {
+                            if (data2 && data2.length > 0) {
+                                const latFound = parseFloat(data2[0].lat);
+                                const lonFound = parseFloat(data2[0].lon);
+                                map.setView([latFound, lonFound], 17);
+                                if (window._marcadorBusqueda) map.removeLayer(window._marcadorBusqueda);
+                                window._marcadorBusqueda = L.marker([latFound, lonFound], { icon: L.divIcon({ className: 'number-icon', html: '📍', iconSize: [28,28], iconAnchor:[14,14] }) }).addTo(map);
+                                mostrarToast(`Encontrado: ${data2[0].display_name}`);
+                            } else {
+                                mostrarToast(`No se encontró "${query}" en un radio de 8 km. Revisa la ortografía.`);
+                            }
+                        })
+                        .catch(() => mostrarToast("Error de conexión con Nominatim"));
+                });
         }
 
         document.getElementById('search-input').addEventListener('keydown', function(e) {
@@ -868,7 +1047,7 @@ async function gestionarPulsacion(e) {
     if (modoActual === 'ruta' || modoActual === 'aislado') {
         const num = obtenerSiguienteNumeroDisponible();
         const icon = L.divIcon({ className: 'number-icon', html: `<span>${num}</span>`, iconSize: [28, 28], iconAnchor: [14, 14] });
-        const marker = L.marker(latlng, { icon: icon, draggable: true, interactive: true }).addTo(map);
+        const marker = L.marker(latlng, { icon: icon, draggable: true, interactive: true, zIndexOffset: 1000 }).addTo(map);
         marker.on('click', function(ev) {
             if (modoActual === 'borrar' && !borradoPreciso) { L.DomEvent.stopPropagation(ev); eliminarMarcadorYLineas(this, "Punto borrado"); }
         });
@@ -1247,7 +1426,7 @@ function procesarYAnadirGeoJSON(geojson, mapInstance) {
             if (f.properties.conecta && f.properties.conecta.length === 2) lineasConConecta.push({ linea: l, conecta: f.properties.conecta });
         } else if (f.properties.tipo === 'marcador') {
             const latlng = [f.geometry.coordinates[1], f.geometry.coordinates[0]];
-            const m = L.marker(latlng, { icon: L.divIcon({ className: 'number-icon', html: `<span>${f.properties.numero}</span>`, iconSize: [28,28], iconAnchor:[14,14] }), interactive: true }).addTo(mapInstance);
+            const m = L.marker(latlng, { icon: L.divIcon({ className: 'number-icon', html: `<span>${f.properties.numero}</span>`, iconSize: [28,28], iconAnchor:[14,14] }), interactive: true, zIndexOffset: 1000 }).addTo(mapInstance);
             m.on('click', ev => { if (modoActual === 'borrar' && !borradoPreciso) { L.DomEvent.stopPropagation(ev); eliminarMarcadorYLineas(m, "Punto borrado"); } });
             historialAcciones.push({ tipo: 'marcador', elemento: m, numero: f.properties.numero, submodo: f.properties.submodo || 'ruta' });
             marcadoresPorNumero[f.properties.numero] = m;
@@ -1278,11 +1457,11 @@ function enfocarMapaEnGrupo(grupoCapas, mapInstance) {
 }
 
 // ============================================
-//   LÓGICA DE GEOCÓDIFICACIÓN Y TRAZADO (CON TIMEOUT A 5s Y AVISOS DE PROGRESO)
+//   LÓGICA DE GEOCÓDIFICACIÓN Y TRAZADO (MEJORADA)
 // ============================================
 const CORDOBA_CENTRO = L.latLng(37.8882, -4.7794);
-const RADIO_MAXIMO_METROS = 10000; // 10 km
-const RADIO_PRIMERA_CALLE_METROS = 10000;
+const RADIO_MAXIMO_METROS = 8000;  // 8 km (más margen)
+const RADIO_PRIMERA_CALLE_METROS = 8000;
 
 async function geocodificarListado(nombres, centroInicial) {
     const resultados = nombres.map(nombre => ({ nombre, latlng: null }));
@@ -1309,13 +1488,17 @@ async function geocodificarListado(nombres, centroInicial) {
             try {
                 latlng = await Promise.race([
                     geocodificarUnaCalleNominatim(nombre, centroReferencia, radioAplicable),
-                    new Promise(resolve => setTimeout(resolve, 6000))
+                    new Promise(resolve => setTimeout(resolve, 8000))
                 ]);
                 if (latlng && latlng.distanceTo(centroReferencia) > radioAplicable) {
                     latlng = null;
                 }
+                if (!latlng) {
+                    mostrarToast(`No se encontró "${nombre}" en 8 km. ¿Está bien escrito?`);
+                }
             } catch (e) {
                 latlng = null;
+                mostrarToast(`Error al buscar "${nombre}"`);
             }
             cacheLocal[claveCache] = latlng;
         }
@@ -1329,20 +1512,27 @@ async function geocodificarListado(nombres, centroInicial) {
     return { resultados, centroRuta };
 }
 
-async function geocodificarUnaCalleNominatim(nombre, centroReferencia, radioMetros, intentos = 2) {
+async function geocodificarUnaCalleNominatim(nombre, centroReferencia, radioMetros, intentos = 3) {
     const nombreLimpio = limpiarLineaOCR(nombre);
     const variantesNombre = generarVariantesNombreCalle(nombreLimpio);
 
+    // Añadir el nombre original sin limpiar (por si acaso)
+    if (!variantesNombre.includes(nombre)) {
+        variantesNombre.push(nombre);
+    }
+
     for (const variante of variantesNombre) {
-        const url1 = `https://nominatim.openstreetmap.org/search?format=json&street=${encodeURIComponent(variante)}&city=Córdoba&country=España&countrycodes=es&limit=5`;
-        const punto1 = await intentarGeocodificar(url1, centroReferencia, radioMetros, intentos);
-        if (punto1) return punto1;
+        // Primero probamos búsqueda libre (más tolerante)
+        const urlLibre = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(variante + ', Córdoba, España')}&countrycodes=es&limit=5`;
+        const puntoLibre = await intentarGeocodificar(urlLibre, centroReferencia, radioMetros, intentos);
+        if (puntoLibre) return puntoLibre;
 
-        const url2 = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(variante + ', Córdoba, España')}&countrycodes=es&limit=5`;
-        const punto2 = await intentarGeocodificar(url2, centroReferencia, radioMetros, intentos);
-        if (punto2) return punto2;
+        // Si falla, probamos estructurada
+        const urlEstructurada = `https://nominatim.openstreetmap.org/search?format=json&street=${encodeURIComponent(variante)}&city=Córdoba&country=España&countrycodes=es&limit=5`;
+        const puntoEstructurada = await intentarGeocodificar(urlEstructurada, centroReferencia, radioMetros, intentos);
+        if (puntoEstructurada) return puntoEstructurada;
 
-        await new Promise(r => setTimeout(r, 300));
+        await new Promise(r => setTimeout(r, 200));
     }
     return null;
 }
@@ -1383,7 +1573,11 @@ function generarVariantesNombreCalle(nombreLimpio) {
         .replace(/^(trav\.?|travesía|travesia)\s*/i, '')
         .trim();
 
-    const variantes = new Set([nombreLimpio, sinPrefijo, `Calle ${sinPrefijo}`]);
+    const variantes = new Set();
+    if (nombreLimpio) variantes.add(nombreLimpio);
+    if (sinPrefijo) variantes.add(sinPrefijo);
+    if (sinPrefijo) variantes.add(`Calle ${sinPrefijo}`);
+    else if (nombreLimpio) variantes.add(`Calle ${nombreLimpio}`);
 
     const expansiones = [
         [/^avda\.?\s*/i, 'Avenida '],
@@ -1395,10 +1589,15 @@ function generarVariantesNombreCalle(nombreLimpio) {
         [/^c\/\s*/i, 'Calle ']
     ];
     expansiones.forEach(([patron, reemplazo]) => {
-        if (patron.test(nombreLimpio)) variantes.add(nombreLimpio.replace(patron, reemplazo));
+        if (patron.test(nombreLimpio)) {
+            variantes.add(nombreLimpio.replace(patron, reemplazo));
+        }
+        if (sinPrefijo && patron.test(sinPrefijo)) {
+            variantes.add(sinPrefijo.replace(patron, reemplazo));
+        }
     });
 
-    return Array.from(variantes).filter(v => v && v.length > 1);
+    return Array.from(variantes).filter(v => v && v.length > 0);
 }
 
 async function procesarListadoCalles(lineas, event) {
@@ -1412,7 +1611,7 @@ async function procesarListadoCalles(lineas, event) {
         const nombresFallidos = indicesFallidos.map(i => entradas[i].nombre);
         const corregidas = await mostrarModalEdicionOCR(nombresFallidos, { 
             titulo: 'Calles no reconocidas', 
-            mensaje: `Estas calles no se han podido localizar. Corrígelas o bórralas.`, 
+            mensaje: `Estas calles no se han podido localizar en 8 km. Corrígelas o bórralas.`, 
             textoBoton: 'Reintentar' 
         });
         if (corregidas && corregidas.length > 0) {
@@ -1435,11 +1634,11 @@ async function procesarListadoCalles(lineas, event) {
     
     if (noReconocidasFinal.length > 0) { 
         console.log("[Debug] Calles descartadas:", noReconocidasFinal);
-        mostrarToast(`⚠️ ${noReconocidasFinal.length} calles no se han podido localizar. Revisa el listado.`);
+        mostrarToast(`⚠️ ${noReconocidasFinal.length} calles no localizadas. Revisa el listado.`);
     }
     
     if (puntosCoordenadas.length === 0) { 
-        mostrarToast("No se encontró ninguna calle en Córdoba."); 
+        mostrarToast("No se encontró ninguna calle en Córdoba (radio 8 km)."); 
         if (event) event.target.value = ''; 
         return; 
     }
@@ -1457,7 +1656,10 @@ async function procesarListadoCalles(lineas, event) {
         const pt = puntosCoordenadas[i];
         const num = obtenerSiguienteNumeroDisponible();
         const icon = L.divIcon({ className: 'number-icon', html: `<span>${num}</span>`, iconSize: [28, 28], iconAnchor: [14, 14] });
-        const marker = L.marker(pt.latlng, { icon: icon, draggable: true, interactive: true }).addTo(map);
+        const marker = L.marker(pt.latlng, { icon: icon, draggable: true, interactive: true, zIndexOffset: 1000 }).addTo(map);
+        marker.on('click', function(ev) {
+            if (modoActual === 'borrar' && !borradoPreciso) { L.DomEvent.stopPropagation(ev); eliminarMarcadorYLineas(this, "Punto borrado"); }
+        });
         grupoCapas.addLayer(marker);
         if (ultimoPunto) {
             const coordsRuta = await obtenerRutaPorCallesOSRM(ultimoPunto, pt.latlng);
@@ -1533,14 +1735,13 @@ function cerrarModalExport() { document.getElementById('modal-export').classList
 //   NUEVAS FUNCIONALIDADES DE INTERFAZ (ARRASTRE Y ZOOM)
 // ============================================
 
-// 1. Añadir control de zoom (+ / -)
 document.addEventListener("DOMContentLoaded", function () {
     if (typeof map !== 'undefined') {
         L.control.zoom({ position: 'bottomright' }).addTo(map);
     }
 });
 
-// 2. Sistema de arrastre sencillo y robusto para los paneles flotantes
+// Sistema de arrastre para paneles flotantes
 (function() {
     const draggables = document.querySelectorAll('#top-bar, #left-tools, #fab-container');
     let activeElement = null;
@@ -1548,12 +1749,11 @@ document.addEventListener("DOMContentLoaded", function () {
     let origLeft = 0, origTop = 0;
 
     const onStart = function(e) {
-        // Si tocamos un botón o input, no arrastramos
         if (e.target.closest('input, button, select, .search-wrapper, .btn, .top-btn, .fab-option, .fab-input, .fab-select, .fab-label')) {
             return;
         }
         e.preventDefault();
-        e.stopPropagation(); // Evita que el mapa reciba el evento
+        e.stopPropagation();
 
         const touch = e.touches ? e.touches[0] : e;
         const rect = this.getBoundingClientRect();
@@ -1567,7 +1767,6 @@ document.addEventListener("DOMContentLoaded", function () {
         this.style.cursor = 'grabbing';
         this.style.touchAction = 'none';
         
-        // Eliminar transform si es la barra superior (estaba centrada)
         if (this.id === 'top-bar') {
             this.style.transform = 'none';
         }
@@ -1585,7 +1784,6 @@ document.addEventListener("DOMContentLoaded", function () {
         let newX = origLeft + deltaX;
         let newY = origTop + deltaY;
 
-        // Limitar a los bordes de la ventana
         const maxX = window.innerWidth - activeElement.offsetWidth;
         const maxY = window.innerHeight - activeElement.offsetHeight;
         newX = Math.max(0, Math.min(maxX, newX));
@@ -1604,7 +1802,6 @@ document.addEventListener("DOMContentLoaded", function () {
         activeElement = null;
     };
 
-    // Asignar eventos
     draggables.forEach(el => {
         el.addEventListener('mousedown', onStart);
         el.addEventListener('touchstart', onStart, { passive: false });

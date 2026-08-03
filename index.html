@@ -14,7 +14,7 @@
         
         /* Control de zoom en la esquina inferior derecha */
         .leaflet-bottom.leaflet-right .leaflet-control-zoom {
-            margin-bottom: 70px !important; /* Deja espacio para el FAB */
+            margin-bottom: 70px !important;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
@@ -43,7 +43,7 @@
             max-width: 92%;
             width: auto;
             box-sizing: border-box;
-            touch-action: none; /* Crucial para el arrastre táctil */
+            touch-action: none;
             cursor: grab;
             user-select: none;
         }
@@ -259,6 +259,26 @@
             <div class="modal-btn-group">
                 <button id="btn-ocr-cancelar" class="btn btn-cancel">Cancelar</button>
                 <button id="btn-ocr-continuar" class="btn btn-primary">Trazar ruta</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE RECORTE (AÑADIDO) -->
+    <div id="modal-crop" class="modal-overlay">
+        <div class="modal-content" style="width:auto; max-width:95vw;">
+            <h3>Recorta y endereza la zona de texto</h3>
+            <p style="font-size:12px; color:#666; margin:0;">Arrastra las esquinas azules para ajustar el recuadro justo a la tabla (fuera del recuadro no se lee), y usa el deslizador si la foto está torcida.</p>
+            <div style="max-width:90vw; max-height:55vh; overflow:auto; touch-action:none; align-self:center;">
+                <canvas id="crop-canvas" style="touch-action:none; display:block;"></canvas>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <label style="font-size:12px; white-space:nowrap;">Girar:</label>
+                <input type="range" id="crop-rotacion" min="-45" max="45" value="0" step="1" style="flex:1;">
+                <span id="crop-rotacion-valor" style="font-size:12px; width:36px; text-align:right;">0°</span>
+            </div>
+            <div class="modal-btn-group">
+                <button class="btn btn-cancel" id="btn-crop-cancelar">Saltar esta imagen</button>
+                <button class="btn btn-primary" id="btn-crop-confirmar">Usar este recorte</button>
             </div>
         </div>
     </div>
