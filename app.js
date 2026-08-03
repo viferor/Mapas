@@ -718,32 +718,19 @@ document.addEventListener("DOMContentLoaded", function () {
         if (grosorInput) grosorInput.addEventListener('input', manejarCambioEstiloDinamico);
         if (opacidadInput) opacidadInput.addEventListener('input', manejarCambioEstiloDinamico);
 
-        // ---- Búsqueda en la barra superior (mejorada) ----
+        // ---- Búsqueda en la barra superior (CORREGIDA) ----
         function realizarBusqueda(query) {
             if (!query) { mostrarToast("Escribe el nombre de una calle"); return; }
-            mostrarToast("Buscando en un radio de 8 km...");
+            mostrarToast("Buscando calle...");
 
-            const center = map.getCenter();
-            const lat = center.lat;
-            const lng = center.lng;
+            // Usamos la API estructurada de Nominatim (más fiable para calles de Córdoba)
+            const url = `https://nominatim.openstreetmap.org/search?format=json&street=${encodeURIComponent(query)}&city=Córdoba&country=España&limit=1`;
 
-            const kmPerDegLat = 111.32;
-            const kmPerDegLon = 111.32 * Math.cos(lat * Math.PI / 180);
-            const deltaLat = 8 / kmPerDegLat;
-            const deltaLon = 8 / kmPerDegLon;
-
-            const latMin = lat - deltaLat;
-            const latMax = lat + deltaLat;
-            const lngMin = lng - deltaLon;
-            const lngMax = lng + deltaLon;
-
-            // Primero intentamos con búsqueda libre (más tolerante)
-            const urlLibre = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', Córdoba, España')}&countrycodes=es&viewbox=${lngMin},${latMin},${lngMax},${latMax}&bounded=1&limit=1`;
-            // Si falla, probamos con estructurada
-            const urlEstructurada = `https://nominatim.openstreetmap.org/search?format=json&street=${encodeURIComponent(query)}&city=Córdoba&country=España&countrycodes=es&viewbox=${lngMin},${latMin},${lngMax},${latMax}&bounded=1&limit=1`;
-
-            fetch(urlLibre)
-                .then(res => res.json())
+            fetch(url)
+                .then(res => {
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return res.json();
+                })
                 .then(data => {
                     if (data && data.length > 0) {
                         const latFound = parseFloat(data[0].lat);
@@ -753,41 +740,12 @@ document.addEventListener("DOMContentLoaded", function () {
                         window._marcadorBusqueda = L.marker([latFound, lonFound], { icon: L.divIcon({ className: 'number-icon', html: '📍', iconSize: [28,28], iconAnchor:[14,14] }) }).addTo(map);
                         mostrarToast(`Encontrado: ${data[0].display_name}`);
                     } else {
-                        // Si no, intentamos con estructurada
-                        fetch(urlEstructurada)
-                            .then(res2 => res2.json())
-                            .then(data2 => {
-                                if (data2 && data2.length > 0) {
-                                    const latFound = parseFloat(data2[0].lat);
-                                    const lonFound = parseFloat(data2[0].lon);
-                                    map.setView([latFound, lonFound], 17);
-                                    if (window._marcadorBusqueda) map.removeLayer(window._marcadorBusqueda);
-                                    window._marcadorBusqueda = L.marker([latFound, lonFound], { icon: L.divIcon({ className: 'number-icon', html: '📍', iconSize: [28,28], iconAnchor:[14,14] }) }).addTo(map);
-                                    mostrarToast(`Encontrado: ${data2[0].display_name}`);
-                                } else {
-                                    mostrarToast(`No se encontró "${query}" en un radio de 8 km. ¿Has escrito bien el nombre?`);
-                                }
-                            })
-                            .catch(() => mostrarToast("Error en la búsqueda estructurada"));
+                        mostrarToast(`No se encontró "${query}". Revisa la ortografía.`);
                     }
                 })
-                .catch(() => {
-                    // Si falla la libre, probamos estructurada directamente
-                    fetch(urlEstructurada)
-                        .then(res2 => res2.json())
-                        .then(data2 => {
-                            if (data2 && data2.length > 0) {
-                                const latFound = parseFloat(data2[0].lat);
-                                const lonFound = parseFloat(data2[0].lon);
-                                map.setView([latFound, lonFound], 17);
-                                if (window._marcadorBusqueda) map.removeLayer(window._marcadorBusqueda);
-                                window._marcadorBusqueda = L.marker([latFound, lonFound], { icon: L.divIcon({ className: 'number-icon', html: '📍', iconSize: [28,28], iconAnchor:[14,14] }) }).addTo(map);
-                                mostrarToast(`Encontrado: ${data2[0].display_name}`);
-                            } else {
-                                mostrarToast(`No se encontró "${query}" en un radio de 8 km. Revisa la ortografía.`);
-                            }
-                        })
-                        .catch(() => mostrarToast("Error de conexión con Nominatim"));
+                .catch((error) => {
+                    console.error("Error en Nominatim:", error);
+                    mostrarToast(`Error de conexión con Nominatim: ${error.message || 'Sin conexión'}`);
                 });
         }
 
@@ -895,8 +853,10 @@ async function buscarCalle() {
     if (!query) { mostrarToast("Escribe el nombre de una calle"); return; }
     mostrarToast("Buscando...");
     try {
-        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', Córdoba, España')}&countrycodes=es&limit=1`;
+        // CORREGIDO: Usamos street, city, country para evitar errores
+        const url = `https://nominatim.openstreetmap.org/search?format=json&street=${encodeURIComponent(query)}&city=Córdoba&country=España&limit=1`;
         const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         if (data && data.length > 0) {
             const lat = parseFloat(data[0].lat);
@@ -909,7 +869,10 @@ async function buscarCalle() {
         } else {
             mostrarToast("No se encontró la calle");
         }
-    } catch (e) { console.error(e); mostrarToast("Error en la búsqueda"); }
+    } catch (e) { 
+        console.error(e); 
+        mostrarToast(`Error de conexión con Nominatim: ${e.message || 'Sin conexión'}`);
+    }
 }
 
 // ---- Añadir comentario ----
@@ -1201,7 +1164,7 @@ function exportarGPX() {
     mostrarToast('GPX exportado');
 }
 
-// ---- EXPORTACIÓN PNG Y PDF ----
+// ---- EXPORTACIÓN PNG Y PDF (DEFINITIVAMENTE CORREGIDO EL DESPLAZAMIENTO) ----
 function cargarScriptExterno(src) {
     return new Promise((resolve, reject) => {
         const script = document.createElement('script');
@@ -1218,17 +1181,30 @@ async function capturarPNG() {
         if (typeof html2canvas === 'undefined') {
             await cargarScriptExterno('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js');
         }
+
+        // 1. Asegurar que el mapa está al 100% y dar tiempo a los tiles a cargar (2 segundos)
         map.invalidateSize();
-        map.fire('moveend');
-        await new Promise(r => setTimeout(r, 250));
-        await new Promise(r => requestAnimationFrame(r));
-        await new Promise(r => setTimeout(r, 300));
-        const canvas = await html2canvas(document.getElementById('map'), { useCORS: true, scale: 2, backgroundColor: null, logging: false });
+        await new Promise(r => setTimeout(r, 2000)); 
+
+        const mapElement = document.getElementById('map');
+        
+        // 2. Capturar usando el elemento del mapa completo
+        const canvas = await html2canvas(mapElement, {
+            useCORS: true,
+            allowTaint: false,
+            scale: 2,
+            backgroundColor: '#ffffff',
+            logging: false,
+            width: mapElement.clientWidth,
+            height: mapElement.clientHeight
+        });
+
+        // 3. Descargar el PNG
         const link = document.createElement('a');
-        link.download = 'mapa.png';
+        link.download = 'mapa_captura.png';
         link.href = canvas.toDataURL('image/png');
         link.click();
-        mostrarToast("✅ PNG descargado");
+        mostrarToast("✅ PNG descargado!");
     } catch (error) {
         mostrarToast("❌ Error al capturar PNG");
         console.error(error);
@@ -1244,20 +1220,35 @@ async function exportarPDF() {
         if (typeof window.jspdf === 'undefined') {
             await cargarScriptExterno('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
         }
+
+        // 1. Asegurar que el mapa está al 100% y dar tiempo a los tiles a cargar (2 segundos)
         map.invalidateSize();
-        map.fire('moveend');
-        await new Promise(r => setTimeout(r, 250));
-        await new Promise(r => requestAnimationFrame(r));
-        await new Promise(r => setTimeout(r, 300));
-        const canvas = await html2canvas(document.getElementById('map'), { useCORS: true, scale: 2, backgroundColor: null, logging: false });
+        await new Promise(r => setTimeout(r, 2000)); 
+
+        const mapElement = document.getElementById('map');
+
+        // 2. Capturar usando el elemento del mapa completo
+        const canvas = await html2canvas(mapElement, {
+            useCORS: true,
+            allowTaint: false,
+            scale: 2,
+            backgroundColor: '#ffffff',
+            logging: false,
+            width: mapElement.clientWidth,
+            height: mapElement.clientHeight
+        });
+
         const imgData = canvas.toDataURL('image/png');
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
+        
+        // 3. Crear PDF en formato apaisado
+        const doc = new jsPDF('landscape', 'mm', 'a4');
         const pdfWidth = doc.internal.pageSize.getWidth();
         const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        
         doc.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-        doc.save('mapa.pdf');
-        mostrarToast("✅ PDF descargado");
+        doc.save('mapa_exportado.pdf');
+        mostrarToast("✅ PDF descargado!");
     } catch (error) {
         mostrarToast("❌ Error al generar PDF");
         console.error(error);
