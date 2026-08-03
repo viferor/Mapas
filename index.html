@@ -82,24 +82,26 @@
         .btn-active-blue { background: #007bff !important; color: white !important; }
         .btn-active-red { background: #dc3545 !important; color: white !important; }
 
-        /* MENÚ FLOTANTE FAB */
-        #fab-container {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-            display: flex;
+        /* MENÚ DESPLEGABLE DEL BOTÓN "+" (AHORA EN LA BARRA SUPERIOR) */
+        #fab-menu {
+            display: none;
             flex-direction: column;
-            align-items: flex-end;
-            touch-action: none;
-            cursor: grab;
-            user-select: none;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+            padding: 12px;
+            min-width: 200px;
+            max-height: 70vh;
+            overflow-y: auto;
+            border: 1px solid rgba(255,255,255,0.6);
+            position: absolute;
+            top: 45px;
+            right: 0;
+            z-index: 2000;
         }
-        #fab-container:active { cursor: grabbing; }
-        #fab-main-btn { width: 50px; height: 50px; border-radius: 50%; background: #007bff; color: white; border: none; font-size: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.25); cursor: pointer; transition: transform 0.2s; display: flex; align-items: center; justify-content: center; }
-        #fab-main-btn:active { transform: scale(0.9); background: #0056b3; }
-        #fab-menu { display: none; flex-direction: column; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); padding: 12px; margin-bottom: 16px; min-width: 180px; max-height: 70vh; overflow-y: auto; border: 1px solid rgba(255,255,255,0.3); }
         #fab-menu.active { display: flex; }
+        
         .fab-option { display: flex; align-items: center; justify-content: space-between; padding: 8px 6px; border-radius: 8px; font-size: 13px; width: 100%; box-sizing: border-box; gap: 8px; background: transparent; border: none; cursor: pointer; touch-action: manipulation; }
         .fab-option:active { background: rgba(0,0,0,0.05); }
         .fab-label { display: flex; align-items: center; gap: 8px; }
@@ -135,8 +137,7 @@
             #top-bar .search-btn { width: 22px; height: 22px; font-size: 11px; }
             #left-tools { top: 70px; padding: 4px; gap: 2px; }
             .btn { width: 32px; height: 32px; font-size: 14px; }
-            #fab-main-btn { width: 44px; height: 44px; font-size: 20px; }
-            #fab-menu { min-width: 150px; padding: 8px; }
+            #fab-menu { min-width: 180px; top: 40px; }
             .fab-option { font-size: 12px; padding: 6px 4px; }
             .modal-content { width: 300px; }
         }
@@ -157,6 +158,37 @@
         <button class="top-btn" onclick="cortarTramoActual()" title="Cortar tramo">✂</button>
         <button class="top-btn" onclick="mostrarModalImportar()" title="Abrir / Cargar">📂</button>
         <button class="top-btn" id="btn-export" title="Exportar">⬇</button>
+        
+        <!-- AQUÍ ESTÁ EL CAMBIO: Botón + integrado en la barra -->
+        <div style="position: relative; display: flex; align-items: center;">
+            <button id="fab-main-btn" class="top-btn" style="background:#007bff; color:white; border-radius:50%; font-weight:bold; font-size:18px;">+</button>
+            <div id="fab-menu">
+                <!-- Contenido original del menú FAB (No se toca nada) -->
+                <div class="fab-option">
+                    <span class="fab-label">🎨 Color</span>
+                    <input type="color" id="color-trazo" value="#3388ff" class="fab-input">
+                </div>
+                <div class="fab-option">
+                    <span class="fab-label">📏 Grosor</span>
+                    <input type="range" id="grosor-trazo" min="1" max="10" value="4" style="width: 70px;">
+                </div>
+                <div class="fab-option">
+                    <span class="fab-label">🌀 Opacidad</span>
+                    <input type="range" id="opacidad-trazo" min="0.1" max="1" step="0.1" value="1" style="width: 70px;">
+                </div>
+                <div class="fab-option">
+                    <span class="fab-label">🎯 Aplicar a</span>
+                    <select id="ambito-estilo" class="fab-select">
+                        <option value="todos">Todos</option>
+                        <option value="ultimo">Último</option>
+                    </select>
+                </div>
+                <div style="border-top: 1px solid #eee; margin: 6px 0;"></div>
+                <button class="fab-option" onclick="abrirModalGithub('guardar')">💾 Guardar en GitHub</button>
+                <button class="fab-option" style="color:#dc3545; font-weight:bold; border-top:1px solid #eee; margin-top:4px;" onclick="confirmarBorrarTodo()">🗑️ Borrar Todo</button>
+                <button id="btn-save" style="display: none;"></button>
+            </div>
+        </div>
     </div>
 
     <!-- BARRA LATERAL IZQUIERDA -->
@@ -167,36 +199,6 @@
         <button class="btn" id="btn-continuo" onclick="setModo('continuo')" title="Mano Alzada">✍️</button>
         <button class="btn" id="btn-borrar" onclick="alternarBorrado()" title="Modo Borrar">🧹</button>
         <button class="btn" id="btn-comentario" onclick="setModo('comentario')" title="Añadir Comentario">💬</button>
-    </div>
-
-    <!-- MENÚ FLOTANTE FAB -->
-    <div id="fab-container">
-        <div id="fab-menu">
-            <div class="fab-option">
-                <span class="fab-label">🎨 Color</span>
-                <input type="color" id="color-trazo" value="#3388ff" class="fab-input">
-            </div>
-            <div class="fab-option">
-                <span class="fab-label">📏 Grosor</span>
-                <input type="range" id="grosor-trazo" min="1" max="10" value="4" style="width: 70px;">
-            </div>
-            <div class="fab-option">
-                <span class="fab-label">🌀 Opacidad</span>
-                <input type="range" id="opacidad-trazo" min="0.1" max="1" step="0.1" value="1" style="width: 70px;">
-            </div>
-            <div class="fab-option">
-                <span class="fab-label">🎯 Aplicar a</span>
-                <select id="ambito-estilo" class="fab-select">
-                    <option value="todos">Todos</option>
-                    <option value="ultimo">Último</option>
-                </select>
-            </div>
-            <div style="border-top: 1px solid #eee; margin: 6px 0;"></div>
-            <button class="fab-option" onclick="abrirModalGithub('guardar')">💾 Guardar en GitHub</button>
-            <button class="fab-option" style="color:#dc3545; font-weight:bold; border-top:1px solid #eee; margin-top:4px;" onclick="confirmarBorrarTodo()">🗑️ Borrar Todo</button>
-            <button id="btn-save" style="display: none;"></button>
-        </div>
-        <button id="fab-main-btn">+</button>
     </div>
 
     <!-- INPUTS OCULTOS -->
@@ -288,6 +290,7 @@
     <script src="app.js"></script>
 
     <script>
+        // Control de apertura/cierre del menú desplegable (Misma lógica que antes)
         document.getElementById('fab-main-btn').addEventListener('click', function(e) {
             e.stopPropagation();
             document.getElementById('fab-menu').classList.toggle('active');
