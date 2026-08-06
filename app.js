@@ -699,9 +699,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         drawnItems = L.featureGroup().addTo(map);
 
-        const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' });
-        const cartoClaro = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 20, attribution: '&copy; CARTO' });
-        const googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', { maxZoom: 20, subdomains: ['mt0', 'mt1', 'mt2', 'mt3'], attribution: '&copy; Google Maps' });
+        const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap', crossOrigin: true });
+        const cartoClaro = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 20, attribution: '&copy; CARTO', crossOrigin: true });
+        const googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', { maxZoom: 20, subdomains: ['mt0', 'mt1', 'mt2', 'mt3'], attribution: '&copy; Google Maps', crossOrigin: true });
 
         osm.addTo(map);
         L.control.layers({ "Callejero": osm, "Claro": cartoClaro, "Google": googleHybrid }, null, { position: 'topright' }).addTo(map);
@@ -1175,38 +1175,104 @@ function cargarScriptExterno(src) {
     });
 }
 
-async function capturarPNG() {
-    mostrarToast("Capturando pantalla...");
-    try {
-        if (typeof html2canvas === 'undefined') {
-            await cargarScriptExterno('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js');
+// --- Generación de la imagen del mapa SIN html2canvas ---
+// html2canvas tiene un problema conocido y sin solución fiable: no interpreta bien cómo Leaflet
+// posiciona internamente el SVG de las líneas (usa un viewBox + transformaciones que la librería
+// no reproduce igual), así que el trazado aparecía desplazado respecto al mapa base. En vez de
+// "capturar" la pantalla, aquí se DIBUJA la imagen: las teselas del mapa tal cual están en
+// pantalla, y encima las líneas/marcadores/comentarios calculando su posición con la MISMA
+// función de proyección que usa el propio mapa (map.latLngToContainerPoint) — así encaja siempre
+// con precisión exacta, venga el trazo de donde venga (ruta OSRM, mano alzada, GPX, etc.).
+async function generarCanvasDelMapa() {
+    map.invalidateSize();
+    await new Promise(r => setTimeout(r, 300)); // da tiempo a que las teselas terminen de cargar
+
+    const contenedorMapa = document.getElementById('map');
+    const rectMapa = contenedorMapa.getBoundingClientRect();
+    const escala = 2; // más resolución que la pantalla, para que no se vea pixelado
+
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(rectMapa.width * escala);
+    canvas.height = Math.round(rectMapa.height * escala);
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.scale(escala, escala);
+
+    // 1. Teselas del mapa base, en su posición real actual en pantalla
+    const imagenesTiles = contenedorMapa.querySelectorAll('.leaflet-tile-pane img.leaflet-tile-loaded');
+    let algunaTeselaFallo = false;
+    for (const img of imagenesTiles) {
+        const rectImg = img.getBoundingClientRect();
+        try {
+            ctx.drawImage(img, rectImg.left - rectMapa.left, rectImg.top - rectMapa.top, rectImg.width, rectImg.height);
+        } catch (e) {
+            algunaTeselaFallo = true;
         }
+    }
 
-        // 1. Asegurar que el mapa está al 100% y dar tiempo a los tiles a cargar (2 segundos)
-        map.invalidateSize();
-        await new Promise(r => setTimeout(r, 2000)); 
+    // 2. Líneas: se recalcula su posición en pantalla con la misma proyección del mapa
+    historialAcciones.forEach(item => {
+        if (item.tipo === 'linea' && item.elemento && typeof item.elemento.getLatLngs === 'function') {
+            const puntos = item.elemento.getLatLngs().map(ll => map.latLngToContainerPoint(ll));
+            if (puntos.length < 2) return;
+            ctx.beginPath();
+            ctx.moveTo(puntos[0].x, puntos[0].y);
+            for (let i = 1; i < puntos.length; i++) ctx.lineTo(puntos[i].x, puntos[i].y);
+            ctx.strokeStyle = item.elemento.options.color || '#3388ff';
+            ctx.lineWidth = item.elemento.options.weight || 4;
+            ctx.globalAlpha = item.elemento.options.opacity !== undefined ? item.elemento.options.opacity : 1;
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+        }
+    });
 
-        const mapElement = document.getElementById('map');
-        
-        // 2. Capturar usando el elemento del mapa completo
-        const canvas = await html2canvas(mapElement, {
-            useCORS: true,
-            allowTaint: false,
-            scale: 2,
-            backgroundColor: '#ffffff',
-            logging: false,
-            width: mapElement.clientWidth,
-            height: mapElement.clientHeight
-        });
+    // 3. Marcadores numerados
+    historialAcciones.forEach(item => {
+        if (item.tipo === 'marcador' && item.elemento && typeof item.elemento.getLatLng === 'function') {
+            const p = map.latLngToContainerPoint(item.elemento.getLatLng());
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 13, 0, Math.PI * 2);
+            ctx.fillStyle = '#007bff';
+            ctx.fill();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#ffffff';
+            ctx.stroke();
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(item.numero != null ? String(item.numero) : '', p.x, p.y + 1);
+        }
+    });
 
-        // 3. Descargar el PNG
+    // 4. Comentarios
+    historialAcciones.forEach(item => {
+        if (item.tipo === 'comentario' && item.elemento && typeof item.elemento.getLatLng === 'function') {
+            const p = map.latLngToContainerPoint(item.elemento.getLatLng());
+            ctx.font = '26px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText('💬', p.x, p.y);
+        }
+    });
+
+    return { canvas, algunaTeselaFallo };
+}
+
+async function capturarPNG() {
+    mostrarToast("Generando PNG...");
+    try {
+        const { canvas, algunaTeselaFallo } = await generarCanvasDelMapa();
         const link = document.createElement('a');
         link.download = 'mapa_captura.png';
         link.href = canvas.toDataURL('image/png');
         link.click();
-        mostrarToast("✅ PNG descargado!");
+        mostrarToast(algunaTeselaFallo ? "✅ PNG descargado (alguna tesela no se pudo incluir)" : "✅ PNG descargado!");
     } catch (error) {
-        mostrarToast("❌ Error al capturar PNG");
+        mostrarToast("❌ Error al generar PNG");
         console.error(error);
     }
 }
@@ -1214,41 +1280,21 @@ async function capturarPNG() {
 async function exportarPDF() {
     mostrarToast("Generando PDF...");
     try {
-        if (typeof html2canvas === 'undefined') {
-            await cargarScriptExterno('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js');
-        }
         if (typeof window.jspdf === 'undefined') {
             await cargarScriptExterno('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
         }
 
-        // 1. Asegurar que el mapa está al 100% y dar tiempo a los tiles a cargar (2 segundos)
-        map.invalidateSize();
-        await new Promise(r => setTimeout(r, 2000)); 
-
-        const mapElement = document.getElementById('map');
-
-        // 2. Capturar usando el elemento del mapa completo
-        const canvas = await html2canvas(mapElement, {
-            useCORS: true,
-            allowTaint: false,
-            scale: 2,
-            backgroundColor: '#ffffff',
-            logging: false,
-            width: mapElement.clientWidth,
-            height: mapElement.clientHeight
-        });
-
+        const { canvas, algunaTeselaFallo } = await generarCanvasDelMapa();
         const imgData = canvas.toDataURL('image/png');
         const { jsPDF } = window.jspdf;
-        
-        // 3. Crear PDF en formato apaisado
+
         const doc = new jsPDF('landscape', 'mm', 'a4');
         const pdfWidth = doc.internal.pageSize.getWidth();
         const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-        
+
         doc.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
         doc.save('mapa_exportado.pdf');
-        mostrarToast("✅ PDF descargado!");
+        mostrarToast(algunaTeselaFallo ? "✅ PDF descargado (alguna tesela no se pudo incluir)" : "✅ PDF descargado!");
     } catch (error) {
         mostrarToast("❌ Error al generar PDF");
         console.error(error);
