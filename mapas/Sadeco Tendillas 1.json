@@ -1,0 +1,2544 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.781897888030394,
+          37.88470192980447
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 1,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.781899,
+            37.884697
+          ],
+          [
+            -4.781421,
+            37.884642
+          ],
+          [
+            -4.781481,
+            37.884372
+          ],
+          [
+            -4.781481,
+            37.884372
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          1,
+          2
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.781458143210975,
+          37.88436750949952
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 2,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.781481,
+            37.884372
+          ],
+          [
+            -4.781421,
+            37.884642
+          ],
+          [
+            -4.781208,
+            37.884618
+          ],
+          [
+            -4.781197,
+            37.884617
+          ],
+          [
+            -4.780536,
+            37.884544
+          ],
+          [
+            -4.780317,
+            37.884523
+          ],
+          [
+            -4.780074,
+            37.884497
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          2,
+          3
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.780075127058255,
+          37.884492703577536
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 3,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.780074,
+            37.884497
+          ],
+          [
+            -4.78005,
+            37.884494
+          ],
+          [
+            -4.780054,
+            37.884424
+          ],
+          [
+            -4.780054,
+            37.884402
+          ],
+          [
+            -4.780055,
+            37.884316
+          ],
+          [
+            -4.780056,
+            37.884283
+          ],
+          [
+            -4.779961,
+            37.884242
+          ],
+          [
+            -4.779931,
+            37.8842
+          ],
+          [
+            -4.779876,
+            37.883837
+          ],
+          [
+            -4.77987,
+            37.8837
+          ],
+          [
+            -4.779845,
+            37.883083
+          ],
+          [
+            -4.779801,
+            37.882851
+          ],
+          [
+            -4.779793,
+            37.882819
+          ],
+          [
+            -4.779788,
+            37.882792
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          3,
+          4
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.779796951535878,
+          37.882791069308844
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 4,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.779788,
+            37.882792
+          ],
+          [
+            -4.77977,
+            37.882688
+          ],
+          [
+            -4.779755,
+            37.882589
+          ],
+          [
+            -4.779756,
+            37.882558
+          ],
+          [
+            -4.779765,
+            37.882471
+          ],
+          [
+            -4.779816,
+            37.882297
+          ],
+          [
+            -4.779968,
+            37.882112
+          ],
+          [
+            -4.779987,
+            37.882089
+          ],
+          [
+            -4.78006,
+            37.881961
+          ],
+          [
+            -4.780087,
+            37.881816
+          ],
+          [
+            -4.780117,
+            37.881751
+          ],
+          [
+            -4.780127,
+            37.881713
+          ],
+          [
+            -4.780264,
+            37.881449
+          ],
+          [
+            -4.780269,
+            37.881433
+          ],
+          [
+            -4.780301,
+            37.881349
+          ],
+          [
+            -4.780333,
+            37.881207
+          ],
+          [
+            -4.780335,
+            37.881199
+          ],
+          [
+            -4.780347,
+            37.881176
+          ],
+          [
+            -4.780379,
+            37.881112
+          ],
+          [
+            -4.780362,
+            37.880947
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          4,
+          5
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.780385294078102,
+          37.8809464890764
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 5,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.780362,
+            37.880947
+          ],
+          [
+            -4.780356,
+            37.880887
+          ],
+          [
+            -4.780352,
+            37.880832
+          ],
+          [
+            -4.780351,
+            37.880725
+          ],
+          [
+            -4.780327,
+            37.88068
+          ],
+          [
+            -4.78024,
+            37.880444
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          5,
+          6
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.780237818681348,
+          37.880444832468974
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 6,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.78024,
+            37.880444
+          ],
+          [
+            -4.780327,
+            37.88068
+          ],
+          [
+            -4.780351,
+            37.880725
+          ],
+          [
+            -4.780391,
+            37.880715
+          ],
+          [
+            -4.780396,
+            37.88072
+          ],
+          [
+            -4.780435,
+            37.880764
+          ],
+          [
+            -4.780461,
+            37.880781
+          ],
+          [
+            -4.780535,
+            37.880696
+          ],
+          [
+            -4.780732,
+            37.880776
+          ],
+          [
+            -4.780867,
+            37.880877
+          ],
+          [
+            -4.781023,
+            37.880961
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          6,
+          7
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.781018097598746,
+          37.880965539259975
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 7,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.781023,
+            37.880961
+          ],
+          [
+            -4.780867,
+            37.880877
+          ],
+          [
+            -4.780732,
+            37.880776
+          ],
+          [
+            -4.780535,
+            37.880696
+          ],
+          [
+            -4.780841,
+            37.880391
+          ],
+          [
+            -4.780865,
+            37.880372
+          ],
+          [
+            -4.780889,
+            37.88036
+          ],
+          [
+            -4.780928,
+            37.880348
+          ],
+          [
+            -4.780981,
+            37.880346
+          ],
+          [
+            -4.781014,
+            37.880352
+          ],
+          [
+            -4.781017,
+            37.880353
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          7,
+          8
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.781018097598746,
+          37.880351697532866
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 8,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.780696333096724,
+          37.88008922571568
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 9,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.780695,
+            37.88008
+          ],
+          [
+            -4.780707,
+            37.880079
+          ],
+          [
+            -4.780711,
+            37.880132
+          ],
+          [
+            -4.780731,
+            37.880182
+          ],
+          [
+            -4.780721,
+            37.880207
+          ],
+          [
+            -4.780656,
+            37.880235
+          ],
+          [
+            -4.780622,
+            37.880265
+          ],
+          [
+            -4.78058,
+            37.880285
+          ],
+          [
+            -4.780512,
+            37.880297
+          ],
+          [
+            -4.780422,
+            37.880335
+          ],
+          [
+            -4.780405,
+            37.880334
+          ],
+          [
+            -4.780226,
+            37.880406
+          ],
+          [
+            -4.780212,
+            37.880381
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          9,
+          10
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.78020832360199,
+          37.880383448092495
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 10,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.780212,
+            37.880381
+          ],
+          [
+            -4.780139,
+            37.880249
+          ],
+          [
+            -4.780045,
+            37.880066
+          ],
+          [
+            -4.779972,
+            37.879941
+          ],
+          [
+            -4.779908,
+            37.87985
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          10,
+          11
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.779916851581449,
+          37.87984588024142
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 11,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7798347493831495,
+          37.88431616762836
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 12,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.779836,
+            37.884265
+          ],
+          [
+            -4.779124,
+            37.884257
+          ],
+          [
+            -4.779124,
+            37.884295
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          12,
+          13
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.779153681187211,
+          37.884295001720425
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 13,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.779124,
+            37.884295
+          ],
+          [
+            -4.779121,
+            37.884519
+          ],
+          [
+            -4.779122,
+            37.884732
+          ],
+          [
+            -4.779122,
+            37.884768
+          ],
+          [
+            -4.779122,
+            37.884825
+          ],
+          [
+            -4.779122,
+            37.884852
+          ],
+          [
+            -4.779114,
+            37.885168
+          ],
+          [
+            -4.779112,
+            37.885307
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          13,
+          14
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7791107792536245,
+          37.88530672531557
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 14,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.779112,
+            37.885307
+          ],
+          [
+            -4.779112,
+            37.88531
+          ],
+          [
+            -4.779099,
+            37.885334
+          ],
+          [
+            -4.779017,
+            37.885355
+          ],
+          [
+            -4.778634,
+            37.88544
+          ],
+          [
+            -4.778652,
+            37.885481
+          ],
+          [
+            -4.778542,
+            37.8855
+          ],
+          [
+            -4.778537,
+            37.885674
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          14,
+          15
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.778596278658936,
+          37.885675415517696
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 15,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.778537,
+            37.885674
+          ],
+          [
+            -4.778542,
+            37.8855
+          ],
+          [
+            -4.778518,
+            37.88546
+          ],
+          [
+            -4.778466,
+            37.885469
+          ],
+          [
+            -4.778415,
+            37.885471
+          ],
+          [
+            -4.777811,
+            37.885421
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          15,
+          16
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.77781146083093,
+          37.885421939070646
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 16,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.777811,
+            37.885421
+          ],
+          [
+            -4.777777,
+            37.885418
+          ],
+          [
+            -4.77773,
+            37.885414
+          ],
+          [
+            -4.777695,
+            37.885166
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          16,
+          17
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.777645215838219,
+          37.885170068153684
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 17,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.777695,
+            37.885166
+          ],
+          [
+            -4.77773,
+            37.885414
+          ],
+          [
+            -4.77705,
+            37.885374
+          ],
+          [
+            -4.776963,
+            37.88537
+          ],
+          [
+            -4.776963,
+            37.885363
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          17,
+          18
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.776966757819073,
+          37.8853626501074
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 18,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.779067445276438,
+          37.884533034880704
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 19,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.779056,
+            37.884533
+          ],
+          [
+            -4.779056,
+            37.884519
+          ],
+          [
+            -4.7786,
+            37.884527
+          ],
+          [
+            -4.777967,
+            37.884573
+          ],
+          [
+            -4.777967,
+            37.884563
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          19,
+          20
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.77796947480034,
+          37.88456256412105
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 20,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.777967,
+            37.884563
+          ],
+          [
+            -4.777967,
+            37.884573
+          ],
+          [
+            -4.777948,
+            37.88476
+          ],
+          [
+            -4.777741,
+            37.884762
+          ],
+          [
+            -4.777712,
+            37.884762
+          ],
+          [
+            -4.77764,
+            37.884764
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          20,
+          21
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.777639707255847,
+          37.884750883980914
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 21,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.77764,
+            37.884764
+          ],
+          [
+            -4.777712,
+            37.884762
+          ],
+          [
+            -4.777741,
+            37.884762
+          ],
+          [
+            -4.777948,
+            37.88476
+          ],
+          [
+            -4.778149,
+            37.884758
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          21,
+          22
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.778149167717365,
+          37.88477416633518
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 22,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.778149,
+            37.884758
+          ],
+          [
+            -4.777948,
+            37.88476
+          ],
+          [
+            -4.777967,
+            37.884573
+          ],
+          [
+            -4.777894,
+            37.884577
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          22,
+          23
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.777894437486617,
+          37.88458155754661
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 23,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.777894,
+            37.884577
+          ],
+          [
+            -4.777601,
+            37.884595
+          ],
+          [
+            -4.7776,
+            37.884582
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          23,
+          24
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.777584777040212,
+          37.884583251174604
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 24,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.7776,
+            37.884582
+          ],
+          [
+            -4.777601,
+            37.884595
+          ],
+          [
+            -4.777608,
+            37.884642
+          ],
+          [
+            -4.777626,
+            37.884764
+          ],
+          [
+            -4.777685,
+            37.885102
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          24,
+          25
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.777665218165733,
+          37.885103928705995
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 25,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.777685,
+            37.885102
+          ],
+          [
+            -4.777688,
+            37.885119
+          ],
+          [
+            -4.778011,
+            37.885117
+          ],
+          [
+            -4.778082,
+            37.88498
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          25,
+          26
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.778078149276637,
+          37.88497905109706
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 26,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.778082,
+            37.88498
+          ],
+          [
+            -4.778011,
+            37.885117
+          ],
+          [
+            -4.777688,
+            37.885119
+          ],
+          [
+            -4.777626,
+            37.884764
+          ],
+          [
+            -4.777608,
+            37.884642
+          ],
+          [
+            -4.777601,
+            37.884595
+          ],
+          [
+            -4.777512,
+            37.8846
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          26,
+          27
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.777512380027266,
+          37.88460018383515
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 27,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.777512,
+            37.8846
+          ],
+          [
+            -4.776984,
+            37.884632
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          27,
+          28
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.776984149969792,
+          37.88463193256322
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 28,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.776984,
+            37.884632
+          ],
+          [
+            -4.776972,
+            37.884633
+          ],
+          [
+            -4.77696,
+            37.884687
+          ],
+          [
+            -4.776963,
+            37.885271
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          28,
+          29
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.776941248036187,
+          37.88527113737614
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 29,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.776963,
+            37.885271
+          ],
+          [
+            -4.77696,
+            37.884687
+          ],
+          [
+            -4.776972,
+            37.884633
+          ],
+          [
+            -4.776905,
+            37.884626
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          29,
+          30
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.776907351880705,
+          37.884617480134956
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 30,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.776905,
+            37.884626
+          ],
+          [
+            -4.776729,
+            37.884608
+          ],
+          [
+            -4.776541,
+            37.884589
+          ],
+          [
+            -4.776171,
+            37.88456
+          ],
+          [
+            -4.775958,
+            37.884546
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          30,
+          31
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.775958274252896,
+          37.88454725012325
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 31,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.775958,
+            37.884546
+          ],
+          [
+            -4.775947,
+            37.884545
+          ],
+          [
+            -4.775944,
+            37.884566
+          ],
+          [
+            -4.775938,
+            37.884609
+          ],
+          [
+            -4.775932,
+            37.884702
+          ],
+          [
+            -4.775932,
+            37.884711
+          ],
+          [
+            -4.775933,
+            37.884802
+          ],
+          [
+            -4.775941,
+            37.884887
+          ],
+          [
+            -4.775959,
+            37.884999
+          ],
+          [
+            -4.775982,
+            37.885123
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          31,
+          32
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.775938483268066,
+          37.885128179175055
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 32,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.775982,
+            37.885123
+          ],
+          [
+            -4.776018,
+            37.885312
+          ],
+          [
+            -4.77604,
+            37.8854
+          ],
+          [
+            -4.776072,
+            37.885442
+          ],
+          [
+            -4.776095,
+            37.885455
+          ],
+          [
+            -4.776137,
+            37.885479
+          ],
+          [
+            -4.77625,
+            37.885433
+          ],
+          [
+            -4.776361,
+            37.885418
+          ],
+          [
+            -4.776402,
+            37.885413
+          ],
+          [
+            -4.776723,
+            37.885373
+          ],
+          [
+            -4.776789,
+            37.885366
+          ],
+          [
+            -4.776862,
+            37.885366
+          ],
+          [
+            -4.776861,
+            37.885393
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          32,
+          33
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7768635562113735,
+          37.88539274959367
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 33,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.779200224649954,
+          37.885248729113485
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 34,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.779113,
+            37.885248
+          ],
+          [
+            -4.779114,
+            37.885168
+          ],
+          [
+            -4.779227,
+            37.885127
+          ],
+          [
+            -4.779238,
+            37.885129
+          ],
+          [
+            -4.779285,
+            37.885131
+          ],
+          [
+            -4.779344,
+            37.885134
+          ],
+          [
+            -4.779355,
+            37.885132
+          ],
+          [
+            -4.779365,
+            37.88517
+          ],
+          [
+            -4.779745,
+            37.884794
+          ],
+          [
+            -4.779756,
+            37.884783
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          34,
+          35
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7797579497867675,
+          37.88478520020734
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 35,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.779756,
+            37.884783
+          ],
+          [
+            -4.779745,
+            37.884794
+          ],
+          [
+            -4.779677,
+            37.884783
+          ],
+          [
+            -4.779673,
+            37.884778
+          ],
+          [
+            -4.779667,
+            37.884775
+          ],
+          [
+            -4.77966,
+            37.884773
+          ],
+          [
+            -4.779653,
+            37.884771
+          ],
+          [
+            -4.779646,
+            37.884771
+          ],
+          [
+            -4.779255,
+            37.884769
+          ],
+          [
+            -4.779122,
+            37.884768
+          ],
+          [
+            -4.779122,
+            37.884732
+          ],
+          [
+            -4.779122,
+            37.884652
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          35,
+          36
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.77916804819975,
+          37.88465185573504
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 36,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.779122,
+            37.884652
+          ],
+          [
+            -4.779122,
+            37.884732
+          ],
+          [
+            -4.779798,
+            37.884741
+          ],
+          [
+            -4.779852,
+            37.884742
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          36,
+          37
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.779854479137381,
+          37.884668788379834
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 37,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.779852,
+            37.884742
+          ],
+          [
+            -4.779951,
+            37.884743
+          ],
+          [
+            -4.779956,
+            37.884497
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          37,
+          38
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.77996977808393,
+          37.88449734517151
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 38,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.782451302738054,
+          37.88469378624428
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 39,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.782451,
+            37.884681
+          ],
+          [
+            -4.782477,
+            37.884681
+          ],
+          [
+            -4.783198,
+            37.884739
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          39,
+          40
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.7831986888746725,
+          37.88473375953994
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 40,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.783198,
+            37.884739
+          ],
+          [
+            -4.783207,
+            37.88474
+          ],
+          [
+            -4.78331,
+            37.88475
+          ],
+          [
+            -4.783497,
+            37.884772
+          ],
+          [
+            -4.783681,
+            37.884808
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          40,
+          41
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.783688077023459,
+          37.884793145019025
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 41,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.783681,
+            37.884808
+          ],
+          [
+            -4.783681,
+            37.884808
+          ],
+          [
+            -4.78377,
+            37.884836
+          ],
+          [
+            -4.783993,
+            37.884895
+          ],
+          [
+            -4.784038,
+            37.884908
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          41,
+          42
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.784036655233975,
+          37.88490955664995
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 42,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.784038,
+            37.884908
+          ],
+          [
+            -4.783993,
+            37.884895
+          ],
+          [
+            -4.78377,
+            37.884836
+          ],
+          [
+            -4.783936,
+            37.885154
+          ],
+          [
+            -4.783946,
+            37.885175
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          42,
+          43
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.783937444512517,
+          37.885178360985556
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 43,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.783946,
+            37.885175
+          ],
+          [
+            -4.783936,
+            37.885154
+          ],
+          [
+            -4.783764,
+            37.885209
+          ],
+          [
+            -4.783664,
+            37.885239
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          43,
+          44
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.783666626056656,
+          37.885246091057105
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 44,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.783664,
+            37.885239
+          ],
+          [
+            -4.783764,
+            37.885209
+          ],
+          [
+            -4.783936,
+            37.885154
+          ],
+          [
+            -4.784019,
+            37.885327
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          44,
+          45
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.784020567008862,
+          37.885326520436145
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 45,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.784019,
+            37.885327
+          ],
+          [
+            -4.784022,
+            37.885333
+          ],
+          [
+            -4.784076,
+            37.885309
+          ],
+          [
+            -4.784125,
+            37.885279
+          ],
+          [
+            -4.784211,
+            37.885149
+          ],
+          [
+            -4.784239,
+            37.885055
+          ],
+          [
+            -4.784218,
+            37.885006
+          ],
+          [
+            -4.784211,
+            37.884983
+          ],
+          [
+            -4.784195,
+            37.884951
+          ],
+          [
+            -4.784112,
+            37.884928
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          45,
+          46
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.78411441498863,
+          37.8849243726625
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 46,
+        "submodo": "ruta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.784112,
+            37.884928
+          ],
+          [
+            -4.784195,
+            37.884951
+          ],
+          [
+            -4.784448,
+            37.885018
+          ],
+          [
+            -4.784567,
+            37.885047
+          ],
+          [
+            -4.78462,
+            37.885043
+          ],
+          [
+            -4.784675,
+            37.885027
+          ],
+          [
+            -4.784733,
+            37.884995
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": [
+          46,
+          47
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -4.784729572097402,
+          37.88499127695718
+        ]
+      },
+      "properties": {
+        "tipo": "marcador",
+        "numero": 47,
+        "submodo": "ruta"
+      }
+    }
+  ]
+}
