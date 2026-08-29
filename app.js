@@ -700,7 +700,7 @@ document.addEventListener("DOMContentLoaded", function () {
         drawnItems = L.featureGroup().addTo(map);
 
         const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap', crossOrigin: true });
-        const cartoClaro = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 20, attribution: '&copy; CARTO', crossOrigin: true });
+        const cartoClaro = L.maplibreGL({ style: 'https://tiles.openfreemap.org/styles/positron', attribution: '&copy; OpenFreeMap &copy; OpenMapTiles &copy; OpenStreetMap contributors', preserveDrawingBuffer: true });
         const googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', { maxZoom: 20, subdomains: ['mt0', 'mt1', 'mt2', 'mt3'], attribution: '&copy; Google Maps', crossOrigin: true });
 
         osm.addTo(map);
@@ -1199,9 +1199,21 @@ async function generarCanvasDelMapa() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.scale(escala, escala);
 
-    // 1. Teselas del mapa base, en su posición real actual en pantalla
-    const imagenesTiles = contenedorMapa.querySelectorAll('.leaflet-tile-pane img.leaflet-tile-loaded');
+    // 1. Fondo del mapa base. Puede venir de dos formas distintas según la capa activa:
+    //    - Capas ráster normales (Callejero, Google): imágenes <img> de teselas individuales.
+    //    - Capa "Claro" (OpenFreeMap/MapLibre): un único <canvas> renderizado por WebGL.
     let algunaTeselaFallo = false;
+
+    const canvasMapLibre = contenedorMapa.querySelector('.maplibregl-canvas');
+    if (canvasMapLibre) {
+        try {
+            ctx.drawImage(canvasMapLibre, 0, 0, rectMapa.width, rectMapa.height);
+        } catch (e) {
+            algunaTeselaFallo = true;
+        }
+    }
+
+    const imagenesTiles = contenedorMapa.querySelectorAll('.leaflet-tile-pane img.leaflet-tile-loaded');
     for (const img of imagenesTiles) {
         const rectImg = img.getBoundingClientRect();
         try {
