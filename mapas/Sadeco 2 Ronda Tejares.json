@@ -3192,75 +3192,6 @@
         "type": "LineString",
         "coordinates": [
           [
-            -4.77975,
-            37.885737
-          ],
-          [
-            -4.779937,
-            37.885355
-          ],
-          [
-            -4.780002,
-            37.885227
-          ],
-          [
-            -4.780076,
-            37.885203
-          ],
-          [
-            -4.78,
-            37.884944
-          ],
-          [
-            -4.779983,
-            37.884887
-          ],
-          [
-            -4.780098,
-            37.884902
-          ],
-          [
-            -4.780237,
-            37.884969
-          ],
-          [
-            -4.78031,
-            37.884562
-          ]
-        ]
-      },
-      "properties": {
-        "tipo": "linea",
-        "color": "#3388ff",
-        "weight": 4,
-        "opacity": 1,
-        "conecta": [
-          41,
-          42
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -4.78030464520806,
-          37.88456125681638
-        ]
-      },
-      "properties": {
-        "tipo": "marcador",
-        "numero": 42,
-        "submodo": "ruta"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "LineString",
-        "coordinates": [
-          [
             -4.781003608408699,
             37.88873354921781
           ]
@@ -3996,6 +3927,63 @@
           [
             -4.781833324006766,
             37.88795969014457
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": []
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.781595858632682,
+            37.88846369674708
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": []
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.780410712359642,
+            37.88822893973786
+          ]
+        ]
+      },
+      "properties": {
+        "tipo": "linea",
+        "color": "#3388ff",
+        "weight": 4,
+        "opacity": 1,
+        "conecta": []
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -4.781120603897196,
+            37.886588279836324
           ]
         ]
       },
