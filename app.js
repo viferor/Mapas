@@ -775,6 +775,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const urlParams = new URLSearchParams(window.location.search);
         const mapaCompartido = urlParams.get('mapa');
         if (mapaCompartido) cargarMapaDesdeGithub(mapaCompartido);
+        if (urlParams.get('galeria')) mostrarGaleriaPublica();
     } catch (e) {
         console.error("Error crítico en la carga del mapa:", e);
         mostrarToast("Error al cargar el mapa, revisa la consola.");
@@ -1461,6 +1462,52 @@ async function compartirMapaEspecifico(fileName) {
     if (navigator.share) { try { await navigator.share({ title: 'Ruta', url: link }); cerrarModal(); return; } catch (e) {} }
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(link)}`, '_blank');
     cerrarModal();
+}
+
+// Muestra el listado de mapas guardados SIN necesitar token de GitHub — se usa tanto cuando el
+// propio usuario pulsa "Ver todos los mapas guardados" como cuando alguien abre un enlace de
+// galería compartido (?galeria=1): al ser un repositorio público, la API de GitHub permite listar
+// su contenido sin autenticación (con un límite de peticiones más bajo, pero de sobra para esto).
+async function mostrarGaleriaPublica() {
+    const tituloEl = document.getElementById('modal-titulo');
+    if (tituloEl) tituloEl.innerText = 'Mapas guardados';
+    document.getElementById('modal-load').classList.add('active');
+    const lista = document.getElementById('lista-mapas');
+    lista.innerHTML = 'Cargando...';
+    const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${GITHUB_FOLDER}`;
+    try {
+        const res = await fetch(url);
+        if (!res.ok) { lista.innerHTML = "No se ha podido obtener el listado de mapas."; return; }
+        const archivos = await res.json();
+        const jsonFiles = Array.isArray(archivos) ? archivos.filter(f => f.name.endsWith('.json')) : [];
+        lista.innerHTML = '';
+        if (jsonFiles.length === 0) { lista.innerHTML = 'No hay mapas guardados.'; return; }
+        jsonFiles.forEach(file => {
+            const nombreBase = file.name.replace('.json', '');
+            const item = document.createElement('div');
+            item.style.cssText = 'display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid #ddd; padding-bottom:6px;';
+            const nombreSpan = document.createElement('span');
+            nombreSpan.style.fontWeight = '600';
+            nombreSpan.textContent = nombreBase;
+            const btn = document.createElement('button');
+            btn.style.borderRadius = '6px';
+            btn.className = 'btn';
+            btn.style.background = '#e0e0e0';
+            btn.textContent = 'Ver';
+            btn.addEventListener('click', () => cargarMapaDesdeGithub(file.name));
+            item.appendChild(nombreSpan);
+            item.appendChild(btn);
+            lista.appendChild(item);
+        });
+    } catch (e) { lista.innerHTML = "Error de conexión con GitHub"; }
+}
+
+// Genera y comparte un enlace único que da acceso a TODOS los mapas guardados (una galería,
+// no uno solo), para quien lo reciba, sin que necesite ningún token ni darse de alta en nada.
+async function compartirTodosLosMapas() {
+    const link = `${window.location.href.split('?')[0]}?galeria=1`;
+    if (navigator.share) { try { await navigator.share({ title: 'Mis mapas guardados', url: link }); return; } catch (e) {} }
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(link)}`, '_blank');
 }
 
 function procesarYAnadirGeoJSON(geojson, mapInstance) {
