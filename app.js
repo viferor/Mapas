@@ -312,7 +312,7 @@ window.confirmarBorrarTodo = function() {
     if (confirm("¿Estás seguro de que quieres borrar todo el mapa?")) {
         const capasAQuitar = [];
         map.eachLayer(function(capa) {
-            if (!(capa instanceof L.TileLayer)) capasAQuitar.push(capa);
+            if (!(capa instanceof L.TileLayer || typeof capa.getMaplibreMap === 'function')) capasAQuitar.push(capa);
         });
         capasAQuitar.forEach(capa => map.removeLayer(capa));
         historialAcciones = [];
@@ -1442,7 +1442,7 @@ async function cargarMapaDesdeGithub(fileName) {
         try { geojson = await res.json(); } catch (errorParseo) { alert("El archivo del mapa no tiene un formato válido."); return; }
         if (!geojson || !Array.isArray(geojson.features)) { alert("El archivo del mapa no contiene datos."); return; }
         const capasAQuitar = [];
-        map.eachLayer(function(capa) { if (!(capa instanceof L.TileLayer)) capasAQuitar.push(capa); });
+        map.eachLayer(function(capa) { if (!(capa instanceof L.TileLayer || typeof capa.getMaplibreMap === 'function')) capasAQuitar.push(capa); });
         capasAQuitar.forEach(capa => map.removeLayer(capa));
         historialAcciones = [];
         historialRehacer = [];
@@ -1457,7 +1457,7 @@ async function cargarMapaDesdeGithub(fileName) {
 async function compartirMapaEspecifico(fileName) {
     const nombreSeguro = sanitizarNombreArchivo(fileName);
     if (!nombreSeguro) { alert("Nombre de archivo no válido."); return; }
-    const link = `${window.location.href.split('?')[0]}?mapa=${nombreSeguro}`;
+    const link = `${window.location.href.split('?')[0]}?mapa=${encodeURIComponent(nombreSeguro)}`;
     if (navigator.share) { try { await navigator.share({ title: 'Ruta', url: link }); cerrarModal(); return; } catch (e) {} }
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(link)}`, '_blank');
     cerrarModal();
